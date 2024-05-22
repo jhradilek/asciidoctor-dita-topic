@@ -42,7 +42,7 @@ class DitaConverter < Asciidoctor::Converter::Base
     <<~EOF.chomp
     <?xml version='1.0' encoding='utf-8' ?>
     <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
-    <topic#{compose_id node.id}#{content_type}>
+    <topic#{compose_id (node.id or node.attributes['docname'])}#{content_type}>
     <title>#{node.doctitle}</title>
     <body>
     #{node.content}
