@@ -83,7 +83,6 @@ class DitaConverter < Asciidoctor::Converter::Base
     return ''
   end
 
-  # FIXME: Handle special cases: horizontal - table.
   # FIXME: Add support for a title.
   def convert_dlist node
     # Check if a different list style is set:
@@ -371,6 +370,10 @@ class DitaConverter < Asciidoctor::Converter::Base
     # AsciiDoc modules contain nested subsections, I chose the simple
     # markup.
 
+    # Issue a warning if there are nested sections:
+    logger.warn "#{NAME}: Nesting of sections not supported in DITA" if node.level > 1
+
+    # Return the XML output:
     <<~EOF.chomp
     <section#{compose_id node.id}>
     <title>#{node.title}</title>
