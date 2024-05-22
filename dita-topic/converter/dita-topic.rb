@@ -35,11 +35,14 @@ class DitaConverter < Asciidoctor::Converter::Base
   end
 
   def convert_document node
+    # Check if the modular documentation content type is specified:
+    content_type = (node.attr? '_mod-docs-content-type') ? %( outputclass="#{(node.attr '_mod-docs-content-type').downcase}") : ''
+
     # Return the XML output:
     <<~EOF.chomp
     <?xml version='1.0' encoding='utf-8' ?>
     <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
-    <topic#{compose_id node.id}>
+    <topic#{compose_id node.id}#{content_type}>
     <title>#{node.doctitle}</title>
     <body>
     #{node.content}
