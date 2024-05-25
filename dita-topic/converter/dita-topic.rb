@@ -259,7 +259,7 @@ class DitaConverter < Asciidoctor::Converter::Base
 
       # Return the XML output:
       <<~EOF.chomp
-      #{check_include_title node}
+      #{compose_floating_title node}
       <codeblock#{language}>
       #{node.content}
       </codeblock>
@@ -267,7 +267,7 @@ class DitaConverter < Asciidoctor::Converter::Base
     else
       # Return the XML output:
       <<~EOF.chomp
-      #{check_include_title node}
+      #{compose_floating_title node}
       <screen>
       #{node.content}
       </screen>
@@ -585,6 +585,10 @@ class DitaConverter < Asciidoctor::Converter::Base
     # titles assigned to certain block elements. As a workaround, I decided
     # to use a paragraph with the outputclass attribute.
 
+    if not node.title?
+      return ''
+    end
+
     # Check whether the section level is defined:
     level = section_level ? %( sect#{section_level}) : ''
 
@@ -593,10 +597,6 @@ class DitaConverter < Asciidoctor::Converter::Base
 
     # Return the XML output:
     node.title ? %(<p outputclass="title#{level}"#{otherprops}><b>#{node.title}</b></p>\n) : ''
-  end
-
-  def check_include_title node
-    node.title? ? compose_floating_title(node) : ''
   end
 
   def compose_id id
