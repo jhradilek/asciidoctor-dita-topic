@@ -89,7 +89,7 @@ class DitaConverter < Asciidoctor::Converter::Base
     return compose_qanda_dlist node if node.style == 'qanda'
     result = ['']
 
-    result << (node.title? ? compose_floating_title(node.title) : '')
+    result << (node.title? ? compose_floating_title(node) : '')
 
     # Open the definition list:
     result << ['<dl>']
@@ -137,7 +137,7 @@ class DitaConverter < Asciidoctor::Converter::Base
   end
 
   def convert_floating_title node
-    compose_floating_title node.title, node.level
+    compose_floating_title node, node.level
   end
 
   # FIXME: Add support for additional attributes.
@@ -286,7 +286,7 @@ class DitaConverter < Asciidoctor::Converter::Base
   def convert_olist node
 
     result = ['']
-    result << (node.title? ? compose_floating_title(node.title) : '')
+    result << (node.title? ? compose_floating_title(node) : '')
 
     # Open the ordered list:
     result << '<ol>'
@@ -331,11 +331,14 @@ class DitaConverter < Asciidoctor::Converter::Base
     if node.title?
       <<~EOF.chomp
       <div outputclass="paragraph">
-      #{compose_floating_title node.title}<p>#{node.content}</p>
+      #{compose_floating_title node}<p>#{node.content}</p>
       </div>
       EOF
     else
-      %(<p>#{node.content}</p>)
+      # Incorporate the role attribute
+      otherprops = (node.attr? 'role') ? %( otherprops="role:#{(node.attr 'role')}") : ''
+
+      %(<p#{otherprops}>#{node.content}</p>)
     end
   end
 
@@ -354,13 +357,13 @@ class DitaConverter < Asciidoctor::Converter::Base
     if node.content_model == :compound
       <<~EOF.chomp
       <lq>
-      #{compose_floating_title node.title}#{node.content}#{author}#{source}
+      #{compose_floating_title node}#{node.content}#{author}#{source}
       </lq>
       EOF
     else
       <<~EOF.chomp
       <lq>
-      #{compose_floating_title node.title}<p>#{node.content}</p>#{author}#{source}
+      #{compose_floating_title node}<p>#{node.content}</p>#{author}#{source}
       </lq>
       EOF
     end
@@ -397,13 +400,13 @@ class DitaConverter < Asciidoctor::Converter::Base
     if node.content_model == :compound
       <<~EOF.chomp
       <div outputclass="sidebar">
-      #{compose_floating_title node.title}#{node.content}
+      #{compose_floating_title node}#{node.content}
       </div>
       EOF
     else
       <<~EOF.chomp
       <div outputclass="sidebar">
-      #{compose_floating_title node.title}<p>#{node.content}</p>
+      #{compose_floating_title node}<p>#{node.content}</p>
       </div>
       EOF
     end
@@ -433,7 +436,7 @@ class DitaConverter < Asciidoctor::Converter::Base
   def convert_ulist node
 
     result = ['']
-    result << ( node.title? ? compose_floating_title(node.title) : '' )
+    result << ( node.title? ? compose_floating_title(node) : '' )
 
     # Open the unordered list:
     result << '<ul>'
@@ -489,7 +492,7 @@ class DitaConverter < Asciidoctor::Converter::Base
   def compose_qanda_dlist node
 
     result << ['']
-    result << (node.title? ? compose_floating_title(node.title) : '')
+    result << (node.title? ? compose_floating_title(node) : '')
 
     # Open the ordered list:
     result << '<ol>'
@@ -524,7 +527,7 @@ class DitaConverter < Asciidoctor::Converter::Base
   def compose_horizontal_dlist node
 
     result = ['']
-    result << (node.title? ? compose_floating_title(node.title) : '')
+    result << (node.title? ? compose_floating_title(node) : '')
 
     # Open the table:
     result << ['<table>']
@@ -577,7 +580,7 @@ class DitaConverter < Asciidoctor::Converter::Base
     result << %(</table>)
   end
 
-  def compose_floating_title title, section_level=false
+  def compose_floating_title node, section_level=false
     # NOTE: Unlike AsciiDoc, DITA does not support floating titles or
     # titles assigned to certain block elements. As a workaround, I decided
     # to use a paragraph with the outputclass attribute.
@@ -585,12 +588,15 @@ class DitaConverter < Asciidoctor::Converter::Base
     # Check whether the section level is defined:
     level = section_level ? %( sect#{section_level}) : ''
 
+    # Incorporate the role attribute
+    otherprops = (node.attr? 'role') ? %( otherprops="role:#{(node.attr 'role')}") : ''
+
     # Return the XML output:
-    title ? %(<p outputclass="title#{level}"><b>#{title}</b></p>\n) : ''
+    node.title ? %(<p outputclass="title#{level}"#{otherprops}><b>#{node.title}</b></p>\n) : ''
   end
 
   def check_include_title node
-    node.title? ? compose_floating_title(node.title) : ''
+    node.title? ? compose_floating_title(node) : ''
   end
 
   def compose_id id
