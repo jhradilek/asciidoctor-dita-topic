@@ -55,7 +55,7 @@ class DitaConverter < Asciidoctor::Converter::Base
     # NOTE: Unlike admonitions in AsciiDoc, the <note> element in DITA
     # cannot have its own <title>. Admonition titles are therefore not
     # preserved.
-    
+
     # Issue a warning if the admonition has a title:
     if node.title?
       logger.warn "#{NAME}: Admonition title not supported - #{node.title}"
@@ -83,14 +83,16 @@ class DitaConverter < Asciidoctor::Converter::Base
     return ''
   end
 
-  # FIXME: Add support for a title.
   def convert_dlist node
     # Check if a different list style is set:
     return compose_horizontal_dlist node if node.style == 'horizontal'
     return compose_qanda_dlist node if node.style == 'qanda'
+    result = ['']
+
+    result << (node.title? ? compose_floating_title(node.title) : '')
 
     # Open the definition list:
-    result = ['<dl>']
+    result << ['<dl>']
 
     # Process individual list items:
     node.items.each do |terms, description|
@@ -168,7 +170,7 @@ class DitaConverter < Asciidoctor::Converter::Base
 
   def convert_inline_break node
     # NOTE: Unlike AsciiDoc, DITA does not support inline line breaks.
-    
+
     # Issue a warning if an inline line break is present:
     logger.warn "#{NAME}: Inline breaks not supported"
 
@@ -257,6 +259,7 @@ class DitaConverter < Asciidoctor::Converter::Base
 
       # Return the XML output:
       <<~EOF.chomp
+      #{check_include_title node}
       <codeblock#{language}>
       #{node.content}
       </codeblock>
@@ -264,6 +267,7 @@ class DitaConverter < Asciidoctor::Converter::Base
     else
       # Return the XML output:
       <<~EOF.chomp
+      #{check_include_title node}
       <screen>
       #{node.content}
       </screen>
@@ -279,10 +283,13 @@ class DitaConverter < Asciidoctor::Converter::Base
     EOF
   end
 
-  # FIXME: Add support for titles.
   def convert_olist node
+
+    result = ['']
+    result << (node.title? ? compose_floating_title(node.title) : '')
+
     # Open the ordered list:
-    result = ['<ol>']
+    result << '<ol>'
 
     # Process individual list items:
     node.items.each do |item|
@@ -423,10 +430,13 @@ class DitaConverter < Asciidoctor::Converter::Base
     %(<p outputclass="thematic-break"></p>)
   end
 
-  # FIXME: Add support for titles.
   def convert_ulist node
+
+    result = ['']
+    result << ( node.title? ? compose_floating_title(node.title) : '' )
+
     # Open the unordered list:
-    result = ['<ul>']
+    result << '<ul>'
 
     # Process individual list items:
     node.items.each do |item|
@@ -477,8 +487,12 @@ class DitaConverter < Asciidoctor::Converter::Base
   end
 
   def compose_qanda_dlist node
+
+    result << ['']
+    result << (node.title? ? compose_floating_title(node.title) : '')
+
     # Open the ordered list:
-    result = ['<ol>']
+    result << '<ol>'
 
     # Process individual list items:
     node.items.each do |terms, description|
@@ -499,7 +513,7 @@ class DitaConverter < Asciidoctor::Converter::Base
       # Close the list item:
       result << %(</li>)
     end
-    
+
     # Close the ordered list:
     result << '</ol>'
 
@@ -508,8 +522,12 @@ class DitaConverter < Asciidoctor::Converter::Base
   end
 
   def compose_horizontal_dlist node
+
+    result = ['']
+    result << (node.title? ? compose_floating_title(node.title) : '')
+
     # Open the table:
-    result = ['<table>']
+    result << ['<table>']
 
     # Define the table properties and open the tgroup:
     result << %(<tgroup cols="2">)
@@ -569,6 +587,10 @@ class DitaConverter < Asciidoctor::Converter::Base
 
     # Return the XML output:
     title ? %(<p outputclass="title#{level}"><b>#{title}</b></p>\n) : ''
+  end
+
+  def check_include_title node
+    node.title? ? compose_floating_title(node.title) : ''
   end
 
   def compose_id id
