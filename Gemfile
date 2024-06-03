@@ -1,5 +1,5 @@
 # Gem source:
 source "https://rubygems.org"
 
-# Dependencies:
-gem "asciidoctor"
+# Source dependencies from the .gemspec file:
+gemspec
