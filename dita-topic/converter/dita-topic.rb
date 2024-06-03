@@ -408,7 +408,6 @@ class DitaConverter < Asciidoctor::Converter::Base
     return ''
   end
 
-  # FIXME: Add support for additional attributes.
   def convert_table node
     # Open the table:
     result = ['<table>']
@@ -482,7 +481,6 @@ class DitaConverter < Asciidoctor::Converter::Base
     end
 
     # Close the table:
-    #result << %(</tbody>)
     result << %(</tgroup>)
     result << %(</table>)
 
