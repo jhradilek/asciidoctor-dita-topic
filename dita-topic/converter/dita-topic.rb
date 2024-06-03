@@ -55,7 +55,7 @@ class DitaConverter < Asciidoctor::Converter::Base
     # NOTE: Unlike admonitions in AsciiDoc, the <note> element in DITA
     # cannot have its own <title>. Admonition titles are therefore not
     # preserved.
-    
+
     # Issue a warning if the admonition has a title:
     if node.title?
       logger.warn "#{NAME}: Admonition title not supported - #{node.title}"
@@ -168,7 +168,7 @@ class DitaConverter < Asciidoctor::Converter::Base
 
   def convert_inline_break node
     # NOTE: Unlike AsciiDoc, DITA does not support inline line breaks.
-    
+
     # Issue a warning if an inline line break is present:
     logger.warn "#{NAME}: Inline breaks not supported"
 
@@ -410,7 +410,84 @@ class DitaConverter < Asciidoctor::Converter::Base
 
   # FIXME: Add support for additional attributes.
   def convert_table node
-    ''
+    # Open the table:
+    result = ['<table>']
+
+    # Check if the title is specified:
+    result << %(<title>#{node.title}</title>) if node.title?
+
+    # Define the table properties and open the tgroup:
+    result << %(<tgroup cols="#{node.attr 'colcount'}">)
+
+    # Define column properties:
+    node.columns.each do |column|
+      result << %(<colspec colname="col_#{column.attr 'colnumber'}" colwidth="#{column.attr ((node.attr? 'width') ? 'colabswidth' : 'colpcwidth')}*"/>)
+    end
+
+    # Process each table section (header, body, and footer):
+    node.rows.to_h.each do |type, rows|
+      # Skip empty sections:
+      next if rows.empty?
+
+      # Issue a warning if a table footer is present:
+      if type == :foot
+        logger.warn "#{NAME}: Table footers not supported"
+        next
+      end
+
+      # Open the section:
+      result << %(<t#{type}>)
+
+      # Process each row:
+      rows.each do |row|
+        # Open the row:
+        result <<%(<row>)
+
+        # Process each cell:
+        row.each do |cell|
+          # Check if the cell spans multiple columns:
+          colspan = cell.colspan ? %( namest="col_#{colnum = cell.column.attr 'colnumber'}" nameend="col_#{column + cell.colspan - 1}") : ''
+
+          # Check if the cell spans multiple rows:
+          rowspan = cell.rowspan ? %( morerows="#{cell.rowspan - 1}") : ''
+
+          # Compose the entry tag:
+          entry_tag = %(entry#{colspan}#{rowspan})
+
+          # Determine the formatting of the entry:
+          if type == :head
+            result << %(<#{entry_tag}>#{cell.text}</entry>)
+            next
+          end
+          case cell.style
+          when :asciidoc
+            result << %(<#{entry_tag}>#{cell.content}</entry>)
+          when :literal
+            result << %(<#{entry_tag}><pre>#{cell.text}</pre></entry>)
+          else
+            result << %(<#{entry_tag}>)
+            cell.content.each do |line|
+              result << %(<p>#{line}</p>)
+            end
+            result << %(</entry>)
+          end
+        end
+
+        # Close the row:
+        result <<%(</row>)
+      end
+
+      # Close the section:
+      result << %(</t#{type}>)
+    end
+
+    # Close the table:
+    #result << %(</tbody>)
+    result << %(</tgroup>)
+    result << %(</table>)
+
+    # Return the XML output:
+    result.join LF
   end
 
   def convert_thematic_break node
@@ -499,7 +576,7 @@ class DitaConverter < Asciidoctor::Converter::Base
       # Close the list item:
       result << %(</li>)
     end
-    
+
     # Close the ordered list:
     result << '</ol>'
 
@@ -557,6 +634,9 @@ class DitaConverter < Asciidoctor::Converter::Base
     result << %(</tbody>)
     result << %(</tgroup>)
     result << %(</table>)
+
+    # Return the XML output:
+    result.join LF
   end
 
   def compose_floating_title title, section_level=false
