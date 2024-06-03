@@ -58,7 +58,7 @@ class DitaConverter < Asciidoctor::Converter::Base
 
     # Issue a warning if the admonition has a title:
     if node.title?
-      logger.warn "#{NAME}: Admonition title not supported - #{node.title}"
+      logger.warn "#{NAME}: Admonition title not supported in DITA - #{node.title}"
     end
 
     # Return the XML output:
@@ -170,7 +170,7 @@ class DitaConverter < Asciidoctor::Converter::Base
     # NOTE: Unlike AsciiDoc, DITA does not support inline line breaks.
 
     # Issue a warning if an inline line break is present:
-    logger.warn "#{NAME}: Inline breaks not supported"
+    logger.warn "#{NAME}: Inline breaks not supported in DITA"
 
     # Return the XML output:
     %(#{node.text}<!-- break -->)
@@ -313,7 +313,7 @@ class DitaConverter < Asciidoctor::Converter::Base
     # NOTE: Unlike AsciiDoc, DITA does not support page breaks.
 
     # Issue a warning if a page break is present:
-    logger.warn "#{NAME}: Page breaks not supported"
+    logger.warn "#{NAME}: Page breaks not supported in DITA"
 
     # Return the XML output:
     %(<p outputclass="page-break"></p>)
@@ -431,7 +431,7 @@ class DitaConverter < Asciidoctor::Converter::Base
 
       # Issue a warning if a table footer is present:
       if type == :foot
-        logger.warn "#{NAME}: Table footers not supported"
+        logger.warn "#{NAME}: Table footers not supported in DITA"
         next
       end
 
@@ -494,7 +494,7 @@ class DitaConverter < Asciidoctor::Converter::Base
     # NOTE: Unlike AsciiDoc, DITA does not support thematic breaks.
 
     # Issue a warning if a thematic break is present:
-    logger.warn "#{NAME}: Thematic breaks not supported"
+    logger.warn "#{NAME}: Thematic breaks not supported in DITA"
 
     # Return the XML output:
     %(<p outputclass="thematic-break"></p>)
