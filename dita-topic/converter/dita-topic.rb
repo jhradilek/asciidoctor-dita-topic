@@ -58,7 +58,7 @@ class DitaConverter < Asciidoctor::Converter::Base
 
     # Issue a warning if the admonition has a title:
     if node.title?
-      logger.warn "#{NAME}: Admonition title not supported in DITA - #{node.title}"
+      logger.warn "#{NAME}: Admonition title not supported in DITA: #{node.title}"
     end
 
     # Return the XML output:
@@ -159,11 +159,55 @@ class DitaConverter < Asciidoctor::Converter::Base
     end
   end
 
-  # FIXME: Implement this with the topmost urgency.
   def convert_inline_anchor node
-    # Issue a warning if an inline anchor is present:
-    logger.warn "#{NAME}: Inline anchor support not implemented"
-    return ''
+    # Determine the type of the anchor:
+    case node.type
+    when :link
+      # Compose an external link:
+      %(<xref href="#{node.target}" scope="external">#{node.text}</xref>)
+    when :xref
+      # NOTE: While AsciiDoc is happy to reference an ID that is not
+      # defined in the same AsciiDoc file, DITA requires the topic ID as
+      # part of the reference. As this script does not have direct access
+      # to the topic IDs of external files and to avoid performance issues
+      # I do not want to process them from this script, I choose to issue a
+      # warning so that the user can resolve the problem.
+
+      # Determine whether the cross reference links to a file path or an ID:
+      if (path = node.attributes['path'])
+        # Issue a warning if the cross reference includes an ID:
+        logger.warn "#{NAME}: Possible invalid reference: #{node.target}" if node.target.include? '#'
+
+        # Compose a cross reference:
+        %(<xref href="#{node.target}">#{node.text || path}</xref>)
+      else
+        # Issue a warning as the cross reference is unlikely to work:
+        logger.warn "#{NAME}: Possible invalid reference: #{node.target}"
+
+        # Compose the cross reference:
+        node.text ? %(<xref href="#{node.target}">#{node.text}</xref>) : %(<xref href="#{node.target}" />)
+      end
+    when :ref
+      # NOTE: DITA does not have a dedicated element for inline anchors or
+      # a direct equivalent of the <span> element from HTML. The solution
+      # below is the least invasive way I could find to achieve the
+      # equivalent behavior.
+
+      # Compose an inline anchor:
+      %(<i id="#{node.id}" />)
+    when :bibref
+      # NOTE: DITA does not have a dedicated element for inline anchors or
+      # a direct equivalent of the <span> element from HTML. The solution
+      # below is the least invasive way I could find to achieve the
+      # equivalent behavior.
+
+      # Compose a bibliographic reference:
+      %(<i id="#{node.id}" />[#{node.reftext || node.id}])
+    else
+      # Issue a warning if an unknown anchor type is present:
+      logger.warn "#{NAME}: Unknown anchor type: #{node.type}"
+      ''
+    end
   end
 
   def convert_inline_break node
