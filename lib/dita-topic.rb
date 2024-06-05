@@ -25,7 +25,7 @@
 # frozen_string_literal: true
 
 module Asciidoctor
-class DitaConverter < Asciidoctor::Converter::Base
+class DitaTopic < Asciidoctor::Converter::Base
   NAME = 'dita-topic'
   register_for NAME
 
@@ -35,18 +35,27 @@ class DitaConverter < Asciidoctor::Converter::Base
   end
 
   def convert_document node
+    # Check if a specific topic type is provided:
+    if (type = node.attr 'dita-topic-type') =~ /^(concept|reference|task)$/
+      element = type
+      body = (type == 'task') ? 'taskbody' : %(#{type[0,3]}body)
+    else
+      element = 'topic'
+      body = 'body'
+    end
+
     # Check if the modular documentation content type is specified:
-    content_type = (node.attr? '_mod-docs-content-type') ? %( outputclass="#{(node.attr '_mod-docs-content-type').downcase}") : ''
+    outputclass = (node.attr? '_mod-docs-content-type') ? %( outputclass="#{(node.attr '_mod-docs-content-type').downcase}") : ''
 
     # Return the XML output:
     <<~EOF.chomp
     <?xml version='1.0' encoding='utf-8' ?>
     <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
-    <topic#{compose_id (node.id or node.attributes['docname'])}#{content_type}>
+    <#{element}#{compose_id (node.id or node.attributes['docname'])}#{outputclass}>
     <title>#{node.doctitle}</title>
-    <body>
+    <#{body}>
     #{node.content}
-    </body>
+    </#{body}>
     </topic>
     EOF
   end
@@ -246,8 +255,6 @@ class DitaConverter < Asciidoctor::Converter::Base
     return ''
   end
 
-  # FIXME: Investigate if there is an equivalent of <span> in DITA that
-  # would group individual <uicontrol> elements together.
   def convert_inline_kbd node
     # Check if there is more than one key:
     if (keys = node.attr 'keys').size == 1
@@ -680,6 +687,8 @@ class DitaConverter < Asciidoctor::Converter::Base
     # Return the XML output:
     result.join LF
   end
+
+  # Helper methods
 
   def compose_floating_title title, section_level=false
     # NOTE: Unlike AsciiDoc, DITA does not support floating titles or
