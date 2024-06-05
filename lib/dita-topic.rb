@@ -32,9 +32,15 @@ class DitaTopic < Asciidoctor::Converter::Base
   def initialize *args
     super
     outfilesuffix '.dita'
+
+    # Enable floating and block titles by default:
+    @titles_allowed = true
   end
 
   def convert_document node
+    # Check if floating and block titles are enabled:
+    @titles_allowed = false if (node.attr 'dita-topic-titles') == 'strict'
+
     # Check if a specific topic type is provided:
     if (type = node.attr 'dita-topic-type') =~ /^(concept|reference|task)$/
       element = type
@@ -67,7 +73,7 @@ class DitaTopic < Asciidoctor::Converter::Base
 
     # Issue a warning if the admonition has a title:
     if node.title?
-      logger.warn "#{NAME}: Admonition title not supported in DITA: #{node.title}"
+      logger.warn "#{NAME}: Admonition titles not supported in DITA"
     end
 
     # Return the XML output:
@@ -92,7 +98,6 @@ class DitaTopic < Asciidoctor::Converter::Base
     return ''
   end
 
-  # FIXME: Add support for a title.
   def convert_dlist node
     # Check if a different list style is set:
     return compose_horizontal_dlist node if node.style == 'horizontal'
@@ -132,19 +137,30 @@ class DitaTopic < Asciidoctor::Converter::Base
     result << '</dl>'
 
     # Return the XML output:
-    result.join LF
+    add_block_title (result.join LF), node.title, 'dlist'
   end
 
   def convert_example node
     <<~EOF.chomp
     <example#{compose_id node.id}>
-    #{compose_title node.title}#{node.content}
+    #{node.title ? %(<title>#{node.title}</title>\n) : ''}#{node.content}
     </example>
     EOF
   end
 
   def convert_floating_title node
-    compose_floating_title node.title, node.level
+    # NOTE: Unlike AsciiDoc, DITA does not have a dedicated element for
+    # floating titles. As a workaround, I decided to use a paragraph with
+    # the outputclass attribute.
+
+    # Issue a warning if floating titles are disabled:
+    unless @titles_allowed
+      logger.warn "#{NAME}: Floating titles not supported in DITA"
+      return ''
+    end
+
+    # Return the XML output:
+    %(<p outputclass="title sect#{node.level}"><b>#{node.title}</b></p>)
   end
 
   # FIXME: Add support for additional attributes.
@@ -306,31 +322,37 @@ class DitaTopic < Asciidoctor::Converter::Base
       # Check whether the source language is defined:
       language = (node.attributes.key? 'language') ? %( outputclass="language-#{node.attributes['language']}") : ''
 
-      # Return the XML output:
-      <<~EOF.chomp
+      # Compose the XML output:
+      result = <<~EOF.chomp
       <codeblock#{language}>
       #{node.content}
       </codeblock>
       EOF
     else
-      # Return the XML output:
-      <<~EOF.chomp
+      # Compose the XML output:
+      result = <<~EOF.chomp
       <screen>
       #{node.content}
       </screen>
       EOF
     end
+
+    # Return the XML output:
+    add_block_title result, node.title, 'listing'
   end
 
   def convert_literal node
-    <<~EOF.chomp
+    # Compose the XML output:
+    result = <<~EOF.chomp
     <pre>
     #{node.content}
     </pre>
     EOF
+
+    # Return the XML output:
+    add_block_title result, node.title, 'literal'
   end
 
-  # FIXME: Add support for titles.
   def convert_olist node
     # Open the ordered list:
     result = ['<ol>']
@@ -352,7 +374,7 @@ class DitaTopic < Asciidoctor::Converter::Base
     result << '</ol>'
 
     # Return the XML output:
-    result.join LF
+    add_block_title (result.join LF), node.title, 'olist'
   end
 
   # FIXME: This is not the top priority.
@@ -371,16 +393,7 @@ class DitaTopic < Asciidoctor::Converter::Base
   end
 
   def convert_paragraph node
-    # Check if the paragraph has a title assigned:
-    if node.title?
-      <<~EOF.chomp
-      <div outputclass="paragraph">
-      #{compose_floating_title node.title}<p>#{node.content}</p>
-      </div>
-      EOF
-    else
-      %(<p>#{node.content}</p>)
-    end
+    add_block_title %(<p>#{node.content}</p>), node.title, 'paragraph'
   end
 
   def convert_preamble node
@@ -549,7 +562,6 @@ class DitaTopic < Asciidoctor::Converter::Base
     %(<p outputclass="thematic-break"></p>)
   end
 
-  # FIXME: Add support for titles.
   def convert_ulist node
     # Open the unordered list:
     result = ['<ul>']
@@ -578,7 +590,7 @@ class DitaTopic < Asciidoctor::Converter::Base
     result << '</ul>'
 
     # Returned the XML output:
-    result.join LF
+    add_block_title (result.join LF), node.title, 'ulist'
   end
 
   def convert_verse node
@@ -630,7 +642,7 @@ class DitaTopic < Asciidoctor::Converter::Base
     result << '</ol>'
 
     # Return the XML output:
-    result.join LF
+    add_block_title (result.join LF), node.title, 'qanda'
   end
 
   def compose_horizontal_dlist node
@@ -685,29 +697,54 @@ class DitaTopic < Asciidoctor::Converter::Base
     result << %(</table>)
 
     # Return the XML output:
-    result.join LF
+    add_block_title (result.join LF), node.title, 'horizontal'
   end
 
   # Helper methods
 
-  def compose_floating_title title, section_level=false
+  def add_block_title content, title, context='wrapper'
+    # NOTE: Unlike AsciiDoc, DITA does not support titles assigned to
+    # certain block elements. As a workaround, I decided to use a paragraph
+    # with the outputclass attribute and wrap the block in a div element.
+
+    # Check if the title is defined:
+    return content unless title
+
+    # Issue a warning if block titles are disabled:
+    unless @titles_allowed
+      logger.warn "#{NAME}: Block titles not supported in DITA"
+      return content
+    end
+
+    # Return the XML output:
+    <<~EOF.chomp
+    <div outputclass="#{context}">
+    <p outputclass="title"><b>#{title}</b></p>
+    #{content}
+    </div>
+    EOF
+  end
+
+  def compose_floating_title title
     # NOTE: Unlike AsciiDoc, DITA does not support floating titles or
     # titles assigned to certain block elements. As a workaround, I decided
     # to use a paragraph with the outputclass attribute.
 
-    # Check whether the section level is defined:
-    level = section_level ? %( sect#{section_level}) : ''
+    # Check if the title is defined:
+    return '' unless title
+
+    # Issue a warning if floating titles are disabled:
+    unless @titles_allowed
+      logger.warn "#{NAME}: Floating titles not supported in DITA"
+      return ''
+    end
 
     # Return the XML output:
-    title ? %(<p outputclass="title#{level}"><b>#{title}</b></p>\n) : ''
+    %(<p outputclass="title"><b>#{title}</b></p>\n)
   end
 
   def compose_id id
     id ? %( id="#{id}") : ''
-  end
-
-  def compose_title title
-    title ? %(<title>#{title}</title>\n) : ''
   end
 end
 end
