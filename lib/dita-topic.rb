@@ -42,11 +42,11 @@ class DitaTopic < Asciidoctor::Converter::Base
     @titles_allowed = false if (node.attr 'dita-topic-titles') == 'strict'
 
     # Check if a specific topic type is provided:
-    if (type = node.attr 'dita-topic-type') =~ /^(concept|reference|task)$/
-      element = type
+    if (value = node.attr 'dita-topic-type') =~ /^(concept|reference|task)$/
+      type = value
       body = (type == 'task') ? 'taskbody' : %(#{type[0,3]}body)
     else
-      element = 'topic'
+      type = 'topic'
       body = 'body'
     end
 
@@ -56,13 +56,13 @@ class DitaTopic < Asciidoctor::Converter::Base
     # Return the XML output:
     <<~EOF.chomp
     <?xml version='1.0' encoding='utf-8' ?>
-    <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
-    <#{element}#{compose_id (node.id or node.attributes['docname'])}#{outputclass}>
+    <!DOCTYPE #{type} PUBLIC "-//OASIS//DTD DITA #{type.capitalize}//EN" "#{type}.dtd">
+    <#{type}#{compose_id (node.id or node.attributes['docname'])}#{outputclass}>
     <title>#{node.doctitle}</title>
     <#{body}>
     #{node.content}
     </#{body}>
-    </topic>
+    </#{type}>
     EOF
   end
 
