@@ -164,21 +164,31 @@ class DitaTopic < Asciidoctor::Converter::Base
   end
 
   # FIXME: Add support for additional attributes.
-  def convert_image node
-    # Check if the image has a title specified:
+  def convert_image(node)
+    # Check if scale, height, and width exist
+    scale = node.attr('scale') || 100
+    height = node.attr('height')
+    width = node.attr('width')
+  
+    # Construct the attributes string based on if scale, height, and width exist
+    attributes = "scale=\"#{scale}\""
+    attributes += " height=\"#{height}\"" if height
+    attributes += " width=\"#{width}\"" if width
+  
+    # Check if the image has a title specified 
     if node.title?
       <<~EOF.chomp
       <fig>
-      <title>#{node.title}</title>
-      <image href="#{node.image_uri(node.attr 'target')}" placement="break">
-      <alt>#{node.alt}</alt>
-      </image>
+        <title>#{node.title}</title>
+        <image href="#{node.image_uri(node.attr 'target')}" placement="break" #{attributes}>
+          <alt>#{node.alt}</alt>
+        </image>
       </fig>
       EOF
     else
       <<~EOF.chomp
-      <image href="#{node.image_uri(node.attr 'target')}" placement="break">
-      <alt>#{node.alt}</alt>
+      <image href="#{node.image_uri(node.attr 'target')}" placement="break" #{attributes}>
+        <alt>#{node.alt}</alt>
       </image>
       EOF
     end
