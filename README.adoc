@@ -1,0 +1,109 @@
+= dita-topic
+
+`dita-topic` is a custom converter for Asciidoctor that converts a single AsciiDoc file to a corresponding DITA topic. To ensured that the generated DITA file is valid, it uses the generic `<topic>` element by default but xref:types[you can enforce] the specialized `<concept>`, `<task>`, or `<reference>` element on the command line.
+
+[#install]
+== Installation
+
+Install the `asciidoctor-dita-topic` Ruby gem:
+
+[literal,subs="+quotes"]
+....
+$ *gem install asciidoctor-dita-topic*
+....
+
+[#use]
+== Usage
+
+To use the custom converter on the command line, load it with the `-r dita-topic` option and then select `dita-topic` as the backend output format with `-b dita-topic`:
+
+[literal,subs="+quotes"]
+....
+$ *asciidoctor -r dita-topic -b dita-topic _your_file_.adoc*
+....
+
+This creates a new file, `_your_file_.dita`, in the same directory as `_your_file_.adoc`. You can also convert multiple files at the same time:
+
+[literal,subs="+quotes"]
+....
+$ **asciidoctor -r dita-topic -b dita-topic *.adoc**
+....
+
+[#attributes]
+=== Supplying attribute definitions
+
+If your AsciiDoc files use attributes that are defined outside of these files, you can supply the attribute definitions on the command line with the `-a _attribute_=_value_` option:
+
+[literal,subs="+quotes"]
+....
+$ **asciidoctor -r dita-topic -b dita-topic -a _attribute_=_value_ _your_file_.adoc**
+....
+
+You can provide multiple `-a _attribute_=_value_` options at the same time. Providing relevant attribute definitions is especially important if your document contains conditional content.
+
+.Providing a product version to resolve `ifeval` conditions
+====
+Your AsciiDoc files include a number of `ifeval` statements that provide different content for different versions of the product you are documenting:
+
+[source]
+----
+\ifeval::["{ProductNumber}" == "1"]
+...
+\endif::[]
+\ifeval::["{ProductNumber}" == "2"]
+...
+\endif::[]
+----
+
+To ensure that the converted DITA files include all content for version 2 of your product, run:
+
+[literal,subs="+quotes"]
+....
+$ **asciidoctor -r dita-topic -b dita-topic -a ProductNumber=2 *.adoc**
+....
+====
+
+[#types]
+=== Enforcing a specialized topic type
+
+Because the specialized `<concept>`, `<task>`, or `<reference>` topic types are restrictive in what block elements they can contain, in order to produce valid DITA output as much as possible, the `dita-topic` converter uses the generic `<topic>` element by default. To convert to one of the specialized topic types, set the value of the `dita-topic-type` attribute to `concept`, `reference`, or `task`:
+
+[literal,subs="+quotes"]
+....
+$ **asciidoctor -r dita-topic -b dita-topic -a dita-topic-type=_type_ _your_file_.adoc**
+....
+
+.Converting AsciiDoc files with the `con_` prefix to DITA concepts
+====
+To convert all AsciiDoc files with the `con_` prefix to DITA concepts, run:
+
+[literal,subs="+quotes"]
+....
+$ **asciidoctor -r dita-topic -b dita-topic -a dita-topic-type=concept con_*.adoc**
+....
+
+====
+
+[#titles]
+=== Disabling floating titles
+
+Unlike AsciiDoc, DITA does not support floating titles and only allows titles to be assigned to a limited number of elements. To avoid losing content during the conversion, as a workaround, the `dita-topic` converter uses the following markup by default:
+
+[source,xml]
+----
+<p outputclass="title"><b>Floating title</b></p>
+----
+
+To disable this behavior, set the value of the `dita-topic-titles` to `strict`:
+
+[literal,subs="+quotes"]
+....
+$ **asciidoctor -r dita-topic -b dita-topic -a dita-topic-titles=strict _your_file_.adoc**
+....
+
+[#copyright]
+== Copyright
+
+Copyright (C) 2024 Jaromir Hradilek
+
+This program is free software, released under the terms of the link:LICENSE[MIT license]. It is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
