@@ -12,10 +12,11 @@ Gem::Specification.new do |s|
 
   # Relevant metadata:
   s.metadata = {
-    'homepage_uri'     => 'https://github.com/jhradilek/asciidoctor-dita-topic',
-    'bug_tracker_uri'  => 'https://github.com/jhradilek/asciidoctor-dita-topic/issues'
+    'homepage_uri'      => 'https://github.com/jhradilek/asciidoctor-dita-topic',
+    'bug_tracker_uri'   => 'https://github.com/jhradilek/asciidoctor-dita-topic/issues',
+    'documentation_uri' => 'https://github.com/jhradilek/asciidoctor-dita-topic/blob/main/README.adoc'
   }
 
   # Required gems:
-  s.add_runtime_dependency 'asciidoctor', '~> 2.0', '>=2.0.0'
+  s.add_runtime_dependency 'asciidoctor', '~> 2.0', '>= 2.0.0'
 end
