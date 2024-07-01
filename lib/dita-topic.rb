@@ -700,6 +700,12 @@ class DitaTopic < Asciidoctor::Converter::Base
     add_block_title (result.join LF), node.title, 'horizontal'
   end
 
+  # Method aliases
+
+  alias convert_embedded content_only
+  alias convert_pass content_only
+  alias convert_toc skip
+
   # Helper methods
 
   def add_block_title content, title, context='wrapper'
