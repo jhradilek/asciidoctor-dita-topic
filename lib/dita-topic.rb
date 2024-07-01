@@ -509,7 +509,7 @@ class DitaTopic < Asciidoctor::Converter::Base
         # Process each cell:
         row.each do |cell|
           # Check if the cell spans multiple columns:
-          colspan = cell.colspan ? %( namest="col_#{colnum = cell.column.attr 'colnumber'}" nameend="col_#{column + cell.colspan - 1}") : ''
+          colspan = cell.colspan ? %( namest="col_#{colnum = cell.column.attr 'colnumber'}" nameend="col_#{colnum + cell.colspan - 1}") : ''
 
           # Check if the cell spans multiple rows:
           rowspan = cell.rowspan ? %( morerows="#{cell.rowspan - 1}") : ''
