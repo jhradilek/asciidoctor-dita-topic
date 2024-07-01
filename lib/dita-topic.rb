@@ -251,7 +251,7 @@ class DitaTopic < Asciidoctor::Converter::Base
 
   def convert_inline_callout node
     # Issue a warning if an inline callout is present:
-    logger.warn "#{NAME}: Inline callout support not implemented"
+    logger.warn "#{NAME}: Callout list support not implemented"
     return ''
   end
 

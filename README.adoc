@@ -101,6 +101,47 @@ To disable this behavior, set the value of the `dita-topic-titles` to `strict`:
 $ **asciidoctor -r dita-topic -b dita-topic -a dita-topic-titles=strict _your_file_.adoc**
 ....
 
+[#warnings]
+== Warnings
+
+Despite aspiring to avoid losing content during conversion and produce a valid DITA output, there are limitations to what is possible because of the differences between the two markup languages. When the `dita-topic` converter encounters a possible problem, it prints a warning to standard error output in the following format:
+
+[literal,subs="+quotes"]
+....
+asciidoctor: WARNING: dita-topic: _The warning message_
+....
+
+This possible warning messages are as follows:
+
+[horizontal]
+Admonition titles not supported in DITA:: AsciiDoc allows you to add a custom title to any admonition by including `._Admonition title_` on the line above it. Unlike AsciiDoc, DITA does not allow titles for admonitions. `dita-topic` issues this warning whenever an admonition has a title defined in the converted AsciiDoc file.
+
+Audio macro not supported:: AsciiDoc allows you to embed audio content in your documents by using the `audio::__audio_file__[]` macro. `dita-topic` does not implement this feature and issues this warning whenever the `audio` macro is present in the converted AsciiDoc file.
+
+Block titles not supported in DITA:: AsciiDoc allows you to include `._Block title_` on the line above most of the block elements to assign a custom title to them. Unlike AsciiDoc, DITA only allows titles to be assigned to a limited number of elements. `dita-topic` issues this warning when the `-a dita-topic-titles=strict` option is specified and a block title is present in the converted AsciiDoc file.
+
+Callout list support not implemented:: AsciiDoc allows you to use `<1>`, `<2>`, `<3>` and so on in verbatim blocks to add annotations to the specific lines. Unlike AsciiDoc, DITA does not provide a direct equivalent for this functionality. `dita-topic` issues this warning whenever these annotations are present in the converted AsciiDoc file, but I intend to emulate the AsciiDoc functionality by using a definition list in the upcoming release.
+
+Floating titles not supported in DITA:: AsciiDoc allows you to use floating titles anywhere in the document. Unlike AsciiDoc, DITA does not support floating titles. `dita-topic` issues this warning when the `-a dita-topic-titles=strict` option is specified and a floating title is present in the converted AsciiDoc file.
+
+Inline breaks not supported in DITA:: AsciiDoc provides multiple ways to insert line breaks in paragraphs, such as inserting ` +` at the end of the line or specifying `[%hardbreaks]` on the line preceding the paragraph. Unlike AsciiDoc, DITA does not provide direct equivalent for this functionality. `dita-topic` issues this warning whenever an inline line break is present in the converted AsciiDoc file and places the `<!-- break -\->` comment in the output file to mark its place.
+
+Inline index terms not implemented:: AsciiDoc allows you to define index terms within the text by using the `\indexterm2:[_primary_]` and `\indexterm:[_primary_, _secondary_, _tertiary_]` macros and their `\((_primary_))` and `(\((_primary_, _secondary_, _tertiary_)))` alternatives. `dita-topic` issues this warning whenever an index term is defined in the converted file, but as DITA does provide equivalent functionality, I intend to implement this feature in the upcoming release.
+
+Nesting of sections not supported in DITA:: AsciiDoc allows you to nest sections up to 5 levels deep. Unlike AsciiDoc, DITA does not allow the `<section>` elements to be nested. `dita-topic` issues a warning whenever nested sections are present in the converted AsciiDoc file.
+
+Page breaks not supported in DITA:: AsciiDoc allows you to use `<<<` on a separate line to enforce a page break in output formats that support it. Unlike AsciiDoc, DITA does not support page breaks. `dita-topic` issues this warning whenever a page break is present in the converted AsciiDoc file and places the `<p outputclass="page-break"></p>` in the output file to mark its place.
+
+Possible invalid reference: _reference_:: AsciiDoc allows you to cross reference by using an ID no matter if this ID is defined within or outside of the converted document. Unlike AsciiDoc, DITA requires both the target ID and the ID of the target topic to be included in the cross reference if the reference leads outside of the current file. As `dita-topic` is meant to be run on individual AsciiDoc files, it does not have access to information from referenced files during conversion. `dita-topic` issues this warning whenever a cross reference is present in the converted AsciiDoc file.
+
+STEM support not implemented:: AsciiDoc provides multiple ways to insert Science, Technology, Engineering and Math (STEM) expressions in the document, including the `stem:[_formula_]` inline macro and the `[stem]` delimited block. `dita-topic` does not implement this feature and issues this warning whenever such an expression is present in the converted AsciiDoc file.
+
+Table footers not supported in DITA:: AsciiDoc allows you to set the `footer` option to mark the last table row as a table footer. Unlike AsciiDoc, DITA does not support table footers. `dita-topic` issues this warning whenever a table footer is present in the converted AsciiDoc file.
+
+Thematic breaks not supported in DITA:: Asciidoc allows you to use `'''`, `---`, or `***` (the last two with possible optional spaces in between the characters) to insert a thematic break in between two blocks, most commonly represented by a horizontal line. Unlike AsciiDoc, DITA does not support thematic breaks. `dita-topic` issues this warning whenever a thematic break is present in the converted AsciiDoc file.
+
+Video macro not supported:: AsciiDoc allows you to embed video content in your documents by using the `video::__video_file__[]` macro. `dita-topic` does not implement this feature and issues this warning whenever the `video` macro is present in the converted AsciiDoc file.
+
 [#copyright]
 == Copyright
 
