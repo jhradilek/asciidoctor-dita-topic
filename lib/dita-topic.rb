@@ -514,7 +514,7 @@ class DitaTopic < Asciidoctor::Converter::Base
       # Process each row:
       rows.each do |row|
         # Open the row:
-        result <<%(<row>)
+        result << %(<row>)
 
         # Process each cell:
         row.each do |cell|
@@ -547,7 +547,7 @@ class DitaTopic < Asciidoctor::Converter::Base
         end
 
         # Close the row:
-        result <<%(</row>)
+        result << %(</row>)
       end
 
       # Close the section:
