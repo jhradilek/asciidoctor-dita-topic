@@ -16,10 +16,10 @@ class Minitest::Test
   end
 
   def assert_xpath_equal xml, exp, xpath, msg=nil
-    assert_equal exp, REXML::XPath.first((REXML::Document.new xml), xpath).to_s, msg
+    assert_equal exp, REXML::XPath.first((REXML::Document.new xml), xpath).to_s.strip, msg
   end
 
   def assert_xpath_includes xml, obj, xpath, msg=nil
-    assert_includes REXML::XPath.match((REXML::Document.new xml), xpath), obj, msg
+    assert_includes REXML::XPath.match((REXML::Document.new xml), xpath).map { |s| s.to_s.strip }, obj, msg
   end
 end
