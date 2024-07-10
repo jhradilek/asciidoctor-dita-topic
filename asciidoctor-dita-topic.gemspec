@@ -19,4 +19,9 @@ Gem::Specification.new do |s|
 
   # Required gems:
   s.add_runtime_dependency 'asciidoctor', '~> 2.0', '>= 2.0.0'
+
+  # Development gems:
+  s.add_development_dependency 'rake', '~> 12.3.0'
+  s.add_development_dependency 'minitest', '~> 5.22.0'
+  s.add_development_dependency 'rexml', '~> 3.2.6'
 end
