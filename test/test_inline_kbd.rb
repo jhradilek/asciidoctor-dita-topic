@@ -9,6 +9,7 @@ class InlineKbdTest < Minitest::Test
     EOF
 
     assert_xpath_equal xml, 'Q', '//uicontrol[@outputclass="key"]/text()'
+    assert_xpath_count xml, 1, '//uicontrol[@outputclass="key"]'
   end
 
   def test_key_combination
@@ -20,5 +21,6 @@ class InlineKbdTest < Minitest::Test
     assert_xpath_includes xml, 'Ctrl', '//uicontrol[@outputclass="key"]/text()'
     assert_xpath_includes xml, 'Alt', '//uicontrol[@outputclass="key"]/text()'
     assert_xpath_includes xml, 'Q', '//uicontrol[@outputclass="key"]/text()'
+    assert_xpath_count xml, 3, '//uicontrol[@outputclass="key"]'
   end
 end

@@ -9,5 +9,6 @@ class InlineButtonTest < Minitest::Test
     EOF
 
     assert_xpath_equal xml, 'OK', '//uicontrol[@outputclass="button"]/text()'
+    assert_xpath_count xml, 1, '//uicontrol[@outputclass="button"]'
   end
 end
