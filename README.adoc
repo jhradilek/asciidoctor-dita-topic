@@ -119,6 +119,16 @@ To disable this behavior, set the value of the `dita-topic-titles` to `strict`:
 $ **asciidoctor -r dita-topic -b dita-topic -a dita-topic-titles=strict _your_file_.adoc**
 ....
 
+[#includes]
+=== Disabling include directives
+
+By default, Asciidoctor resolves all `include` directives before converting the file. To only convert the contents of the selected file, specify the `-S secure` option:
+
+[literal,subs="+quotes"]
+....
+$ **asciidoctor -r dita-topic -b dita-topic -S secure _your_file_.adoc**
+....
+
 [#warnings]
 == Warnings
 
