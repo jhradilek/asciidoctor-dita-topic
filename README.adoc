@@ -1,6 +1,6 @@
 = dita-topic
 
-`dita-topic` is a custom converter for Asciidoctor that converts a single AsciiDoc file to a corresponding DITA topic. To ensured that the generated DITA file is valid, it uses the generic `<topic>` element by default but xref:types[you can enforce] the specialized `<concept>`, `<task>`, or `<reference>` element on the command line.
+`dita-topic` is a custom converter for Asciidoctor that converts a single AsciiDoc file to a corresponding DITA topic. It uses the generic `<topic>` element by default but xref:types[you can enforce] the specialized `<concept>`, `<task>`, or `<reference>` element on the command line.
 
 [#install]
 == Installation
@@ -72,6 +72,24 @@ Because the specialized `<concept>`, `<task>`, or `<reference>` topic types are 
 ....
 $ **asciidoctor -r dita-topic -b dita-topic -a dita-topic-type=_type_ _your_file_.adoc**
 ....
+
+[NOTE]
+====
+`dita-topic` does not validate the converted content. If you have link:https://www.dita-ot.org/[DITA Open Toolkit] installed, you can check that the converted file can be built as follows:
+
+[literal,subs="+quotes"]
+....
+$ **dita -i _converted_file_.dita -f xhtml**
+....
+
+To produce slightly more readable errors, you can also use `xmlstarlet`:
+
+[literal,subs="+quotes"]
+....
+$ **xmlstarlet val -e -s _path_to_dita-ot_directory_/plugins/org.oasis-open.dita.v1_3/schema-url/technicalContent/xsd/_topic_type_.xsd _converted_file_.dita**
+....
+
+====
 
 .Converting AsciiDoc files with the `con_` prefix to DITA concepts
 ====
