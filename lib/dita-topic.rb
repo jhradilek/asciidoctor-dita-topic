@@ -35,11 +35,17 @@ class DitaTopic < Asciidoctor::Converter::Base
 
     # Enable floating and block titles by default:
     @titles_allowed = true
+
+    # Enable callouts by default:
+    @callouts_allowed = true
   end
 
   def convert_document node
     # Check if floating and block titles are enabled:
-    @titles_allowed = false if (node.attr 'dita-topic-titles') == 'strict'
+    @titles_allowed = false if (node.attr 'dita-topic-titles') == 'off'
+
+    # Check if callouts are enabled:
+    @callouts_allowed = false if (node.attr 'dita-topic-callouts') == 'off'
 
     # Check if a specific topic type is provided:
     if (value = node.attr 'dita-topic-type') =~ /^(concept|reference|task)$/
@@ -91,6 +97,12 @@ class DitaTopic < Asciidoctor::Converter::Base
   end
 
   def convert_colist node
+    # Issue a warning if callouts are disabled:
+    unless @callouts_allowed
+      logger.warn "#{NAME}: Callouts not supported in DITA"
+      return ''
+    end
+
     # Reset the counter:
     number = 0
 
@@ -297,6 +309,13 @@ class DitaTopic < Asciidoctor::Converter::Base
   end
 
   def convert_inline_callout node
+    # Issue a warning if callouts are disabled:
+    unless @callouts_allowed
+      logger.warn "#{NAME}: Callouts not supported in DITA"
+      return ''
+    end
+
+    # Return the XML entity:
     compose_circled_number node.text.to_i
   end
 
