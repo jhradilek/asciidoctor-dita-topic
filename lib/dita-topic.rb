@@ -90,12 +90,49 @@ class DitaTopic < Asciidoctor::Converter::Base
     return ''
   end
 
-  # FIXME: Figure out how to handle this along with convert_inline_callout.
-  # A definition list looks like a reasonable option.
   def convert_colist node
-    # Issue a warning if a callout list is present:
-    logger.warn "#{NAME}: Callout list support not implemented"
-    return ''
+    # Reset the counter:
+    number = 0
+
+    # Open the table:
+    result = ['<table>']
+    result << %(<tgroup cols="2">)
+    result << %(<colspec colwidth="#{node.attr 'labelwidth', 15}*" />)
+    result << %(<colspec colwidth="#{node.attr 'itemwidth', 85}*" />)
+    result << %(<tbody>)
+
+    # Process individual list items:
+    node.items.each do |item|
+      # Increment the counter:
+      number += 1
+
+      # Open the table row:
+      result << %(<row>)
+
+      # Compose the callout number:
+      result << %(<entry>#{compose_circled_number number}</entry>)
+
+      # Check if description contains multiple block elements:
+      if item.blocks
+        result << %(<entry>)
+        result << %(<p>#{item.text}</p>)
+        result << item.content
+        result << %(</entry>)
+      else
+        result << %(<entry>#{item.text}</entry>)
+      end
+
+      # Close the row:
+      result << %(</row>)
+    end
+
+    # Close the table:
+    result << %(</tbody>)
+    result << %(</tgroup>)
+    result << %(</table>)
+
+    # Return the XML output:
+    result.join LF
   end
 
   def convert_dlist node
@@ -169,13 +206,13 @@ class DitaTopic < Asciidoctor::Converter::Base
     scale = node.attr('scale') || 100
     height = node.attr('height')
     width = node.attr('width')
-  
+
     # Construct the attributes string based on if scale, height, and width exist
     attributes = "scale=\"#{scale}\""
     attributes += " height=\"#{height}\"" if height
     attributes += " width=\"#{width}\"" if width
-  
-    # Check if the image has a title specified 
+
+    # Check if the image has a title specified
     if node.title?
       <<~EOF.chomp
       <fig>
@@ -260,9 +297,7 @@ class DitaTopic < Asciidoctor::Converter::Base
   end
 
   def convert_inline_callout node
-    # Issue a warning if an inline callout is present:
-    logger.warn "#{NAME}: Callout list support not implemented"
-    return ''
+    compose_circled_number node.text.to_i
   end
 
   # FIXME: Add support for footnoteref equivalent.
@@ -658,13 +693,9 @@ class DitaTopic < Asciidoctor::Converter::Base
   def compose_horizontal_dlist node
     # Open the table:
     result = ['<table>']
-
-    # Define the table properties and open the tgroup:
     result << %(<tgroup cols="2">)
     result << %(<colspec colwidth="#{node.attr 'labelwidth', 15}*" />)
     result << %(<colspec colwidth="#{node.attr 'itemwidth', 85}*" />)
-
-    # Open the table body:
     result << %(<tbody>)
 
     # Process individual list items:
@@ -761,6 +792,23 @@ class DitaTopic < Asciidoctor::Converter::Base
 
   def compose_id id
     id ? %( id="#{id}") : ''
+  end
+
+  def compose_circled_number number
+    # Verify the number is in a supported range:
+    if number < 1 || number > 50
+      logger.warn "#{NAME}: Callout number not in range between 1 and 50"
+      return number
+    end
+
+    # Compose the XML entity:
+    if number < 21
+      %(&##{9311 + number};)
+    elsif number < 36
+      %(&##{12860 + number};)
+    else
+      %(&##{12941 + number};)
+    end
   end
 end
 end
