@@ -112,11 +112,23 @@ Unlike AsciiDoc, DITA does not support floating titles and only allows titles to
 <p outputclass="title"><b>Floating title</b></p>
 ----
 
-To disable this behavior, set the value of the `dita-topic-titles` to `strict`:
+To disable this behavior, set the value of the `dita-topic-titles` to `off`:
 
 [literal,subs="+quotes"]
 ....
-$ **asciidoctor -r dita-topic -b dita-topic -a dita-topic-titles=strict _your_file_.adoc**
+$ **asciidoctor -r dita-topic -b dita-topic -a dita-topic-titles=off _your_file_.adoc**
+....
+
+[#callouts]
+=== Disabling callouts
+
+Unlike AsciiDoc, DITA does not support callouts as a method to add annotations to specific lines in verbatim blocks. To avoid losing content during the conversion, as a workaround, the `dita-topic` converter uses XML entities for circled numbers.
+
+To disable this behavior, set the value of the `dita-topic-callouts` to `off`:
+
+[literal,subs="+quotes"]
+....
+$ **asciidoctor -r dita-topic -b dita-topic -a dita-topic-callouts=off _your_file_.adoc**
 ....
 
 [#includes]
@@ -146,11 +158,11 @@ Admonition titles not supported in DITA:: AsciiDoc allows you to add a custom ti
 
 Audio macro not supported:: AsciiDoc allows you to embed audio content in your documents by using the `audio::__audio_file__[]` macro. `dita-topic` does not implement this feature and issues this warning whenever the `audio` macro is present in the converted AsciiDoc file.
 
-Block titles not supported in DITA:: AsciiDoc allows you to include `._Block title_` on the line above most of the block elements to assign a custom title to them. Unlike AsciiDoc, DITA only allows titles to be assigned to a limited number of elements. `dita-topic` issues this warning when the `-a dita-topic-titles=strict` option is specified and a block title is present in the converted AsciiDoc file.
+Block titles not supported in DITA:: AsciiDoc allows you to include `._Block title_` on the line above most of the block elements to assign a custom title to them. Unlike AsciiDoc, DITA only allows titles to be assigned to a limited number of elements. `dita-topic` issues this warning when the `-a dita-topic-titles=off` option is specified and a block title is present in the converted AsciiDoc file.
 
-Callout list support not implemented:: AsciiDoc allows you to use `<1>`, `<2>`, `<3>` and so on in verbatim blocks to add annotations to the specific lines. Unlike AsciiDoc, DITA does not provide a direct equivalent for this functionality. `dita-topic` issues this warning whenever these annotations are present in the converted AsciiDoc file, but I intend to emulate the AsciiDoc functionality by using a definition list in the upcoming release.
+Callouts not supported in DITA:: AsciiDoc allows you to use `<1>`, `<2>`, `<3>` and so on in verbatim blocks to add annotations to the specific lines. Unlike AsciiDoc, DITA does not provide a direct equivalent for this functionality. `dita-topic` issues this warning when the `-a dita-topic-callouts=off` option is specified and these annotations are present in the converted AsciiDoc file.
 
-Floating titles not supported in DITA:: AsciiDoc allows you to use floating titles anywhere in the document. Unlike AsciiDoc, DITA does not support floating titles. `dita-topic` issues this warning when the `-a dita-topic-titles=strict` option is specified and a floating title is present in the converted AsciiDoc file.
+Floating titles not supported in DITA:: AsciiDoc allows you to use floating titles anywhere in the document. Unlike AsciiDoc, DITA does not support floating titles. `dita-topic` issues this warning when the `-a dita-topic-titles=off` option is specified and a floating title is present in the converted AsciiDoc file.
 
 Inline breaks not supported in DITA:: AsciiDoc provides multiple ways to insert line breaks in paragraphs, such as inserting `{nbsp}+` at the end of the line or specifying `[%hardbreaks]` on the line preceding the paragraph. Unlike AsciiDoc, DITA does not provide direct equivalent for this functionality. `dita-topic` issues this warning whenever an inline line break is present in the converted AsciiDoc file and places the `<!-- break -\->` comment in the output file to mark its place.
 
