@@ -213,24 +213,24 @@ class DitaTopic < Asciidoctor::Converter::Base
   end
 
   def convert_image(node)
-    # Check if additional attributes have been specified:
-    scale  = (node.attr? 'scale') ? %( scale="#{(node.attr 'scale').tr('%', '')}") : ''
-    height = (node.attr? 'height') ? %( height="#{node.attr 'height'}") : ''
+    # Check if additional attributes are specified:
     width  = (node.attr? 'width') ? %( width="#{node.attr 'width'}") : ''
+    height = (node.attr? 'height') ? %( height="#{node.attr 'height'}") : ''
+    scale  = (node.attr? 'scale') ? %( scale="#{(node.attr 'scale').tr('%', '')}") : ''
 
     # Check if the image has a title specified:
     if node.title?
       <<~EOF.chomp
       <fig>
       <title>#{node.title}</title>
-      <image href="#{node.image_uri(node.attr 'target')}"#{height}#{width}#{scale} placement="break">
+      <image href="#{node.image_uri(node.attr 'target')}"#{width}#{height}#{scale} placement="break">
       <alt>#{node.alt}</alt>
       </image>
       </fig>
       EOF
     else
       <<~EOF.chomp
-      <image href="#{node.image_uri(node.attr 'target')}"#{height}#{width}#{scale} placement="break">
+      <image href="#{node.image_uri(node.attr 'target')}"#{width}#{height}#{scale} placement="break">
       <alt>#{node.alt}</alt>
       </image>
       EOF
@@ -318,9 +318,13 @@ class DitaTopic < Asciidoctor::Converter::Base
     %(<fn>#{node.text}</fn>)
   end
 
-  # FIXME: Add support for additional attributes.
   def convert_inline_image node
-    %(<image href="#{node.image_uri node.target}" placement="inline"><alt>#{node.alt}</alt></image>)
+    # Check if additional attributes are specified:
+    width  = (node.attr? 'width') ? %( width="#{node.attr 'width'}") : ''
+    height = (node.attr? 'height') ? %( height="#{node.attr 'height'}") : ''
+
+    # Return the XML output:
+    %(<image href="#{node.image_uri node.target}"#{width}#{height} placement="inline"><alt>#{node.alt}</alt></image>)
   end
 
   def convert_inline_indexterm node
