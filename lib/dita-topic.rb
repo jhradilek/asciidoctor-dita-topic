@@ -107,7 +107,7 @@ class DitaTopic < Asciidoctor::Converter::Base
     number = 0
 
     # Open the table:
-    result = ['<table>']
+    result = ['<table outputclass="callout-list">']
     result << %(<tgroup cols="2">)
     result << %(<colspec colwidth="#{node.attr 'labelwidth', 15}*" />)
     result << %(<colspec colwidth="#{node.attr 'itemwidth', 85}*" />)
@@ -709,7 +709,7 @@ class DitaTopic < Asciidoctor::Converter::Base
 
   def compose_horizontal_dlist node
     # Open the table:
-    result = ['<table>']
+    result = ['<table outputclass="horizontal-dlist">']
     result << %(<tgroup cols="2">)
     result << %(<colspec colwidth="#{node.attr 'labelwidth', 15}*" />)
     result << %(<colspec colwidth="#{node.attr 'itemwidth', 85}*" />)
