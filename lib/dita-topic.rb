@@ -47,28 +47,19 @@ class DitaTopic < Asciidoctor::Converter::Base
     # Check if callouts are enabled:
     @callouts_allowed = false if (node.attr 'dita-topic-callouts') == 'off'
 
-    # Check if a specific topic type is provided:
-    if (value = node.attr 'dita-topic-type') =~ /^(concept|reference|task)$/
-      type = value
-      body = (type == 'task') ? 'taskbody' : %(#{type[0,3]}body)
-    else
-      type = 'topic'
-      body = 'body'
-    end
-
     # Check if the modular documentation content type is specified:
     outputclass = (node.attr? '_mod-docs-content-type') ? %( outputclass="#{(node.attr '_mod-docs-content-type').downcase}") : ''
 
     # Return the XML output:
     <<~EOF.chomp
     <?xml version='1.0' encoding='utf-8' ?>
-    <!DOCTYPE #{type} PUBLIC "-//OASIS//DTD DITA #{type.capitalize}//EN" "#{type}.dtd">
-    <#{type}#{compose_id (node.id or node.attributes['docname'])}#{outputclass}>
+    <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
+    <topic#{compose_id (node.id or node.attributes['docname'])}#{outputclass}>
     <title>#{node.doctitle}</title>
-    <#{body}>
+    <body>
     #{node.content}
-    </#{body}>
-    </#{type}>
+    </body>
+    </topic>
     EOF
   end
 
