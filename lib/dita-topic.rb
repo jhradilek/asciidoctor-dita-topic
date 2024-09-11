@@ -370,25 +370,15 @@ class DitaTopic < Asciidoctor::Converter::Base
   end
 
   def convert_listing node
-    # Check the listing style:
-    if node.style == 'source'
-      # Check whether the source language is defined:
-      language = (node.attributes.key? 'language') ? %( outputclass="language-#{node.attributes['language']}") : ''
+    # Check whether the source language is defined:
+    language = (node.attributes.key? 'language') ? %( outputclass="language-#{node.attributes['language']}") : ''
 
-      # Compose the XML output:
-      result = <<~EOF.chomp
-      <codeblock#{language}>
-      #{node.content}
-      </codeblock>
-      EOF
-    else
-      # Compose the XML output:
-      result = <<~EOF.chomp
-      <screen>
-      #{node.content}
-      </screen>
-      EOF
-    end
+    # Compose the XML output:
+    result = <<~EOF.chomp
+    <codeblock#{language}>
+    #{node.content}
+    </codeblock>
+    EOF
 
     # Return the XML output:
     add_block_title result, node.title
