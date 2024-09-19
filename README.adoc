@@ -1,6 +1,6 @@
 = dita-topic
 
-`dita-topic` is a custom converter for Asciidoctor that converts a single AsciiDoc file to a corresponding DITA topic.
+`dita-topic` is a custom converter for Asciidoctor that converts a single AsciiDoc file to a corresponding DITA topic. To convert the produced DITA topic to a specialized DITA concept, reference, or task, use the link:https://github.com/jhradilek/dita-custom-xslt[dita_convert Python package].
 
 [#install]
 == Installation
