@@ -1,7 +1,7 @@
 require 'minitest/autorun'
 require_relative 'helper'
 
-class CodeBlockTest < Minitest::Test
+class ListingTest < Minitest::Test
   def test_block_code
     xml = <<~EOF.chomp.to_dita
     [source, ruby]
