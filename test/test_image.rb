@@ -55,4 +55,14 @@ class ImageTest < Minitest::Test
 
     assert_xpath_equal xml, '50', '//image/@scale'
   end
+
+  def test_image_with_title
+    xml = <<~EOF.chomp.to_dita
+    .Image title
+    image::image.png[]
+    EOF
+
+    assert_xpath_equal xml, 'Image title', '//fig/title/text()'
+    assert_xpath_equal xml, 'image.png', '//fig/image/@href'
+  end
 end
