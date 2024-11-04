@@ -1,7 +1,7 @@
 require 'minitest/autorun'
 require_relative 'helper'
 
-class InlineLinkTest < Minitest::Test
+class InlineAnchorTest < Minitest::Test
   def test_inline_link
     xml = <<~EOF.chomp.to_dita
     Check out the link:http://example.com[example].
