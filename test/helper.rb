@@ -6,7 +6,7 @@ require_relative '../lib/dita-topic'
 
 class String
   def to_dita
-    return Asciidoctor.convert self, backend: 'dita-topic', standalone: true
+    return Asciidoctor.convert self, backend: 'dita-topic', standalone: true, logger: false
   end
 end
 
