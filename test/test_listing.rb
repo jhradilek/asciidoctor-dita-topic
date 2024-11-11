@@ -30,22 +30,13 @@ class ListingTest < Minitest::Test
     EOF
 
     assert_xpath_equal xml, 'A listing block title', '//p[@outputclass="title"]/b/text()'
+    assert_xpath_equal xml, 'A listing block', '//codeblock/text()'
   end
 
   def test_explicit_source_block
     xml = <<~EOF.chomp.to_dita
     [source]
     A source code block
-    EOF
-
-    assert_xpath_equal xml, 'A source code block', '//codeblock/text()'
-  end
-
-  def test_delimited_source_block
-    xml = <<~EOF.chomp.to_dita
-    ----
-    A source code block
-    ----
     EOF
 
     assert_xpath_equal xml, 'A source code block', '//codeblock/text()'
@@ -60,6 +51,19 @@ class ListingTest < Minitest::Test
     EOF
 
     assert_xpath_equal xml, 'puts "Hello"', '//codeblock/text()'
+  end
+
+  def test_source_block_title
+    xml = <<~EOF.chomp.to_dita
+    .A source block title
+    [source]
+    ----
+    A source block
+    ----
+    EOF
+
+    assert_xpath_equal xml, 'A source block title', '//p[@outputclass="title"]/b/text()'
+    assert_xpath_equal xml, 'A source block', '//codeblock/text()'
   end
 
   def test_source_block_language
