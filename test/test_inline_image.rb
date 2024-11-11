@@ -18,7 +18,7 @@ class InlineImageTest < Minitest::Test
     assert_xpath_equal xml, 'inline', '//p/image/@placement'
   end
 
-def test_image_with_alt_text
+  def test_image_with_alt_text
     xml = <<~EOF.chomp.to_dita
     A paragraph with a image:image-1.png[first] and image:image-2.png[alt=second] image.
     EOF
