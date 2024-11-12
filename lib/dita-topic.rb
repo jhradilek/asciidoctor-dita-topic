@@ -691,6 +691,11 @@ class DitaTopic < Asciidoctor::Converter::Base
   def compose_horizontal_dlist node
     # Open the table:
     result = ['<table outputclass="horizontal-dlist">']
+
+    # Check if the title is specified:
+    result << %(<title>#{node.title}</title>) if node.title?
+
+    # Define the table properties and open the tgroup:
     result << %(<tgroup cols="2">)
     result << %(<colspec colwidth="#{node.attr 'labelwidth', 15}*" />)
     result << %(<colspec colwidth="#{node.attr 'itemwidth', 85}*" />)
@@ -736,7 +741,7 @@ class DitaTopic < Asciidoctor::Converter::Base
     result << %(</table>)
 
     # Return the XML output:
-    add_block_title (result.join LF), node.title
+    result.join LF
   end
 
   # Method aliases
