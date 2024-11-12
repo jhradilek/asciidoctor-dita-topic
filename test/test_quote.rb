@@ -40,6 +40,17 @@ class QuoteTest < Minitest::Test
     assert_xpath_equal xml, 'Quote source', '//lq/cite/text()'
   end
 
+  def test_markdown_style_quote
+    xml = <<~EOF.chomp.to_dita
+    > Quoted line
+    > -- Author Name, Quote source
+    EOF
+
+    assert_xpath_equal xml, 'Quoted line', '//lq/p[1]/text()'
+    assert_xpath_equal xml, '&#8212; Author Name', '//lq/p[2]/text()'
+    assert_xpath_equal xml, 'Quote source', '//lq/cite/text()'
+  end
+
   def test_quote_title
     xml = <<~EOF.chomp.to_dita
     .Quote title
