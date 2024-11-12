@@ -35,4 +35,15 @@ class UlistTest < Minitest::Test
     assert_xpath_equal xml, '&#10003; Item two', '//ul/li[2]/text()'
     assert_xpath_equal xml, '&#10063; Item three', '//ul/li[3]/text()'
   end
+
+  def test_unordered_list_title
+    xml = <<~EOF.chomp.to_dita
+    .An unordered list title
+    * Item one
+    * Item two
+    EOF
+
+    assert_xpath_equal xml, 'An unordered list title', '//p[@outputclass="title"]/b/text()'
+    assert_xpath_count xml, 2, '//ul/li'
+  end
 end
