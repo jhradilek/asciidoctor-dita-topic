@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
   s.description = 'An extension for AsciiDoctor that converts a single AsciiDoc file to a DITA topic.'
   s.authors     = ['Jaromir Hradilek']
   s.email       = 'jhradilek@gmail.com'
-  s.files       = ['lib/dita-topic.rb']
+  s.files       = ['lib/dita-topic.rb', 'LICENSE', 'AUTHORS', 'README.adoc']
   s.homepage    = 'https://github.com/jhradilek/asciidoctor-dita-topic'
   s.license     = 'MIT'
 
