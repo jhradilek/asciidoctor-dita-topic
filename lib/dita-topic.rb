@@ -100,8 +100,8 @@ class DitaTopic < Asciidoctor::Converter::Base
     # Open the table:
     result = ['<table outputclass="callout-list">']
     result << %(<tgroup cols="2">)
-    result << %(<colspec colwidth="#{node.attr 'labelwidth', 15}*" />)
-    result << %(<colspec colwidth="#{node.attr 'itemwidth', 85}*" />)
+    result << %(<colspec colwidth="15*" />)
+    result << %(<colspec colwidth="85*" />)
     result << %(<tbody>)
 
     # Process individual list items:
