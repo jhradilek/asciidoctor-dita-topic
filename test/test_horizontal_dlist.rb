@@ -26,6 +26,17 @@ class HorizontalDlistTest < Minitest::Test
     assert_xpath_equal xml, 'horizontal-dlist', '//table/@outputclass'
   end
 
+  def test_horizontal_dlist_widths
+    xml = <<~EOF.chomp.to_dita
+    [horizontal,labelwidth=30,itemwidth=70]
+    Term1:: Definition one
+    Term2:: Definition two
+    EOF
+
+    assert_xpath_equal xml, '30*', '//table/tgroup/colspec[1]/@colwidth'
+    assert_xpath_equal xml, '70*', '//table/tgroup/colspec[2]/@colwidth'
+  end
+
   def test_horizontal_dlist_title
     xml = <<~EOF.chomp.to_dita
     .A description list title
