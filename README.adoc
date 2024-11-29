@@ -144,8 +144,6 @@ Floating titles not supported in DITA:: AsciiDoc allows you to use floating titl
 
 Inline breaks not supported in DITA:: AsciiDoc provides multiple ways to insert line breaks in paragraphs, such as inserting `{nbsp}+` at the end of the line or specifying `[%hardbreaks]` on the line preceding the paragraph. Unlike AsciiDoc, DITA does not provide direct equivalent for this functionality. `dita-topic` issues this warning whenever an inline line break is present in the converted AsciiDoc file and places the `<!-- break -\->` comment in the output file to mark its place.
 
-Inline index terms not implemented:: AsciiDoc allows you to define index terms within the text by using the `\indexterm2:[_primary_]` and `\indexterm:[_primary_, _secondary_, _tertiary_]` macros and their `\((_primary_))` and `(\((_primary_, _secondary_, _tertiary_)))` alternatives. `dita-topic` issues this warning whenever an index term is defined in the converted file, but as DITA does provide equivalent functionality, I intend to implement this feature in the upcoming release.
-
 Nesting of sections not supported in DITA:: AsciiDoc allows you to nest sections up to 5 levels deep. Unlike AsciiDoc, DITA does not allow the `<section>` elements to be nested. `dita-topic` issues a warning whenever nested sections are present in the converted AsciiDoc file.
 
 Page breaks not supported in DITA:: AsciiDoc allows you to use `<<<` on a separate line to enforce a page break in output formats that support it. Unlike AsciiDoc, DITA does not support page breaks. `dita-topic` issues this warning whenever a page break is present in the converted AsciiDoc file and places the `<p outputclass="page-break"></p>` in the output file to mark its place.
