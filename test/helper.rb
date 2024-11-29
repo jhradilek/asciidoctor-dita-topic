@@ -5,8 +5,8 @@ require 'minitest'
 require_relative '../lib/dita-topic'
 
 class String
-  def to_dita
-    return Asciidoctor.convert self, backend: 'dita-topic', standalone: true, logger: false
+  def to_dita(doctype='article')
+    return Asciidoctor.convert self, backend: 'dita-topic', standalone: true, logger: false, doctype: doctype
   end
 end
 

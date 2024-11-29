@@ -434,9 +434,24 @@ class DitaTopic < Asciidoctor::Converter::Base
     add_block_title (result.join LF), node.title
   end
 
-  # FIXME: This is not the top priority.
   def convert_open node
-    ''
+    # NOTE: Although DITA provides an <abstract> element that is intended
+    # for this purpose, it is placed alongside the <body> element and not
+    # inside of ot. As there is no clean way to place it there, I use
+    # a workaround.
+
+    # Determine the node type:
+    if node.style == 'partintro'
+      node.content
+    elsif node.content_model == :compound
+      <<~EOF.chomp
+      <div#{(node.style == 'abstract') ? ' outputclass="abstract"' : ''}>
+      #{compose_floating_title node.title}#{node.content}
+      </div>
+      EOF
+    else
+      %(#{compose_floating_title node.title}<p#{(node.style == 'abstract') ? ' outputclass="abstract"' : ''}>#{node.content}</p>)
+    end
   end
 
   def convert_page_break node
