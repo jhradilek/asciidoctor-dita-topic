@@ -319,9 +319,23 @@ class DitaTopic < Asciidoctor::Converter::Base
   end
 
   def convert_inline_indexterm node
-    # Issue a warning if an inline index term is present:
-    logger.warn "#{NAME}: Inline index terms not implemented"
-    return ''
+    # Check if the index term appears in the flow of the text:
+    if node.type == :visible
+      return %(<indexterm>#{node.text}</indexterm>#{node.text})
+    end
+
+    # Get primary, secondary, and tertiary index terms:
+    terms = node.attr 'terms'
+
+    # Determine the number of terms:
+    case terms.size
+    when 1
+      %(<indexterm>#{terms[0]}</indexterm>)
+    when 2
+      %(<indexterm>#{terms[0]}<indexterm>#{terms[1]}</indexterm></indexterm>)
+    else
+      %(<indexterm>#{terms[0]}<indexterm>#{terms[1]}<indexterm>#{terms[2]}</indexterm></indexterm></indexterm>)
+    end
   end
 
   def convert_inline_kbd node
