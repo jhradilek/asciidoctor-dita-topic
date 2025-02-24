@@ -33,36 +33,70 @@ class DitaTopic < Asciidoctor::Converter::Base
     super
     outfilesuffix '.dita'
 
-    # Enable floating and block titles by default:
-    @titles_allowed = true
+    # Disable the author line by default:
+    @authors_allowed = false
 
     # Enable callouts by default:
     @callouts_allowed = true
+
+    # Enable floating and block titles by default:
+    @titles_allowed = true
   end
 
   def convert_document node
-    # Check if floating and block titles are enabled:
-    @titles_allowed = false if (node.attr 'dita-topic-titles') == 'off'
+    # Check if the author line is enabled:
+    @authors_allowed = true if (node.attr 'dita-topic-authors') == 'on'
 
     # Check if callouts are enabled:
     @callouts_allowed = false if (node.attr 'dita-topic-callouts') == 'off'
+
+    # Check if floating and block titles are enabled:
+    @titles_allowed = false if (node.attr 'dita-topic-titles') == 'off'
 
     # Check if the modular documentation content type is specified:
     outputclass = ''
     outputclass = %( outputclass="#{(node.attr '_content-type').downcase}") if node.attr? '_content-type'
     outputclass = %( outputclass="#{(node.attr '_mod-docs-content-type').downcase}") if node.attr? '_mod-docs-content-type'
 
+    # Open the document:
+    result = ["<?xml version='1.0' encoding='utf-8' ?>"]
+    result << %(<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">)
+    result << %(<topic#{compose_id (node.id or node.attributes['docname'])}#{outputclass}>)
+    result << %(<title>#{node.doctitle}</title>)
+
+    # Check if the author line is enabled and defined:
+    if @authors_allowed && !node.authors.empty?
+      # Open the prolog:
+      result << %(<prolog>)
+
+      # Process individual author names:
+      node.authors.each do |author|
+        result << %(<author>#{compose_author author, node}</author>)
+      end
+
+      # Close the prolog:
+      result << %(</prolog>)
+    end
+
+    # Open the document body:
+    result << %(<body>)
+
+    # Check if the author line defined while disabled:
+    if !@authors_allowed && !node.authors.empty?
+      # Issue a warning as inline content is not going to be processed:
+      logger.warn "#{NAME}: Author lines not enabled for topics"
+
+      # Process the author line as a plain paragraph:
+      result << %(<p>#{node.authors.map {|author| compose_author author, node}.join('; ')}</p>)
+    end
+
+    # Close the document body:
+    result << node.content
+    result << %(</body>)
+    result << %(</topic>)
+
     # Return the XML output:
-    <<~EOF.chomp
-    <?xml version='1.0' encoding='utf-8' ?>
-    <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
-    <topic#{compose_id (node.id or node.attributes['docname'])}#{outputclass}>
-    <title>#{node.doctitle}</title>
-    <body>
-    #{node.content}
-    </body>
-    </topic>
-    EOF
+    result.join LF
   end
 
   def convert_admonition node
@@ -802,6 +836,12 @@ class DitaTopic < Asciidoctor::Converter::Base
     <p outputclass="title"><b>#{title}</b></p>
     #{content}
     EOF
+  end
+
+  def compose_author author, node
+    name = node.sub_replacements author.name
+    mail = %( &lt;#{node.sub_replacements author.email}&gt;) if author.email
+    return %(#{name}#{mail})
   end
 
   def compose_floating_title title
