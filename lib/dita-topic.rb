@@ -1,5 +1,5 @@
 # A custom AsciiDoc converter that generates individual DITA topics
-# Copyright (C) 2024 Jaromir Hradilek
+# Copyright (C) 2024, 2025 Jaromir Hradilek
 
 # MIT License
 #
@@ -48,7 +48,9 @@ class DitaTopic < Asciidoctor::Converter::Base
     @callouts_allowed = false if (node.attr 'dita-topic-callouts') == 'off'
 
     # Check if the modular documentation content type is specified:
-    outputclass = (node.attr? '_mod-docs-content-type') ? %( outputclass="#{(node.attr '_mod-docs-content-type').downcase}") : ''
+    outputclass = ''
+    outputclass = %( outputclass="#{(node.attr '_content-type').downcase}") if node.attr? '_content-type'
+    outputclass = %( outputclass="#{(node.attr '_mod-docs-content-type').downcase}") if node.attr? '_mod-docs-content-type'
 
     # Return the XML output:
     <<~EOF.chomp
