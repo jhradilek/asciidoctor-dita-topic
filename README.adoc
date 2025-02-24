@@ -175,6 +175,6 @@ Video macro not supported:: AsciiDoc allows you to embed video content in your d
 [#copyright]
 == Copyright
 
-Copyright (C) 2024 Jaromir Hradilek
+Copyright (C) 2024, 2025 Jaromir Hradilek
 
 This program is free software, released under the terms of the link:LICENSE[MIT license]. It is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
