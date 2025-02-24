@@ -80,10 +80,22 @@ $ **asciidoctor -r dita-topic -b dita-topic -a ProductNumber=2 *.adoc**
 ....
 ====
 
+[#authors]
+=== Enabling author lines
+
+AsciiDoc topics are expected to be included in other files and therefore should not contain link:https://docs.asciidoctor.org/asciidoc/latest/document/author-line/[author line] definitions. In most cases, lines that directly follow the topic title are intended as first paragraphs. For this reason, author lines are disabled by default. To avoid losing content during conversion, as a workaround, the `dita-topic` converter interprets the raw content of the author line as a paragraph and issues a warning.
+
+To enable processing of author lines as metadata, set the value of the `dita-topic-authors` to `on`:
+
+[literal,subs="+quotes"]
+....
+$ **asciidoctor -r dita-topic -b dita-topic -a dita-topic-authors=on _your_file_.adoc**
+....
+
 [#titles]
 === Disabling floating titles
 
-Unlike AsciiDoc, DITA does not support floating titles and only allows titles to be assigned to a limited number of elements. To avoid losing content during the conversion, as a workaround, the `dita-topic` converter uses the following markup by default:
+Unlike AsciiDoc, DITA does not support floating titles and only allows titles to be assigned to a limited number of elements. To avoid losing content during conversion, as a workaround, the `dita-topic` converter uses the following markup by default:
 
 [source,xml]
 ----
@@ -100,7 +112,7 @@ $ **asciidoctor -r dita-topic -b dita-topic -a dita-topic-titles=off _your_file_
 [#callouts]
 === Disabling callouts
 
-Unlike AsciiDoc, DITA does not support callouts as a method to add annotations to specific lines in verbatim blocks. To avoid losing content during the conversion, as a workaround, the `dita-topic` converter uses XML entities for circled numbers.
+Unlike AsciiDoc, DITA does not support callouts as a method to add annotations to specific lines in verbatim blocks. To avoid losing content during conversion, as a workaround, the `dita-topic` converter uses XML entities for circled numbers.
 
 To disable this behavior, set the value of the `dita-topic-callouts` to `off`:
 
@@ -135,6 +147,8 @@ This possible warning messages are as follows:
 Admonition titles not supported in DITA:: AsciiDoc allows you to add a custom title to any admonition by including `._Admonition title_` on the line above it. Unlike AsciiDoc, DITA does not allow titles for admonitions. `dita-topic` issues this warning whenever an admonition has a title defined in the converted AsciiDoc file.
 
 Audio macro not supported:: AsciiDoc allows you to embed audio content in your documents by using the `audio::__audio_file__[]` macro. `dita-topic` does not implement this feature and issues this warning whenever the `audio` macro is present in the converted AsciiDoc file.
+
+Author lines not enabled for topics:: AsciiDoc interprets the first line that directly follows the document title as an author line. Because topics are not expected to have author lines, `dita-topic` issues this warning when an author line is present in the converted AsciiDoc file.
 
 Block titles not supported in DITA:: AsciiDoc allows you to include `._Block title_` on the line above most of the block elements to assign a custom title to them. Unlike AsciiDoc, DITA only allows titles to be assigned to a limited number of elements. `dita-topic` issues this warning when the `-a dita-topic-titles=off` option is specified and a block title is present in the converted AsciiDoc file.
 
