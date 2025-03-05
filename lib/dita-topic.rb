@@ -278,20 +278,26 @@ class DitaTopic < Asciidoctor::Converter::Base
       # I do not want to process them from this script, I choose to issue a
       # warning so that the user can resolve the problem.
 
-      # Determine whether the cross reference links to a file path or an ID:
+      # Determine whether the cross reference links to a file path:
       if (path = node.attributes['path'])
         # Issue a warning if the cross reference includes an ID:
         logger.warn "#{NAME}: Possible invalid reference: #{node.target}" if node.target.include? '#'
 
         # Compose a cross reference:
-        %(<xref href="#{node.target}">#{node.text || path}</xref>)
-      else
-        # Issue a warning as the cross reference is unlikely to work:
-        logger.warn "#{NAME}: Possible invalid reference: #{node.target}"
-
-        # Compose the cross reference:
-        node.text ? %(<xref href="#{node.target}">#{node.text}</xref>) : %(<xref href="#{node.target}" />)
+        return %(<xref href="#{node.target}">#{node.text || path}</xref>)
       end
+
+      # Determine whether the ID reference target is in this document:
+      if node.document.catalog[:refs].key? (target = node.target.delete_prefix '#')
+        # Compose the cross reference:
+        return node.text ? %(<xref href="#./#{target}">#{node.text}</xref>) : %(<xref href="#./#{target}" />)
+      end
+
+      # Issue a warning as the cross reference is unlikely to work:
+      logger.warn "#{NAME}: Possible invalid reference: #{node.target}"
+
+      # Compose the cross reference:
+      node.text ? %(<xref href="#{node.target}">#{node.text}</xref>) : %(<xref href="#{node.target}" />)
     when :ref
       # NOTE: DITA does not have a dedicated element for inline anchors or
       # a direct equivalent of the <span> element from HTML. The solution
