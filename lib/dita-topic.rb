@@ -53,8 +53,11 @@ class DitaTopic < Asciidoctor::Converter::Base
     # Check if floating and block titles are enabled:
     @titles_allowed = false if (node.attr 'dita-topic-titles') == 'off'
 
-    # Check if the modular documentation content type is specified:
+    # Check if the modular documentation content type is specified; both
+    # _module-type and _content-type are deprecated, but still present in
+    # some modules:
     outputclass = ''
+    outputclass = %( outputclass="#{(node.attr '_module-type').downcase}") if node.attr? '_module-type'
     outputclass = %( outputclass="#{(node.attr '_content-type').downcase}") if node.attr? '_content-type'
     outputclass = %( outputclass="#{(node.attr '_mod-docs-content-type').downcase}") if node.attr? '_mod-docs-content-type'
 
