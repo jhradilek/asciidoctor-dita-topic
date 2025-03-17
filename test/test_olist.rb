@@ -20,8 +20,8 @@ class OlistTest < Minitest::Test
     . Item two
     EOF
 
-    assert_xpath_equal xml, 'Item one', '//ol/li[1]/p[1]/text()'
-    assert_xpath_equal xml, 'Additional paragraph', '//ol/li[1]/p[2]/text()'
+    assert_xpath_equal xml, 'Item one', '//ol/li[1]/text()'
+    assert_xpath_equal xml, 'Additional paragraph', '//ol/li[1]/p[1]/text()'
   end
 
   def test_ordered_list_title

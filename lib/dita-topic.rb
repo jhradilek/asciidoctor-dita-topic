@@ -463,8 +463,7 @@ class DitaTopic < Asciidoctor::Converter::Base
     node.items.each do |item|
       # Check if the list item contains multiple block elements:
       if item.blocks?
-        result << %(<li>)
-        result << %(<p>#{item.text}</p>)
+        result << %(<li>#{item.text})
         result << item.content
         result << %(</li>)
       else
@@ -694,8 +693,7 @@ class DitaTopic < Asciidoctor::Converter::Base
 
       # Check if the list item contains multiple block elements:
       if item.blocks?
-        result << %(<li>)
-        result << %(<p>#{check_box}#{item.text}</p>)
+        result << %(<li>#{check_box}#{item.text})
         result << item.content
         result << %(</li>)
       else
