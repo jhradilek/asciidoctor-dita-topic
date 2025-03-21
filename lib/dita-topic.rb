@@ -36,6 +36,9 @@ class DitaTopic < Asciidoctor::Converter::Base
     # Disable the author line by default:
     @authors_allowed = false
 
+    # Enable abstract paragraphs by default:
+    @abstracts_allowed = true
+
     # Enable callouts by default:
     @callouts_allowed = true
 
@@ -46,6 +49,9 @@ class DitaTopic < Asciidoctor::Converter::Base
   def convert_document node
     # Check if the author line is enabled:
     @authors_allowed = true if (node.attr 'dita-topic-authors') == 'on'
+
+    # Check if abstract paragraphs are enabled:
+    @abstracts_allowed = false if (node.attr 'dita-topic-abstracts') == 'off'
 
     # Check if callouts are enabled:
     @callouts_allowed = false if (node.attr 'dita-topic-callouts') == 'off'
@@ -509,7 +515,11 @@ class DitaTopic < Asciidoctor::Converter::Base
   end
 
   def convert_paragraph node
-    add_block_title %(<p>#{node.content}</p>), node.title
+    if @abstracts_allowed and (node.attr 'role') == '_abstract'
+      add_block_title %(<p outputclass="abstract">#{node.content}</p>), node.title
+    else
+      add_block_title %(<p>#{node.content}</p>), node.title
+    end
   end
 
   def convert_preamble node
