@@ -1,6 +1,6 @@
 = dita-topic
 
-`dita-topic` is a custom converter for Asciidoctor that converts a single AsciiDoc file to a corresponding DITA topic. To convert the produced DITA topic to a specialized DITA concept, reference, or task, use the link:https://github.com/jhradilek/dita-custom-xslt[dita_convert Python package].
+`dita-topic` is a custom converter for Asciidoctor that converts a single AsciiDoc file to a corresponding DITA topic. To convert the produced DITA topic to a specialized DITA concept, reference, or task, use the link:https://github.com/jhradilek/dita-custom-xslt#installation[dita-convert Python package].
 
 [#install]
 == Installation
@@ -119,6 +119,18 @@ To disable this behavior, set the value of the `dita-topic-callouts` to `off`:
 [literal,subs="+quotes"]
 ....
 $ **asciidoctor -r dita-topic -b dita-topic -a dita-topic-callouts=off _your_file_.adoc**
+....
+
+[#abstracts]
+=== Disable abstracts
+
+By default, the `dita-topic` converter recognizes a paragraph preceded by the `[role="_abstract"]` attribute list and preserves this information by adding the `outputclass="abstract"` attribute to it in DITA. The link:https://github.com/jhradilek/dita-custom-xslt#installation[dita-convert Python package] uses this attribute to populate the `<shortdesc>` element during conversion to a specialized DITA concept, reference, or task.
+
+To disable this behavior, set the value of the `dita-topic-abstracts` to `off`:
+
+[literal,subs="+quotes"]
+....
+$ **asciidoctor -r dita-topic -b dita-topic -a dita-topic-abstracts=off _your_file_.adoc**
 ....
 
 [#includes]
