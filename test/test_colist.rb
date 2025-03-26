@@ -19,13 +19,13 @@ class ColistTest < Minitest::Test
     <3> Convert self to DocBook 5
     EOF
 
-    assert_xpath_equal xml, '2', '//table/tgroup/@cols'
-    assert_xpath_equal xml, '&#9312;', '//table/tgroup/tbody/row[1]/entry[1]/text()'
-    assert_xpath_equal xml, 'Extend the String class', '//table/tgroup/tbody/row[1]/entry[2]/p/text()'
-    assert_xpath_equal xml, '&#9313;', '//table/tgroup/tbody/row[2]/entry[1]/text()'
-    assert_xpath_equal xml, 'Define a new method', '//table/tgroup/tbody/row[2]/entry[2]/p/text()'
-    assert_xpath_equal xml, '&#9314;', '//table/tgroup/tbody/row[3]/entry[1]/text()'
-    assert_xpath_equal xml, 'Convert self to DocBook 5', '//table/tgroup/tbody/row[3]/entry[2]/p/text()'
+    assert_xpath_count xml, 3, '//dl/dlentry'
+    assert_xpath_equal xml, '&#9312;', '//dl/dlentry[1]/dt/text()'
+    assert_xpath_equal xml, 'Extend the String class', '//dl/dlentry[1]/dd/text()'
+    assert_xpath_equal xml, '&#9313;', '//dl/dlentry[2]/dt/text()'
+    assert_xpath_equal xml, 'Define a new method', '//dl/dlentry[2]/dd/text()'
+    assert_xpath_equal xml, '&#9314;', '//dl/dlentry[3]/dt/text()'
+    assert_xpath_equal xml, 'Convert self to DocBook 5', '//dl/dlentry[3]/dd/text()'
   end
 
   def test_colist_outputclass
@@ -36,6 +36,6 @@ class ColistTest < Minitest::Test
     <1> Code description
     EOF
 
-    assert_xpath_equal xml, 'callout-list', '//table/@outputclass'
+    assert_xpath_equal xml, 'callout-list', '//dl/@outputclass'
   end
 end

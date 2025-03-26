@@ -142,42 +142,36 @@ class DitaTopic < Asciidoctor::Converter::Base
     # Reset the counter:
     number = 0
 
-    # Open the table:
-    result = ['<table outputclass="callout-list">']
-    result << %(<tgroup cols="2">)
-    result << %(<colspec colwidth="15*" />)
-    result << %(<colspec colwidth="85*" />)
-    result << %(<tbody>)
+    # Open the definition list:
+    result = ['<dl outputclass="callout-list">']
 
     # Process individual list items:
     node.items.each do |item|
       # Increment the counter:
       number += 1
 
-      # Open the table row:
-      result << %(<row>)
+      # Open the definition entry:
+      result << %(<dlentry>)
 
       # Compose the callout number:
-      result << %(<entry>#{compose_circled_number number}</entry>)
+      result << %(<dt>#{compose_circled_number number}</dt>)
 
       # Check if description contains multiple block elements:
       if item.blocks
-        result << %(<entry>)
-        result << %(<p>#{item.text}</p>)
+        result << %(<dd>)
+        result << item.text
         result << item.content
-        result << %(</entry>)
+        result << %(</dd>)
       else
         result << %(<entry>#{item.text}</entry>)
       end
 
-      # Close the row:
-      result << %(</row>)
+      # Close the definition entry:
+      result << %(</dlentry>)
     end
 
-    # Close the table:
-    result << %(</tbody>)
-    result << %(</tgroup>)
-    result << %(</table>)
+    # Close the definition list:
+    result << %(</dl>)
 
     # Return the XML output:
     result.join LF
