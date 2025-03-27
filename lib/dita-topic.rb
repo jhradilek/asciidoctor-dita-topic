@@ -242,11 +242,15 @@ class DitaTopic < Asciidoctor::Converter::Base
     %(<p outputclass="title sect#{node.level}"><b>#{node.title}</b></p>)
   end
 
-  def convert_image(node)
+  def convert_image node
     # Check if additional attributes are specified:
     width  = (node.attr? 'width') ? %( width="#{node.attr 'width'}") : ''
     height = (node.attr? 'height') ? %( height="#{node.attr 'height'}") : ''
     scale  = (node.attr? 'scale') ? %( scale="#{(node.attr 'scale').tr('%', '')}") : ''
+
+    # Exclude width and height attributes with percentage values:
+    width   = '' if width.include? '%'
+    height  = '' if height.include? '%'
 
     # Check if the image has a title specified:
     if node.title?
@@ -358,6 +362,10 @@ class DitaTopic < Asciidoctor::Converter::Base
     # Check if additional attributes are specified:
     width  = (node.attr? 'width') ? %( width="#{node.attr 'width'}") : ''
     height = (node.attr? 'height') ? %( height="#{node.attr 'height'}") : ''
+
+    # Exclude width and height attributes with percentage values:
+    width   = '' if width.include? '%'
+    height  = '' if height.include? '%'
 
     # Return the XML output:
     %(<image href="#{node.image_uri node.target}"#{width}#{height} placement="inline"><alt>#{node.alt}</alt></image>)

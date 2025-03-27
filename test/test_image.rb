@@ -40,12 +40,15 @@ class ImageTest < Minitest::Test
     xml = <<~EOF.chomp.to_dita
     image::image-1.png[First image,320,240]
     image::image-2.png[alt="Second image", width=640, height=480]
+    image::image-3.png[Third image,50%,50%]
     EOF
 
     assert_xpath_equal xml, '320', '//image[@href="image-1.png"]/@width'
     assert_xpath_equal xml, '240', '//image[@href="image-1.png"]/@height'
     assert_xpath_equal xml, '640', '//image[@href="image-2.png"]/@width'
     assert_xpath_equal xml, '480', '//image[@href="image-2.png"]/@height'
+    assert_xpath_count xml, 0, '//image[@href="image-3.png"]/@width'
+    assert_xpath_count xml, 0, '//image[@href="image-3.png"]/@height'
   end
 
   def test_image_scaling

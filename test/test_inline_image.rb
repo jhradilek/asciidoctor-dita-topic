@@ -37,12 +37,14 @@ class InlineImageTest < Minitest::Test
 
   def test_image_sizing
     xml = <<~EOF.chomp.to_dita
-    A paragraph with a image:image-1.png[first,48,32] and image:image-2.png[alt=second, width=24, height=16] image.
+    A paragraph with a image:image-1.png[first,48,32], image:image-2.png[alt=second, width=24, height=16], and image:image-3.png[third,50%,50%] image.
     EOF
 
     assert_xpath_equal xml, '48', '//p/image[@href="image-1.png"]/@width'
     assert_xpath_equal xml, '32', '//p/image[@href="image-1.png"]/@height'
     assert_xpath_equal xml, '24', '//p/image[@href="image-2.png"]/@width'
     assert_xpath_equal xml, '16', '//p/image[@href="image-2.png"]/@height'
+    assert_xpath_count xml, 0, '//p/image[@href="image-3.png"]/@width'
+    assert_xpath_count xml, 0, '//p/image[@href="image-3.png"]/@height'
   end
 end
