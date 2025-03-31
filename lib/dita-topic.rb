@@ -353,9 +353,17 @@ class DitaTopic < Asciidoctor::Converter::Base
     compose_circled_number node.text.to_i
   end
 
-  # FIXME: Add support for footnoteref equivalent.
   def convert_inline_footnote node
-    %(<fn>#{node.text}</fn>)
+    # Check whether the footnote is a definition or a reference:
+    if node.type == :xref
+      %(<xref href="#./#{node.target}" type="fn" />)
+    elsif node.id
+      # Define the footnote and immediately reference it to match AsdciiDoc
+      # behavior:
+      %(<fn#{compose_id node.id}>#{node.text}</fn><xref href="#./#{node.id}" type="fn" />)
+    else
+      %(<fn>#{node.text}</fn>)
+    end
   end
 
   def convert_inline_image node
