@@ -29,6 +29,8 @@ class DitaTopic < Asciidoctor::Converter::Base
   NAME = 'dita-topic'
   register_for NAME
 
+  require 'securerandom'
+
   def initialize *args
     super
     outfilesuffix '.dita'
@@ -70,7 +72,7 @@ class DitaTopic < Asciidoctor::Converter::Base
     # Open the document:
     result = ["<?xml version='1.0' encoding='utf-8' ?>"]
     result << %(<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">)
-    result << %(<topic#{compose_id (node.id or node.attributes['docname'])}#{outputclass}>)
+    result << %(<topic#{compose_id (node.id or node.attributes['docname'] or 'topic-'+SecureRandom.uuid)}#{outputclass}>)
     result << %(<title>#{node.doctitle}</title>)
 
     # Check if the author line is enabled and defined:

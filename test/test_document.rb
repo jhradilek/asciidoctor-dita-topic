@@ -15,6 +15,16 @@ class DocumentTest < Minitest::Test
     assert_xpath_equal xml, 'Topic contents.', '/topic/body/p/text()'
   end
 
+  def test_no_topic_id
+    xml = <<~EOF.chomp.to_dita
+    = Topic title
+
+    Topic contents.
+    EOF
+
+    assert_xpath_count xml, 1, '/topic/@id'
+  end
+
   def test_content_type
     xml = <<~EOF.chomp.to_dita
     :_mod-docs-content-type: PROCEDURE
