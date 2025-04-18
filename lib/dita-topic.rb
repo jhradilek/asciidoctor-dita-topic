@@ -352,7 +352,7 @@ class DitaTopic < Asciidoctor::Converter::Base
     end
 
     # Return the XML entity:
-    compose_circled_number node.text.to_i
+    %(<b outputclass="callout">#{compose_circled_number node.text.to_i}</b>)
   end
 
   def convert_inline_footnote node

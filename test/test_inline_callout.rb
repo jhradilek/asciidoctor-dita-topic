@@ -2,6 +2,16 @@ require 'minitest/autorun'
 require_relative 'helper'
 
 class InlineCalloutTest < Minitest::Test
+  def test_callout_number_outputclass
+    xml = <<~EOF.chomp.to_dita
+    ....
+    puts "Testing a callout" <1>
+    ....
+    EOF
+
+    assert_xpath_equal xml, 'callout', '//pre/b/@outputclass'
+  end
+
   def test_callout_number_range
     xml = <<~EOF.chomp.to_dita
     ....
@@ -25,11 +35,11 @@ class InlineCalloutTest < Minitest::Test
     EOF
 
     # Three ranges of symbols are used to cover numbers between 1 and 50:
-    assert_xpath_equal xml, '1: &#9312;', '//pre[contains(., "1:")]/text()'
-    assert_xpath_equal xml, '20: &#9331;', '//pre[contains(., "20:")]/text()'
-    assert_xpath_equal xml, '21: &#12881;', '//pre[contains(., "21:")]/text()'
-    assert_xpath_equal xml, '35: &#12895;', '//pre[contains(., "35:")]/text()'
-    assert_xpath_equal xml, '36: &#12977;', '//pre[contains(., "36:")]/text()'
-    assert_xpath_equal xml, '50: &#12991;', '//pre[contains(., "50:")]/text()'
+    assert_xpath_equal xml, '&#9312;', '//pre[contains(., "1:")]/b/text()'
+    assert_xpath_equal xml, '&#9331;', '//pre[contains(., "20:")]/b/text()'
+    assert_xpath_equal xml, '&#12881;', '//pre[contains(., "21:")]/b/text()'
+    assert_xpath_equal xml, '&#12895;', '//pre[contains(., "35:")]/b/text()'
+    assert_xpath_equal xml, '&#12977;', '//pre[contains(., "36:")]/b/text()'
+    assert_xpath_equal xml, '&#12991;', '//pre[contains(., "50:")]/b/text()'
   end
 end
