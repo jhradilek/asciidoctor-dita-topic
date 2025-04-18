@@ -222,6 +222,12 @@ class DitaTopic < Asciidoctor::Converter::Base
   end
 
   def convert_example node
+    # Issue a warning if the example is nested:
+    unless (parent = node.parent.context) == :document
+      logger.warn "#{NAME}: Examples not supported within #{parent} in DITA"
+    end
+
+    # Return the XML output:
     <<~EOF.chomp
     <example#{compose_id node.id}>
     #{node.title ? %(<title>#{node.title}</title>\n) : ''}#{node.content}
