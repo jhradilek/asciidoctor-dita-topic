@@ -447,6 +447,18 @@ class DitaTopic < Asciidoctor::Converter::Base
       %(&#8220;#{node.text}&#8221;)
     when :single
       %(&#8216;#{node.text}&#8217;)
+    when :asciimath
+      # Issue a warning if a STEM content is present:
+      logger.warn "#{NAME}: STEM support not implemented"
+
+      # Add comments around the STEM content:
+      %(<!-- asciimath start -->#{node.text}<!-- asciimath end -->)
+    when :latexmath
+      # Issue a warning if a STEM content is present:
+      logger.warn "#{NAME}: STEM support not implemented"
+
+      # Add comments around the STEM content:
+      %(<!-- latexmath start -->#{node.text}<!-- latexmath end -->)
     else
       node.text
     end
