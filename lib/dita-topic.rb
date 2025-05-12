@@ -46,6 +46,9 @@ class DitaTopic < Asciidoctor::Converter::Base
 
     # Enable floating and block titles by default:
     @titles_allowed = true
+
+    # Enable sidebars by default:
+    @sidebars_allowed = true
   end
 
   def convert_document node
@@ -60,6 +63,9 @@ class DitaTopic < Asciidoctor::Converter::Base
 
     # Check if floating and block titles are enabled:
     @titles_allowed = false if (node.attr 'dita-topic-titles') == 'off'
+
+    # Check if sidebars are enabled:
+    @sidebars_allowed = false if (node.attr 'dita-topic-sidebars') == 'off'
 
     # Check if the modular documentation content type is specified; both
     # _module-type and _content-type are deprecated, but still present in
@@ -605,6 +611,12 @@ class DitaTopic < Asciidoctor::Converter::Base
   def convert_sidebar node
     # NOTE: Unlike AsciiDoc, DITA does not provide markup for a sidebar. As
     # a workaround, I decided to use a div with the outputclass attribute.
+
+    # Issue a warning if sidebars are disabled:
+    unless @sidebars_allowed
+      logger.warn "#{NAME}: Sidebars not supported in DITA"
+      return ''
+    end
 
     # Check if the content contains multiple block elements:
     if node.content_model == :compound
