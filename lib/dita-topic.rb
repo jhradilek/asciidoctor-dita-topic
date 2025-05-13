@@ -229,7 +229,7 @@ class DitaTopic < Asciidoctor::Converter::Base
 
   def convert_example node
     # Issue a warning if the example is nested:
-    unless (parent = node.parent.context) == :document
+    if (parent = node.parent.context) != :document && parent != :preamble
       logger.warn "#{NAME}: Examples not supported within #{parent} in DITA"
     end
 
