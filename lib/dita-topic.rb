@@ -310,7 +310,13 @@ class DitaTopic < Asciidoctor::Converter::Base
 
       # Determine whether the ID reference target is in this document:
       if node.document.catalog[:refs].key? (target = node.target.delete_prefix '#')
-        # Compose the cross reference:
+        # Determine whether the ID reference target is the document id:
+        if target == node.document.id
+          # Compose the unchanged cross reference:
+          return node.text ? %(<xref href="##{target}">#{node.text}</xref>) : %(<xref href="##{target}" />)
+        end
+
+        # Compose the adjusted cross reference:
         return node.text ? %(<xref href="#./#{target}">#{node.text}</xref>) : %(<xref href="#./#{target}" />)
       end
 
