@@ -68,6 +68,17 @@ class InlineAnchorTest < Minitest::Test
     assert_xpath_count xml, 2, '//xref[@href="#./section-title"]'
   end
 
+  def test_xrefs_to_document_id
+    xml = <<~EOF.chomp.to_dita
+    [#topic-title]
+    = Topic title
+
+    Cross reference to xref:topic-title[an anchor] within the same document: <<topic-title>>
+    EOF
+
+    assert_xpath_count xml, 2, '//xref[@href="#topic-title"]'
+  end
+
   def test_xrefs_to_files
     xml = <<~EOF.chomp.to_dita
     Cross references can look like xref:file.adoc[].
