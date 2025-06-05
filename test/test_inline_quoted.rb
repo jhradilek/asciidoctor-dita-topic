@@ -54,4 +54,21 @@ class InlineQuotedTest < Minitest::Test
     assert_xpath_equal xml, 'latexmath end', '//p/comment()[2]'
     assert_xpath_equal xml, '\alpha = \beta + \gamma', '//p/text()[2]'
   end
+
+  def test_semantic_markup
+    xml = <<~EOF.chomp.to_dita
+    :dita-topic-semantic: on
+
+    * [command]`a command`
+    * [filename]`a file name`
+    * [directory]`a directory name`
+    * [option]`an option`
+    EOF
+
+    assert_xpath_count xml, 4, '//li'
+    assert_xpath_equal xml, 'a command', '//li[1]/cmdname/text()'
+    assert_xpath_equal xml, 'a file name', '//li[2]/filepath/text()'
+    assert_xpath_equal xml, 'a directory name', '//li[3]/filepath/text()'
+    assert_xpath_equal xml, 'an option', '//li[4]/option/text()'
+  end
 end
