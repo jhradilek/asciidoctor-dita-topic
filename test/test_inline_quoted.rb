@@ -57,8 +57,6 @@ class InlineQuotedTest < Minitest::Test
 
   def test_semantic_markup
     xml = <<~EOF.chomp.to_dita
-    :dita-topic-semantic: on
-
     * [command]`a command`
     * [filename]`a file name`
     * [directory]`a directory name`
