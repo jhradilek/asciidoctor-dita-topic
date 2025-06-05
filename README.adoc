@@ -166,6 +166,40 @@ By default, Asciidoctor resolves all `include` directives before converting the 
 $ **asciidoctor -r dita-topic -b dita-topic -S secure _your_file_.adoc**
 ....
 
+[#semantics]
+=== Using semantic markup
+
+Unlike AsciiDoc, DITA provides a number of semantic elements for software components such as file names, commands, or command-line options. To replicate this behavior, the `dita-topic` converter recognizes the following link:https://docs.asciidoctor.org/asciidoc/latest/attributes/role/#assign-roles-to-formatted-inline-elements[roles] assigned to monospace (```) inline text:
+
+[cols="1,1"]
+|===
+| AsciiDoc Role
+| DITA Element
+
+| command
+| `<cmdname>`
+
+| directory
+| `<filepath>`
+
+| filename
+| `<filepath>`
+
+| option
+| `<option>`
+
+| variable
+| `<varname>`
+|===
+
+For example, to describe a file name, use the following AsciiDoc markup:
+
+[source,asciidoc]
+----
+Read the [filename]`/etc/passwd` file to see the complete list of
+available user accounts.
+----
+
 [#warnings]
 == Warnings
 

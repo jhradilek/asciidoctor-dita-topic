@@ -450,7 +450,26 @@ class DitaTopic < Asciidoctor::Converter::Base
     when :strong
       %(<b>#{node.text}</b>)
     when :monospaced
-      %(<tt>#{node.text}</tt>)
+      # Check whether a role is provided:
+      if node.role
+        # Define supported roles:
+        semantic_markup = {
+          'command'   => 'cmdname',
+          'directory' => 'filepath',
+          'filename'  => 'filepath',
+          'option'    => 'option',
+          'variable'  => 'varname'
+        }
+
+        # Select the appropriate semantic element:
+        element = (semantic_markup.key? node.role) ? semantic_markup[node.role] : 'tt'
+      else
+        # Use the teletype element by default:
+        element = 'tt'
+      end
+
+      # Return the result:
+      %(<#{element}>#{node.text}</#{element}>)
     when :superscript
       %(<sup>#{node.text}</sup>)
     when :subscript
