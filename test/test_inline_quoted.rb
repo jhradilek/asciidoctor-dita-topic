@@ -58,15 +58,17 @@ class InlineQuotedTest < Minitest::Test
   def test_semantic_markup
     xml = <<~EOF.chomp.to_dita
     * [command]`a command`
-    * [filename]`a file name`
     * [directory]`a directory name`
+    * [filename]`a file name`
     * [option]`an option`
+    * [variable]`a variable`
     EOF
 
-    assert_xpath_count xml, 4, '//li'
+    assert_xpath_count xml, 5, '//li'
     assert_xpath_equal xml, 'a command', '//li[1]/cmdname/text()'
-    assert_xpath_equal xml, 'a file name', '//li[2]/filepath/text()'
-    assert_xpath_equal xml, 'a directory name', '//li[3]/filepath/text()'
+    assert_xpath_equal xml, 'a directory name', '//li[2]/filepath/text()'
+    assert_xpath_equal xml, 'a file name', '//li[3]/filepath/text()'
     assert_xpath_equal xml, 'an option', '//li[4]/option/text()'
+    assert_xpath_equal xml, 'a variable', '//li[5]/varname/text()'
   end
 end

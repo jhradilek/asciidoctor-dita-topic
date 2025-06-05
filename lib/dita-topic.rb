@@ -455,9 +455,10 @@ class DitaTopic < Asciidoctor::Converter::Base
         # Define supported roles:
         semantic_markup = {
           'command'   => 'cmdname',
-          'filename'  => 'filepath',
           'directory' => 'filepath',
-          'option'    => 'option'
+          'filename'  => 'filepath',
+          'option'    => 'option',
+          'variable'  => 'varname'
         }
 
         # Select the appropriate semantic element:
