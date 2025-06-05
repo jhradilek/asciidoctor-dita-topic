@@ -38,6 +38,9 @@ class DitaTopic < Asciidoctor::Converter::Base
     # Disable the author line by default:
     @authors_allowed = false
 
+    # Disable semantic markup by default:
+    @semantic_allowed = false
+
     # Enable abstract paragraphs by default:
     @abstracts_allowed = true
 
@@ -54,6 +57,9 @@ class DitaTopic < Asciidoctor::Converter::Base
   def convert_document node
     # Check if the author line is enabled:
     @authors_allowed = true if (node.attr 'dita-topic-authors') == 'on'
+
+    # Check if semantic markup is enabled:
+    @semantic_allowed = true if (node.attr 'dita-topic-semantic') == 'on'
 
     # Check if abstract paragraphs are enabled:
     @abstracts_allowed = false if (node.attr 'dita-topic-abstracts') == 'off'
@@ -450,7 +456,25 @@ class DitaTopic < Asciidoctor::Converter::Base
     when :strong
       %(<b>#{node.text}</b>)
     when :monospaced
-      %(<tt>#{node.text}</tt>)
+      # Check whether semantic markup is enabled:
+      if @semantic_allowed and node.role
+        # Define supported roles:
+        semantic_markup = {
+          'command'   => 'cmdname',
+          'filename'  => 'filepath',
+          'directory' => 'filepath',
+          'option'    => 'option'
+        }
+
+        # Select the appropriate semantic element:
+        element = (semantic_markup.key? node.role) ? semantic_markup[node.role] : 'tt'
+      else
+        # Use the teletype element by default:
+        element = 'tt'
+      end
+
+      # Return the result:
+      %(<#{element}>#{node.text}</#{element}>)
     when :superscript
       %(<sup>#{node.text}</sup>)
     when :subscript
