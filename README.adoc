@@ -144,18 +144,6 @@ To disable this behavior, set the value of the `dita-topic-callouts` to `off`:
 $ **asciidoctor -r dita-topic -b dita-topic -a dita-topic-callouts=off _your_file_.adoc**
 ....
 
-[#abstracts]
-=== Disable abstracts
-
-By default, the `dita-topic` converter recognizes a paragraph preceded by the `[role="_abstract"]` attribute list and preserves this information by adding the `outputclass="abstract"` attribute to it in DITA. The link:https://github.com/jhradilek/dita-custom-xslt#installation[dita-convert Python package] uses this attribute to populate the `<shortdesc>` element during conversion to a specialized DITA concept, reference, or task.
-
-To disable this behavior, set the value of the `dita-topic-abstracts` to `off`:
-
-[literal,subs="+quotes"]
-....
-$ **asciidoctor -r dita-topic -b dita-topic -a dita-topic-abstracts=off _your_file_.adoc**
-....
-
 [#includes]
 === Disabling include directives
 
@@ -166,8 +154,27 @@ By default, Asciidoctor resolves all `include` directives before converting the 
 $ **asciidoctor -r dita-topic -b dita-topic -S secure _your_file_.adoc**
 ....
 
+[#abstracts]
+=== Adding short descriptions
+
+DITA provides the `<shortdesc>` element which allows the user to describe the purpose of the topic and is often used as preview text in search results. To replicate this behavior, the `dita-topic` converter recognizes a paragraph preceded by the `[role="_abstract"]` attribute list and adds the `outputclass="abstract"` attribute to it. The link:https://github.com/jhradilek/dita-custom-xslt#installation[dita-convert Python package] transforms such a paragraph to `<shortdesc>` during conversion to a specialized DITA concept, reference, or task.
+
+For example, to designate a paragraph as a short description, use the following AsciiDoc markup:
+
+[source,asciidoc]
+----
+[id="topic-id"]
+= Procedure title
+
+[role="_abstract"]
+A short description of the procedure module and what it helps the
+user accomplish.
+
+An introductory paragraph.
+----
+
 [#semantics]
-=== Using semantic markup
+=== Adding semantic markup
 
 Unlike AsciiDoc, DITA provides a number of semantic elements for software components such as file names, commands, or command-line options. To replicate this behavior, the `dita-topic` converter recognizes the following link:https://docs.asciidoctor.org/asciidoc/latest/attributes/role/#assign-roles-to-formatted-inline-elements[roles] assigned to monospace (```) inline text:
 
