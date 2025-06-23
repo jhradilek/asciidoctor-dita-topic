@@ -222,8 +222,6 @@ This possible warning messages are as follows:
 [horizontal]
 Admonition titles not supported in DITA:: AsciiDoc allows you to add a custom title to any admonition by including `._Admonition title_` on the line above it. Unlike AsciiDoc, DITA does not allow titles for admonitions. `dita-topic` issues this warning whenever an admonition has a title defined in the converted AsciiDoc file.
 
-Audio macro not supported:: AsciiDoc allows you to embed audio content in your documents by using the `audio::__audio_file__[]` macro. `dita-topic` does not implement this feature and issues this warning whenever the `audio` macro is present in the converted AsciiDoc file.
-
 Author lines not enabled for topics:: AsciiDoc interprets the first line that directly follows the document title as an author line. Because topics are not expected to have author lines, `dita-topic` issues this warning when an author line is present in the converted AsciiDoc file.
 
 Block titles not supported in DITA:: AsciiDoc allows you to include `._Block title_` on the line above most of the block elements to assign a custom title to them. Unlike AsciiDoc, DITA only allows titles to be assigned to a limited number of elements. `dita-topic` issues this warning when the `-a dita-topic-titles=off` option is specified and a block title is present in the converted AsciiDoc file.
@@ -249,8 +247,6 @@ STEM support not implemented:: AsciiDoc provides multiple ways to insert Science
 Table footers not supported in DITA:: AsciiDoc allows you to set the `footer` option to mark the last table row as a table footer. Unlike AsciiDoc, DITA does not support table footers. `dita-topic` issues this warning whenever a table footer is present in the converted AsciiDoc file.
 
 Thematic breaks not supported in DITA:: Asciidoc allows you to use `'''`, `---`, or `\***` (the last two with possible optional spaces in between the characters) to insert a thematic break in between two blocks, most commonly represented by a horizontal line. Unlike AsciiDoc, DITA does not support thematic breaks. `dita-topic` issues this warning whenever a thematic break is present in the converted AsciiDoc file.
-
-Video macro not supported:: AsciiDoc allows you to embed video content in your documents by using the `video::__video_file__[]` macro. `dita-topic` does not implement this feature and issues this warning whenever the `video` macro is present in the converted AsciiDoc file.
 
 [#copyright]
 == Copyright

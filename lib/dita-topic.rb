@@ -129,9 +129,16 @@ class DitaTopic < Asciidoctor::Converter::Base
   end
 
   def convert_audio node
-    # Issue a warning if audio content is present:
-    logger.warn "#{NAME}: Audio macro not supported"
-    return ''
+    # Check if the audio macro has a title specified:
+    if node.title?
+      <<~EOF.chomp
+      <object data="#{node.media_uri(node.attr 'target')}">
+        <desc>#{node.title}</desc>
+      </object>
+      EOF
+    else
+      %(<object data="#{node.media_uri(node.attr 'target')}" />)
+    end
   end
 
   def convert_colist node
@@ -795,9 +802,41 @@ class DitaTopic < Asciidoctor::Converter::Base
   end
 
   def convert_video node
-    # Issue a warning if video content is present:
-    logger.warn "#{NAME}: Video macro not supported"
-    return ''
+    # Check if additional attributes are specified:
+    width  = (node.attr? 'width') ? %( width="#{node.attr 'width'}") : ''
+    height = (node.attr? 'height') ? %( height="#{node.attr 'height'}") : ''
+
+    # Check if the video is a Vimeo or YouTube video:
+    if (provider = (node.attr 'poster')) == 'youtube'
+      # Separate a playlist from the target:
+      target, list = (node.attr 'target').split '/', 2
+
+      # Check if the playlist is provided as an attribute:
+      if node.attr 'list' and not list
+        list = node.attr 'list'
+      end
+
+      # Compose the playlist URL fragment:
+      list = list ? %(?list=#{list}) : ''
+
+      # Compose the target URL:
+      target_url = %(https://www.youtube.com/embed/#{target}#{list})
+    elsif provider == 'vimeo'
+      target_url = %(https://player.vimeo.com/video/#{node.attr 'target'})
+    else
+      target_url = node.media_uri(node.attr 'target')
+    end
+
+    # Check if the audio macro has a title specified:
+    if node.title?
+      <<~EOF.chomp
+      <object data="#{target_url}"#{width}#{height}>
+        <desc>#{node.title}</desc>
+      </object>
+      EOF
+    else
+      %(<object data="#{target_url}"#{width}#{height} />)
+    end
   end
 
   def compose_qanda_dlist node
