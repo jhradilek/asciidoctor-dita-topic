@@ -129,9 +129,16 @@ class DitaTopic < Asciidoctor::Converter::Base
   end
 
   def convert_audio node
-    # Issue a warning if audio content is present:
-    logger.warn "#{NAME}: Audio macro not supported"
-    return ''
+    # Check if the audio macro has a title specified:
+    if node.title?
+      <<~EOF.chomp
+      <object data="#{node.media_uri(node.attr 'target')}">
+        <desc>#{node.title}</desc>
+      </object>
+      EOF
+    else
+      %(<object data="#{node.media_uri(node.attr 'target')}" />)
+    end
   end
 
   def convert_colist node
