@@ -30,6 +30,14 @@ class VideoTest < Minitest::Test
     assert_xpath_equal xml, '480', '//object/@height'
   end
 
+  def test_vimeo_video
+    xml = <<~EOF.chomp.to_dita
+    video::67480300[vimeo]
+    EOF
+
+    assert_xpath_equal xml, 'https://player.vimeo.com/video/67480300', '//object/@data'
+  end
+
   def test_youtube_video
     xml = <<~EOF.chomp.to_dita
     video::lJIrF4YjHfQ[youtube]

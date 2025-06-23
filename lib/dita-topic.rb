@@ -807,7 +807,7 @@ class DitaTopic < Asciidoctor::Converter::Base
     height = (node.attr? 'height') ? %( height="#{node.attr 'height'}") : ''
 
     # Check if the video is a Vimeo or YouTube video:
-    if (node.attr 'poster') == 'youtube'
+    if (provider = (node.attr 'poster')) == 'youtube'
       # Separate a playlist from the target:
       target, list = (node.attr 'target').split '/', 2
 
@@ -821,6 +821,8 @@ class DitaTopic < Asciidoctor::Converter::Base
 
       # Compose the target URL:
       target_url = %(https://www.youtube.com/embed/#{target}#{list})
+    elsif provider == 'vimeo'
+      target_url = %(https://player.vimeo.com/video/#{node.attr 'target'})
     else
       target_url = node.media_uri(node.attr 'target')
     end
