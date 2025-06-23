@@ -248,8 +248,6 @@ Table footers not supported in DITA:: AsciiDoc allows you to set the `footer` op
 
 Thematic breaks not supported in DITA:: Asciidoc allows you to use `'''`, `---`, or `\***` (the last two with possible optional spaces in between the characters) to insert a thematic break in between two blocks, most commonly represented by a horizontal line. Unlike AsciiDoc, DITA does not support thematic breaks. `dita-topic` issues this warning whenever a thematic break is present in the converted AsciiDoc file.
 
-Video macro not supported:: AsciiDoc allows you to embed video content in your documents by using the `video::__video_file__[]` macro. `dita-topic` does not implement this feature and issues this warning whenever the `video` macro is present in the converted AsciiDoc file.
-
 [#copyright]
 == Copyright
 
