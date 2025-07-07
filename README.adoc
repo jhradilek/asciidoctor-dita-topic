@@ -35,6 +35,11 @@ Install the `asciidoctor-dita-topic` Ruby gem:
 $ *gem install asciidoctor-dita-topic*
 ....
 
+[IMPORTANT]
+====
+On macOS, `asciidoctor` installed with Homebrew expects Ruby gems in a different directory than where `gem install` places them. To work around this issue, you can either link:https://docs.asciidoctor.org/asciidoctor/latest/install/ruby-packaging/#gem-install[install `asciidoctor` as a Ruby gem], or run `asciidoctor` with the `-r` option followed by the relative path to the `dita-topic.rb` file.
+====
+
 [#use]
 == Usage
 
