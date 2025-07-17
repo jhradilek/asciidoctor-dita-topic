@@ -61,6 +61,13 @@ class DitaTopic < Asciidoctor::Converter::Base
     # Check if sidebars are enabled:
     @sidebars_allowed = false if (node.attr 'dita-topic-sidebars') == 'off'
 
+    # Check if the file name is available (it is not for standard input):
+    if node.attr? 'docname'
+      file_name   = node.attr 'docname'
+      file_suffix = (node.attr? 'docfilesuffix') ? (node.attr 'docfilesuffix') : ''
+      @file_name  = "#{file_name}#{file_suffix}"
+    end
+
     # Check if the modular documentation content type is specified; both
     # _module-type and _content-type are deprecated, but still present in
     # some modules:
@@ -95,7 +102,7 @@ class DitaTopic < Asciidoctor::Converter::Base
     # Check if the author line defined while disabled:
     if !@authors_allowed && !node.authors.empty?
       # Issue a warning as inline content is not going to be processed:
-      logger.warn "#{NAME}: Author lines not enabled for topics"
+      logger.warn format_message "Author lines not enabled for topics"
 
       # Process the author line as a plain paragraph:
       result << %(<p>#{node.authors.map {|author| compose_author author, node}.join('; ')}</p>)
@@ -117,7 +124,7 @@ class DitaTopic < Asciidoctor::Converter::Base
 
     # Issue a warning if the admonition has a title:
     if node.title?
-      logger.warn "#{NAME}: Admonition titles not supported in DITA"
+      logger.warn format_message "Admonition titles not supported in DITA"
     end
 
     # Return the XML output:
@@ -144,7 +151,7 @@ class DitaTopic < Asciidoctor::Converter::Base
   def convert_colist node
     # Issue a warning if callouts are disabled:
     unless @callouts_allowed
-      logger.warn "#{NAME}: Callouts not supported in DITA"
+      logger.warn format_message "Callouts not supported in DITA"
       return ''
     end
 
@@ -231,7 +238,7 @@ class DitaTopic < Asciidoctor::Converter::Base
   def convert_example node
     # Issue a warning if the example is nested:
     if (parent = node.parent.context) != :document && parent != :preamble
-      logger.warn "#{NAME}: Examples not supported within #{parent} in DITA"
+      logger.warn format_message "Examples not supported within #{parent} in DITA"
     end
 
     # Return the XML output:
@@ -249,7 +256,7 @@ class DitaTopic < Asciidoctor::Converter::Base
 
     # Issue a warning if floating titles are disabled:
     unless @titles_allowed
-      logger.warn "#{NAME}: Floating titles not supported in DITA"
+      logger.warn format_message "Floating titles not supported in DITA"
       return ''
     end
 
@@ -303,7 +310,7 @@ class DitaTopic < Asciidoctor::Converter::Base
       # Determine whether the cross reference links to a file path:
       if (path = node.attributes['path'])
         # Issue a warning if the cross reference includes an ID:
-        logger.warn "#{NAME}: Possible invalid reference: #{node.target}" if node.target.include? '#'
+        logger.warn format_message "Possible invalid reference: #{node.target}" if node.target.include? '#'
 
         # Compose a cross reference:
         return %(<xref href="#{node.target}">#{node.text || path}</xref>)
@@ -322,7 +329,7 @@ class DitaTopic < Asciidoctor::Converter::Base
       end
 
       # Issue a warning as the cross reference is unlikely to work:
-      logger.warn "#{NAME}: Possible invalid reference: #{node.target}"
+      logger.warn format_message "Possible invalid reference: #{node.target}"
 
       # Compose the cross reference:
       node.text ? %(<xref href="#{node.target}">#{node.text}</xref>) : %(<xref href="#{node.target}" />)
@@ -344,7 +351,7 @@ class DitaTopic < Asciidoctor::Converter::Base
       %(<i id="#{node.id}" />[#{node.reftext || node.id}])
     else
       # Issue a warning if an unknown anchor type is present:
-      logger.warn "#{NAME}: Unknown anchor type: #{node.type}"
+      logger.warn format_message "Unknown anchor type: #{node.type}"
       ''
     end
   end
@@ -353,7 +360,7 @@ class DitaTopic < Asciidoctor::Converter::Base
     # NOTE: Unlike AsciiDoc, DITA does not support inline line breaks.
 
     # Issue a warning if an inline line break is present:
-    logger.warn "#{NAME}: Inline breaks not supported in DITA"
+    logger.warn format_message "Inline breaks not supported in DITA"
 
     # Return the XML output:
     %(#{node.text}<!-- break -->)
@@ -366,7 +373,7 @@ class DitaTopic < Asciidoctor::Converter::Base
   def convert_inline_callout node
     # Issue a warning if callouts are disabled:
     unless @callouts_allowed
-      logger.warn "#{NAME}: Callouts not supported in DITA"
+      logger.warn format_message "Callouts not supported in DITA"
       return ''
     end
 
@@ -481,13 +488,13 @@ class DitaTopic < Asciidoctor::Converter::Base
       %(&#8216;#{node.text}&#8217;)
     when :asciimath
       # Issue a warning if a STEM content is present:
-      logger.warn "#{NAME}: STEM support not implemented"
+      logger.warn format_message "STEM support not implemented"
 
       # Add comments around the STEM content:
       %(<!-- asciimath start -->#{node.text}<!-- asciimath end -->)
     when :latexmath
       # Issue a warning if a STEM content is present:
-      logger.warn "#{NAME}: STEM support not implemented"
+      logger.warn format_message "STEM support not implemented"
 
       # Add comments around the STEM content:
       %(<!-- latexmath start -->#{node.text}<!-- latexmath end -->)
@@ -570,7 +577,7 @@ class DitaTopic < Asciidoctor::Converter::Base
     # NOTE: Unlike AsciiDoc, DITA does not support page breaks.
 
     # Issue a warning if a page break is present:
-    logger.warn "#{NAME}: Page breaks not supported in DITA"
+    logger.warn format_message "Page breaks not supported in DITA"
 
     # Return the XML output:
     %(<p outputclass="page-break"></p>)
@@ -623,7 +630,7 @@ class DitaTopic < Asciidoctor::Converter::Base
     # markup.
 
     # Issue a warning if there are nested sections:
-    logger.warn "#{NAME}: Nesting of sections not supported in DITA" if node.level > 1
+    logger.warn format_message "Nesting of sections not supported in DITA" if node.level > 1
 
     # Return the XML output:
     <<~EOF.chomp
@@ -640,7 +647,7 @@ class DitaTopic < Asciidoctor::Converter::Base
 
     # Issue a warning if sidebars are disabled:
     unless @sidebars_allowed
-      logger.warn "#{NAME}: Sidebars not supported in DITA"
+      logger.warn format_message "Sidebars not supported in DITA"
       return ''
     end
 
@@ -662,7 +669,7 @@ class DitaTopic < Asciidoctor::Converter::Base
 
   def convert_stem node
     # Issue a warning if a STEM content is present:
-    logger.warn "#{NAME}: STEM support not implemented"
+    logger.warn format_message "STEM support not implemented"
     return ''
   end
 
@@ -688,7 +695,7 @@ class DitaTopic < Asciidoctor::Converter::Base
 
       # Issue a warning if a table footer is present:
       if type == :foot
-        logger.warn "#{NAME}: Table footers not supported in DITA"
+        logger.warn format_message "Table footers not supported in DITA"
         next
       end
 
@@ -750,7 +757,7 @@ class DitaTopic < Asciidoctor::Converter::Base
     # NOTE: Unlike AsciiDoc, DITA does not support thematic breaks.
 
     # Issue a warning if a thematic break is present:
-    logger.warn "#{NAME}: Thematic breaks not supported in DITA"
+    logger.warn format_message "Thematic breaks not supported in DITA"
 
     # Return the XML output:
     %(<p outputclass="thematic-break"></p>)
@@ -944,7 +951,7 @@ class DitaTopic < Asciidoctor::Converter::Base
 
     # Issue a warning if block titles are disabled:
     unless @titles_allowed
-      logger.warn "#{NAME}: Block titles not supported in DITA"
+      logger.warn format_message "Block titles not supported in DITA"
       return content
     end
 
@@ -971,7 +978,7 @@ class DitaTopic < Asciidoctor::Converter::Base
 
     # Issue a warning if floating titles are disabled:
     unless @titles_allowed
-      logger.warn "#{NAME}: Floating titles not supported in DITA"
+      logger.warn format_message "Floating titles not supported in DITA"
       return ''
     end
 
@@ -986,7 +993,7 @@ class DitaTopic < Asciidoctor::Converter::Base
   def compose_circled_number number
     # Verify the number is in a supported range:
     if number < 1 || number > 50
-      logger.warn "#{NAME}: Callout number not in range between 1 and 50"
+      logger.warn format_message "Callout number not in range between 1 and 50"
       return number
     end
 
@@ -998,6 +1005,12 @@ class DitaTopic < Asciidoctor::Converter::Base
     else
       %(&##{12941 + number};)
     end
+  end
+
+  def format_message message
+    # Compose the warning or error message:
+    file_name = (defined? @file_name) ? %( #{@file_name}:) : ''
+    %(#{NAME}:#{file_name} #{message})
   end
 end
 end
