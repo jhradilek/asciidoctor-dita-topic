@@ -4,6 +4,8 @@ require_relative 'helper'
 class InlineCalloutTest < Minitest::Test
   def test_callout_number_outputclass
     xml = <<~EOF.chomp.to_dita
+    :dita-topic-callouts: on
+
     ....
     puts "Testing a callout" <1>
     ....
@@ -14,6 +16,8 @@ class InlineCalloutTest < Minitest::Test
 
   def test_callout_number_range
     xml = <<~EOF.chomp.to_dita
+    :dita-topic-callouts: on
+
     ....
     1: <1>
     ....
