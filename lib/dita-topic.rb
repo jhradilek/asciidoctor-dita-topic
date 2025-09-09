@@ -68,13 +68,8 @@ class DitaTopic < Asciidoctor::Converter::Base
       @file_name  = "#{file_name}#{file_suffix}"
     end
 
-    # Check if the modular documentation content type is specified; both
-    # _module-type and _content-type are deprecated, but still present in
-    # some modules:
-    outputclass = ''
-    outputclass = %( outputclass="#{(node.attr '_module-type').downcase}") if node.attr? '_module-type'
-    outputclass = %( outputclass="#{(node.attr '_content-type').downcase}") if node.attr? '_content-type'
-    outputclass = %( outputclass="#{(node.attr '_mod-docs-content-type').downcase}") if node.attr? '_mod-docs-content-type'
+    # Check if the modular documentation content type is specified:
+    outputclass = compose_type_outputclass node
 
     # Open the document:
     result = ["<?xml version='1.0' encoding='utf-8' ?>"]
@@ -1005,6 +1000,18 @@ class DitaTopic < Asciidoctor::Converter::Base
     else
       %(&##{12941 + number};)
     end
+  end
+
+  def compose_type_outputclass node
+    # NOTE: _module-type and _content-type are deprecated, but still
+    # present in some modules:
+    outputclass = ''
+    outputclass = %( outputclass="#{(node.attr '_module-type').downcase}") if node.attr? '_module-type'
+    outputclass = %( outputclass="#{(node.attr '_content-type').downcase}") if node.attr? '_content-type'
+    outputclass = %( outputclass="#{(node.attr '_mod-docs-content-type').downcase}") if node.attr? '_mod-docs-content-type'
+
+    # Return the outputclass attribute:
+    return outputclass
   end
 
   def format_message message
