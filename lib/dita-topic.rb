@@ -46,6 +46,9 @@ class DitaTopic < Asciidoctor::Converter::Base
 
     # Enable sidebars by default:
     @sidebars_allowed = true
+
+    # Disable propagating the content type to sections by default:
+    @type_allowed = false
   end
 
   def convert_document node
@@ -60,6 +63,9 @@ class DitaTopic < Asciidoctor::Converter::Base
 
     # Check if sidebars are enabled:
     @sidebars_allowed = false if (node.attr 'dita-topic-sidebars') == 'off'
+
+    # Check if propagating the content type to sections is enabled:
+    @type_allowed = true if (node.attr 'dita-topic-type') == 'on'
 
     # Check if the file name is available (it is not for standard input):
     if node.attr? 'docname'
@@ -627,9 +633,12 @@ class DitaTopic < Asciidoctor::Converter::Base
     # Issue a warning if there are nested sections:
     logger.warn format_message "Nesting of sections not supported in DITA" if node.level > 1
 
+    # Check if the modular documentation content type is specified:
+    outputclass = @type_allowed ? compose_type_outputclass(node.document) : ''
+
     # Return the XML output:
     <<~EOF.chomp
-    <section#{compose_id node.id}>
+    <section#{compose_id node.id}#{outputclass}>
     <title>#{node.title}</title>
     #{node.content}
     </section>
