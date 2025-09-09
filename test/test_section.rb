@@ -55,4 +55,34 @@ class SectionTest < Minitest::Test
 
     assert_xpath_equal xml, '_section_title', '//section/@id'
   end
+
+  def test_type_outputclass
+    xml = <<~EOF.chomp.to_dita
+    :dita-topic-type: on
+    :_mod-docs-content-type: ASSEMBLY
+
+    = Topic title
+
+    :_mod-docs-content-type: CONCEPT
+    == First section
+
+    Section contents.
+
+    :_mod-docs-content-type: PROCEDURE
+    == Second section
+
+    Section contents.
+
+    :_mod-docs-content-type: REFERENCE
+    == Third section
+
+    Section contents.
+    EOF
+
+    assert_xpath_count xml, 3, '//section'
+    assert_xpath_equal xml, 'assembly', '//topic/@outputclass'
+    assert_xpath_equal xml, 'concept', '//section[1]/@outputclass'
+    assert_xpath_equal xml, 'procedure', '//section[2]/@outputclass'
+    assert_xpath_equal xml, 'reference', '//section[3]/@outputclass'
+  end
 end
