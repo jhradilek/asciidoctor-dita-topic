@@ -1023,6 +1023,43 @@ class DitaTopic < Asciidoctor::Converter::Base
     return outputclass
   end
 
+  def compose_metadata node
+    # Check if the role is defined:
+    return '' unless node.role
+
+    # Set the initial value:
+    result = {}
+
+    # Define supported metadata attributes:
+    valid  = ['platform', 'product', 'audience', 'otherprops']
+
+    # Process each role:
+    node.role.split.each do |role|
+      # Ignore roles that do not follow the attribute:value format:
+      next unless role.include? ':'
+
+      # Separate the attribute name from its value:
+      attribute, value = role.split ':'
+
+      # Ignore unsupported attribute names:
+      next unless valid.include? attribute
+
+      # Append the value to the attribute:
+      if result.key? attribute
+        result[attribute] << %( #{value})
+      else
+        result[attribute] = %(#{value})
+      end
+    end
+
+    # Return the list of metadata attributes otherwise:
+    if result.empty?
+      return ''
+    else
+      return ' ' + result.map { |k, v| %(#{k}="#{v}") unless v.empty? }.join(' ')
+    end
+  end
+
   def format_message message
     # Compose the warning or error message:
     file_name = (defined? @file_name) ? %( #{@file_name}:) : ''
