@@ -47,4 +47,24 @@ class SidebarTest < Minitest::Test
     assert_xpath_equal xml, 'A sidebar title', '//div/p[@outputclass="title"]/b/text()'
     assert_xpath_equal xml, 'Sidebar text', '//div/p[2]/text()'
   end
+
+  def test_sidebar_role
+    xml = <<~EOF.chomp.to_dita
+    [sidebar,role="platform:linux"]
+    Sidebar text
+    EOF
+
+    assert_xpath_equal xml, 'linux', '//div/@platform'
+  end
+
+  def test_delimited_sidebar_role
+    xml = <<~EOF.chomp.to_dita
+    [role="platform:linux"]
+    ****
+    Sidebar text
+    ****
+    EOF
+
+    assert_xpath_equal xml, 'linux', '//div/@platform'
+  end
 end

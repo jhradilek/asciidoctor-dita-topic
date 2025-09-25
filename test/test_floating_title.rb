@@ -30,4 +30,13 @@ class FloatingTitleTest < Minitest::Test
     assert_xpath_includes xml, 'Section 4', '//p[@outputclass="title sect4"]/b/text()'
     assert_xpath_includes xml, 'Section 5', '//p[@outputclass="title sect5"]/b/text()'
   end
+
+  def test_section_role
+    xml = <<~EOF.chomp.to_dita
+    [discrete,role="platform:linux"]
+    == Section 1
+    EOF
+
+    assert_xpath_equal xml, 'linux', '//p[@outputclass="title sect1"]/@platform'
+  end
 end

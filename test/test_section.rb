@@ -85,4 +85,17 @@ class SectionTest < Minitest::Test
     assert_xpath_equal xml, 'procedure', '//section[2]/@outputclass'
     assert_xpath_equal xml, 'reference', '//section[3]/@outputclass'
   end
+
+  def test_section_role
+    xml = <<~EOF.chomp.to_dita
+    = Topic title
+
+    [role="platform:linux"]
+    == Section title
+
+    Section contents.
+    EOF
+
+    assert_xpath_equal xml, 'linux', '//section/@platform'
+  end
 end

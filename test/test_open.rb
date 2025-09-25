@@ -75,4 +75,45 @@ class OpenTest < Minitest::Test
     assert_xpath_count xml, 1, '//body/p'
     assert_xpath_count xml, 1, '//body/section/p'
   end
+
+  def test_simple_abstract_role
+    xml = <<~EOF.chomp.to_dita
+    = A document header
+
+    [abstract,role="platform:linux"]
+    An abstract.
+    EOF
+
+    assert_xpath_equal xml, 'linux', '//body/p/@platform'
+  end
+
+  def test_compound_abstract_role
+    xml = <<~EOF.chomp.to_dita
+    = A document header
+
+    [abstract,role="platform:linux"]
+    --
+    An abstract.
+
+    An abstract continued.
+    --
+    EOF
+
+    assert_xpath_equal xml, 'linux', '//body/div/@platform'
+  end
+
+  def test_part_introduction_role
+    xml = <<~EOF.chomp.to_dita 'book'
+    = A document header
+
+    A paragraph.
+
+    = A part header
+
+    [role="platform:linux"]
+    A part introduction.
+    EOF
+
+    assert_xpath_equal xml, 'linux', '//body/section/p/@platform'
+  end
 end

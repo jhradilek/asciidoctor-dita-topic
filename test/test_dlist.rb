@@ -60,4 +60,14 @@ class DlistTest < Minitest::Test
     assert_xpath_equal xml, 'A description list title', '//p[@outputclass="title"]/b/text()'
     assert_xpath_count xml, 2, '//dl/dlentry'
   end
+
+  def test_description_list_role
+    xml = <<~EOF.chomp.to_dita
+    [role="platform:linux"]
+    Term1:: Definition one
+    Term2:: Definition two
+    EOF
+
+    assert_xpath_equal xml, 'linux', '//dl/@platform'
+  end
 end

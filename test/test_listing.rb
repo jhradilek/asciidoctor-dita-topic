@@ -76,4 +76,13 @@ class ListingTest < Minitest::Test
 
     assert_xpath_equal xml, 'language-ruby', '//codeblock/@outputclass'
   end
+
+  def test_source_block_role
+    xml = <<~EOF.chomp.to_dita
+    [source,role="platform:linux"]
+    A source code block
+    EOF
+
+    assert_xpath_equal xml, 'linux', '//codeblock/@platform'
+  end
 end

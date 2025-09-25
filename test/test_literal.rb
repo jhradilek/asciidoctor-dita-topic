@@ -41,4 +41,13 @@ class LiteralTest < Minitest::Test
     assert_xpath_equal xml, 'A literal block title', '//p[@outputclass="title"]/b/text()'
     assert_xpath_equal xml, 'A literal block', '//pre/text()'
   end
+
+  def test_literal_block_role
+    xml = <<~EOF.chomp.to_dita
+    [literal,role="platform:linux"]
+    A literal block
+    EOF
+
+    assert_xpath_equal xml, 'linux', '//pre/@platform'
+  end
 end

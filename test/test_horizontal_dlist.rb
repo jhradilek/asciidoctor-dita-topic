@@ -48,4 +48,14 @@ class HorizontalDlistTest < Minitest::Test
     assert_xpath_equal xml, 'A description list title', '//table/title/text()'
     assert_xpath_count xml, 2, '//table/tgroup/tbody/row'
   end
+
+  def test_horizontal_dlist_role
+    xml = <<~EOF.chomp.to_dita
+    [horizontal,role="platform:linux"]
+    Term1:: Definition one
+    Term2:: Definition two
+    EOF
+
+    assert_xpath_equal xml, 'linux', '//table/@platform'
+  end
 end

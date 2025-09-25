@@ -43,4 +43,14 @@ class QuandaDlistTest < Minitest::Test
     assert_xpath_equal xml, 'A quanda list title', '//p[@outputclass="title"]/b/text()'
     assert_xpath_count xml, 2, '//ol/li'
   end
+
+  def test_qanda_list_role
+    xml = <<~EOF.chomp.to_dita
+    [qanda,role="platform:linux"]
+    Question 1:: Answer one
+    Question 2:: Answer two
+    EOF
+
+    assert_xpath_equal xml, 'linux', '//ol/@platform'
+  end
 end

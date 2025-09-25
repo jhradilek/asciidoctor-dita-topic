@@ -60,4 +60,26 @@ class QuoteTest < Minitest::Test
 
     assert_xpath_equal xml, 'Quote title', '//lq/p[@outputclass="title"]/b/text()'
   end
+
+  def test_quote_role
+    xml = <<~EOF.chomp.to_dita
+    [quote,Author Name,Quote source,role="platform:linux"]
+    Quoted line
+    EOF
+
+    assert_xpath_equal xml, 'linux', '//lq/@platform'
+  end
+
+  def test_delimited_quote_role
+    xml = <<~EOF.chomp.to_dita
+    [quote,Author Name,Quote source,role="platform:linux"]
+    ____
+    First line
+
+    Second line
+    ____
+    EOF
+
+    assert_xpath_equal xml, 'linux', '//lq/@platform'
+  end
 end
