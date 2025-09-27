@@ -231,7 +231,7 @@ class DitaTopic < Asciidoctor::Converter::Base
     result << %(</dl>)
 
     # Return the XML output:
-    add_block_title (result.join LF), node.title
+    add_block_title (result.join LF), node
   end
 
   def convert_example node
@@ -514,7 +514,7 @@ class DitaTopic < Asciidoctor::Converter::Base
     EOF
 
     # Return the XML output:
-    add_block_title result, node.title
+    add_block_title result, node
   end
 
   def convert_literal node
@@ -526,7 +526,7 @@ class DitaTopic < Asciidoctor::Converter::Base
     EOF
 
     # Return the XML output:
-    add_block_title result, node.title
+    add_block_title result, node
   end
 
   def convert_olist node
@@ -549,7 +549,7 @@ class DitaTopic < Asciidoctor::Converter::Base
     result << '</ol>'
 
     # Return the XML output:
-    add_block_title (result.join LF), node.title
+    add_block_title (result.join LF), node
   end
 
   def convert_open node
@@ -584,9 +584,9 @@ class DitaTopic < Asciidoctor::Converter::Base
 
   def convert_paragraph node
     if (node.attr 'role') and (node.attr 'role').split.include? '_abstract'
-      add_block_title %(<p outputclass="abstract"#{compose_metadata node}>#{node.content}</p>), node.title
+      add_block_title %(<p outputclass="abstract"#{compose_metadata node}>#{node.content}</p>), node
     else
-      add_block_title %(<p#{compose_metadata node}>#{node.content}</p>), node.title
+      add_block_title %(<p#{compose_metadata node}>#{node.content}</p>), node
     end
   end
 
@@ -792,7 +792,7 @@ class DitaTopic < Asciidoctor::Converter::Base
     result << '</ul>'
 
     # Returned the XML output:
-    add_block_title (result.join LF), node.title
+    add_block_title (result.join LF), node
   end
 
   def convert_verse node
@@ -876,7 +876,7 @@ class DitaTopic < Asciidoctor::Converter::Base
     result << %(</ol>)
 
     # Return the XML output:
-    add_block_title (result.join LF), node.title
+    add_block_title (result.join LF), node
   end
 
   def compose_horizontal_dlist node
@@ -943,13 +943,13 @@ class DitaTopic < Asciidoctor::Converter::Base
 
   # Helper methods
 
-  def add_block_title content, title
+  def add_block_title content, node
     # NOTE: Unlike AsciiDoc, DITA does not support titles assigned to
     # certain block elements. As a workaround, I decided to use a paragraph
     # with the outputclass attribute.
 
     # Check if the title is defined:
-    return content unless title
+    return content unless node.title
 
     # Issue a warning if block titles are disabled:
     unless @titles_allowed
@@ -959,7 +959,7 @@ class DitaTopic < Asciidoctor::Converter::Base
 
     # Return the XML output:
     <<~EOF.chomp
-    <p outputclass="title"><b>#{title}</b></p>
+    <p outputclass="title"#{compose_metadata node}><b>#{node.title}</b></p>
     #{content}
     EOF
   end

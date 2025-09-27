@@ -38,10 +38,12 @@ class OlistTest < Minitest::Test
   def test_ordered_list_role
     xml = <<~EOF.chomp.to_dita
     [role="platform:linux"]
+    .An ordered list title
     . Item one
     . Item two
     EOF
 
     assert_xpath_equal xml, 'linux', '//ol/@platform'
+    assert_xpath_equal xml, 'linux', '//p[@outputclass="title"]/@platform'
   end
 end

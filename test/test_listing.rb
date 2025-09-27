@@ -80,9 +80,11 @@ class ListingTest < Minitest::Test
   def test_source_block_role
     xml = <<~EOF.chomp.to_dita
     [source,role="platform:linux"]
+    .A listing block title
     A source code block
     EOF
 
     assert_xpath_equal xml, 'linux', '//codeblock/@platform'
+    assert_xpath_equal xml, 'linux', '//p[@outputclass="title"]/@platform'
   end
 end

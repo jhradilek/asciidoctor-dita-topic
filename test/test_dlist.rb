@@ -64,10 +64,12 @@ class DlistTest < Minitest::Test
   def test_description_list_role
     xml = <<~EOF.chomp.to_dita
     [role="platform:linux"]
+    .A description list title
     Term1:: Definition one
     Term2:: Definition two
     EOF
 
     assert_xpath_equal xml, 'linux', '//dl/@platform'
+    assert_xpath_equal xml, 'linux', '//p[@outputclass="title"]/@platform'
   end
 end
