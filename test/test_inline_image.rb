@@ -47,4 +47,12 @@ class InlineImageTest < Minitest::Test
     assert_xpath_count xml, 0, '//p/image[@href="image-3.png"]/@width'
     assert_xpath_count xml, 0, '//p/image[@href="image-3.png"]/@height'
   end
+
+  def test_image_role
+    xml = <<~EOF.chomp.to_dita
+    A paragraph with an image:image.png[image,role="platform:linux"].
+    EOF
+
+    assert_xpath_equal xml, 'linux', '//p/image/@platform'
+  end
 end
