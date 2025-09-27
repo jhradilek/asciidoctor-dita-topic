@@ -120,18 +120,6 @@ To enable processing of author lines as metadata, set the value of the `dita-top
 $ **asciidoctor -r dita-topic -b dita-topic -a dita-topic-authors=on _your_file_.adoc**
 ....
 
-[#callouts]
-=== Enabling callouts
-
-Unlike AsciiDoc, DITA does not support callouts as a method to add annotations to specific lines in verbatim blocks. For this reason, the conversion of callouts is disabled by default.
-
-If callouts are required, the `dita-topic` converter can use XML entities for circled numbers in place of callouts. To enable this behavior, set the value of the `dita-topic-callouts` to `on`:
-
-[literal,subs="+quotes"]
-....
-$ **asciidoctor -r dita-topic -b dita-topic -a dita-topic-callouts=on _your_file_.adoc**
-....
-
 [#titles]
 === Disabling floating titles
 
@@ -147,6 +135,18 @@ To disable this behavior, set the value of the `dita-topic-titles` to `off`:
 [literal,subs="+quotes"]
 ....
 $ **asciidoctor -r dita-topic -b dita-topic -a dita-topic-titles=off _your_file_.adoc**
+....
+
+[#callouts]
+=== Disabling callouts
+
+Unlike AsciiDoc, DITA does not support callouts as a method to add annotations to specific lines in verbatim blocks. To avoid losing content during conversion, as a workaround, the `dita-topic` converter uses XML entities for circled numbers.
+
+To disable this behavior, set the value of the `dita-topic-callouts` to `off`:
+
+[literal,subs="+quotes"]
+....
+$ **asciidoctor -r dita-topic -b dita-topic -a dita-topic-callouts=off _your_file_.adoc**
 ....
 
 [#includes]
