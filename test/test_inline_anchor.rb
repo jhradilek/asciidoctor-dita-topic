@@ -96,4 +96,55 @@ class InlineAnchorTest < Minitest::Test
     assert_xpath_equal xml, 'with custom text', '//xref[@href="#xref-macro"]/text()'
     assert_xpath_equal xml, 'file references', '//xref[@href="file.dita"]/text()'
   end
+
+  def test_external_link_role
+    xml = <<~EOF.chomp.to_dita
+    A paragraph with an link:https://example.com[external link,role="platform:linux"].
+    EOF
+
+    assert_xpath_equal xml, 'linux', '//xref/@platform'
+  end
+
+  def test_xref_to_file_role
+    xml = <<~EOF.chomp.to_dita
+    Cross reference to xref:file.adoc[an external file,role="platform:linux"].
+    EOF
+
+    assert_xpath_equal xml, 'linux', '//xref/@platform'
+  end
+
+  def test_xref_to_document_id_role
+    xml = <<~EOF.chomp.to_dita
+    [#topic-title]
+    = Topic title
+
+    Cross reference to xref:topic-title[an anchor,role="platform:linux"] within the same document.
+    EOF
+
+    assert_xpath_equal xml, 'linux', '//xref/@platform'
+  end
+
+  def test_xref_to_inside_anchor_role
+    xml = <<~EOF.chomp.to_dita
+    [#topic-title]
+    = Topic title
+
+    Cross reference to xref:section-title[an anchor,role="platform:linux"] within the same document.
+
+    [#section-title]
+    == Section
+
+    Sample text.
+    EOF
+
+    assert_xpath_equal xml, 'linux', '//xref/@platform'
+  end
+
+  def test_xref_to_anchor_role
+    xml = <<~EOF.chomp.to_dita
+    Cross references can look like xref:this[this,role="platform:linux"].
+    EOF
+
+    assert_xpath_equal xml, 'linux', '//xref/@platform'
+  end
 end

@@ -297,7 +297,7 @@ class DitaTopic < Asciidoctor::Converter::Base
     case node.type
     when :link
       # Compose an external link:
-      %(<xref href="#{node.target}" scope="external">#{node.text}</xref>)
+      %(<xref href="#{node.target}" scope="external"#{compose_metadata node}>#{node.text}</xref>)
     when :xref
       # NOTE: While AsciiDoc is happy to reference an ID that is not
       # defined in the same AsciiDoc file, DITA requires the topic ID as
@@ -312,7 +312,7 @@ class DitaTopic < Asciidoctor::Converter::Base
         logger.warn format_message "Possible invalid reference: #{node.target}" if node.target.include? '#'
 
         # Compose a cross reference:
-        return %(<xref href="#{node.target}">#{node.text || path}</xref>)
+        return %(<xref href="#{node.target}"#{compose_metadata node}>#{node.text || path}</xref>)
       end
 
       # Determine whether the ID reference target is in this document:
@@ -320,18 +320,18 @@ class DitaTopic < Asciidoctor::Converter::Base
         # Determine whether the ID reference target is the document id:
         if target == node.document.id
           # Compose the unchanged cross reference:
-          return node.text ? %(<xref href="##{target}">#{node.text}</xref>) : %(<xref href="##{target}" />)
+          return node.text ? %(<xref href="##{target}"#{compose_metadata node}>#{node.text}</xref>) : %(<xref href="##{target}" />)
         end
 
         # Compose the adjusted cross reference:
-        return node.text ? %(<xref href="#./#{target}">#{node.text}</xref>) : %(<xref href="#./#{target}" />)
+        return node.text ? %(<xref href="#./#{target}"#{compose_metadata node}>#{node.text}</xref>) : %(<xref href="#./#{target}" />)
       end
 
       # Issue a warning as the cross reference is unlikely to work:
       logger.warn format_message "Possible invalid reference: #{node.target}"
 
       # Compose the cross reference:
-      node.text ? %(<xref href="#{node.target}">#{node.text}</xref>) : %(<xref href="#{node.target}" />)
+      node.text ? %(<xref href="#{node.target}"#{compose_metadata node}>#{node.text}</xref>) : %(<xref href="#{node.target}" />)
     when :ref
       # NOTE: DITA does not have a dedicated element for inline anchors or
       # a direct equivalent of the <span> element from HTML. The solution
@@ -403,7 +403,7 @@ class DitaTopic < Asciidoctor::Converter::Base
     height  = '' if height.include? '%'
 
     # Return the XML output:
-    %(<image href="#{node.image_uri node.target}"#{width}#{height} placement="inline"><alt>#{node.alt}</alt></image>)
+    %(<image href="#{node.image_uri node.target}"#{width}#{height} placement="inline"#{compose_metadata node}><alt>#{node.alt}</alt></image>)
   end
 
   def convert_inline_indexterm node
