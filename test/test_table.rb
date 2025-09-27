@@ -82,7 +82,7 @@ class TableTest < Minitest::Test
 
     assert_xpath_equal xml, 'i', 'name(//table/tgroup/tbody/row/entry[1]/p/*)'
     assert_xpath_equal xml, 'b', 'name(//table/tgroup/tbody/row/entry[2]/p/*)'
-    assert_xpath_equal xml, 'tt', 'name(//table/tgroup/tbody/row/entry[3]/p/*)'
+    assert_xpath_equal xml, 'codeph', 'name(//table/tgroup/tbody/row/entry[3]/p/*)'
     assert_xpath_equal xml, 'pre', 'name(//table/tgroup/tbody/row/entry[4]/*)'
   end
 
@@ -99,7 +99,7 @@ class TableTest < Minitest::Test
 
     assert_xpath_equal xml, 'i', 'name(//table/tgroup/tbody/row/entry[1]/p/*)'
     assert_xpath_equal xml, 'b', 'name(//table/tgroup/tbody/row/entry[2]/p/*)'
-    assert_xpath_equal xml, 'tt', 'name(//table/tgroup/tbody/row/entry[3]/p/*)'
+    assert_xpath_equal xml, 'codeph', 'name(//table/tgroup/tbody/row/entry[3]/p/*)'
     assert_xpath_equal xml, 'pre', 'name(//table/tgroup/tbody/row/entry[4]/*)'
   end
 

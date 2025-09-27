@@ -10,7 +10,7 @@ class InlineQuotedTest < Minitest::Test
 
     assert_xpath_equal xml, 'emphasis', '//i/text()'
     assert_xpath_equal xml, 'strong', '//b/text()'
-    assert_xpath_equal xml, 'monospace', '//tt/text()'
+    assert_xpath_equal xml, 'monospace', '//codeph/text()'
     assert_xpath_equal xml, 'superscript', '//sup/text()'
     assert_xpath_equal xml, 'subscript', '//sub/text()'
   end
@@ -80,7 +80,7 @@ class InlineQuotedTest < Minitest::Test
 
     assert_xpath_equal xml, 'linux', '//i/@platform'
     assert_xpath_equal xml, 'linux', '//b/@platform'
-    assert_xpath_equal xml, 'linux', '//tt/@platform'
+    assert_xpath_equal xml, 'linux', '//codeph/@platform'
     assert_xpath_equal xml, 'linux', '//sup/@platform'
     assert_xpath_equal xml, 'linux', '//sub/@platform'
   end

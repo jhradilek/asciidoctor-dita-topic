@@ -458,7 +458,7 @@ class DitaTopic < Asciidoctor::Converter::Base
       %(<b#{compose_metadata node}>#{node.text}</b>)
     when :monospaced
       # Set the default element value:
-      element = 'tt'
+      element = 'codeph'
 
       # Check if the role is provided:
       if node.role
