@@ -453,10 +453,13 @@ class DitaTopic < Asciidoctor::Converter::Base
     # Determine the inline markup type:
     case node.type
     when :emphasis
-      %(<i>#{node.text}</i>)
+      %(<i#{compose_metadata node}>#{node.text}</i>)
     when :strong
-      %(<b>#{node.text}</b>)
+      %(<b#{compose_metadata node}>#{node.text}</b>)
     when :monospaced
+      # Set the default element value:
+      element = 'tt'
+
       # Check if the role is provided:
       if node.role
         # Define supported roles:
@@ -468,19 +471,19 @@ class DitaTopic < Asciidoctor::Converter::Base
           'variable'  => 'varname'
         }
 
-        # Select the appropriate semantic element:
-        element = (semantic_markup.key? node.role) ? semantic_markup[node.role] : 'tt'
-      else
-        # Use the teletype element by default:
-        element = 'tt'
+        # Process each role:
+        node.role.split.each do |role|
+          # Select the appropriate semantic element:
+          element = semantic_markup[role] if semantic_markup.key? role
+        end
       end
 
       # Return the result:
-      %(<#{element}>#{node.text}</#{element}>)
+      %(<#{element}#{compose_metadata node}>#{node.text}</#{element}>)
     when :superscript
-      %(<sup>#{node.text}</sup>)
+      %(<sup#{compose_metadata node}>#{node.text}</sup>)
     when :subscript
-      %(<sub>#{node.text}</sub>)
+      %(<sub#{compose_metadata node}>#{node.text}</sub>)
     when :double
       %(&#8220;#{node.text}&#8221;)
     when :single

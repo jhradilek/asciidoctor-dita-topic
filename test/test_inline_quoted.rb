@@ -71,4 +71,33 @@ class InlineQuotedTest < Minitest::Test
     assert_xpath_equal xml, 'an option', '//li[4]/option/text()'
     assert_xpath_equal xml, 'a variable', '//li[5]/varname/text()'
   end
+
+  def test_markup_roles
+    xml = <<~EOF.chomp.to_dita
+    Inline markup for [.platform:linux]_emphasis_, [.platform:linux]*strong*, [.platform:linux]`monospace`,
+    [.platform:linux]^superscript^, and [.platform:linux]~subscript~.
+    EOF
+
+    assert_xpath_equal xml, 'linux', '//i/@platform'
+    assert_xpath_equal xml, 'linux', '//b/@platform'
+    assert_xpath_equal xml, 'linux', '//tt/@platform'
+    assert_xpath_equal xml, 'linux', '//sup/@platform'
+    assert_xpath_equal xml, 'linux', '//sub/@platform'
+  end
+
+  def test_semantic_markup_roles
+    xml = <<~EOF.chomp.to_dita
+    * [.command.platform:linux]`a command`
+    * [.directory.platform:linux]`a directory name`
+    * [.filename.platform:linux]`a file name`
+    * [.option.platform:linux]`an option`
+    * [.variable.platform:linux]`a variable`
+    EOF
+
+    assert_xpath_equal xml, 'linux', '//li[1]/cmdname/@platform'
+    assert_xpath_equal xml, 'linux', '//li[2]/filepath/@platform'
+    assert_xpath_equal xml, 'linux', '//li[3]/filepath/@platform'
+    assert_xpath_equal xml, 'linux', '//li[4]/option/@platform'
+    assert_xpath_equal xml, 'linux', '//li[5]/varname/@platform'
+  end
 end
