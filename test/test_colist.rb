@@ -4,8 +4,6 @@ require_relative 'helper'
 class ColistTest < Minitest::Test
   def test_simple_colist
     xml = <<~EOF.chomp.to_dita
-    :dita-topic-callouts: on
-
     [source,ruby]
     ----
     require 'asciidoctor'
@@ -32,8 +30,6 @@ class ColistTest < Minitest::Test
 
   def test_colist_outputclass
     xml = <<~EOF.chomp.to_dita
-    :dita-topic-callouts: on
-
     ----
     Code line <1>
     ----

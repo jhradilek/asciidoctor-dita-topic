@@ -39,7 +39,7 @@ class DitaTopic < Asciidoctor::Converter::Base
     @authors_allowed = false
 
     # Enable callouts by default:
-    @callouts_allowed = false
+    @callouts_allowed = true
 
     # Enable floating and block titles by default:
     @titles_allowed = true
@@ -56,7 +56,7 @@ class DitaTopic < Asciidoctor::Converter::Base
     @authors_allowed = true if (node.attr 'dita-topic-authors') == 'on'
 
     # Check if callouts are enabled:
-    @callouts_allowed = true if (node.attr 'dita-topic-callouts') == 'on'
+    @callouts_allowed = false if (node.attr 'dita-topic-callouts') == 'off'
 
     # Check if floating and block titles are enabled:
     @titles_allowed = false if (node.attr 'dita-topic-titles') == 'off'
