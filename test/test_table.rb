@@ -134,4 +134,18 @@ class TableTest < Minitest::Test
     assert_xpath_equal xml, 'Row 1, column 2', '//table/tgroup/tbody/row[1]/entry[2]/p/text()'
     assert_xpath_equal xml, 'Row 2, column 2', '//table/tgroup/tbody/row[2]/entry[1]/p/text()'
   end
+
+  def test_table_role
+    xml = <<~EOF.chomp.to_dita
+    [cols="1, 1",role="platform:linux"]
+    |===
+    |Column 1 header|Column 2 header
+
+    |Column 1
+    |Column 2
+    |===
+    EOF
+
+    assert_xpath_equal xml, 'linux', '//table/@platform'
+  end
 end

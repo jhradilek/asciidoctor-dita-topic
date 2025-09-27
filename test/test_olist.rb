@@ -34,4 +34,16 @@ class OlistTest < Minitest::Test
     assert_xpath_equal xml, 'An ordered list title', '//p[@outputclass="title"]/b/text()'
     assert_xpath_count xml, 2, '//ol/li'
   end
+
+  def test_ordered_list_role
+    xml = <<~EOF.chomp.to_dita
+    [role="platform:linux"]
+    .An ordered list title
+    . Item one
+    . Item two
+    EOF
+
+    assert_xpath_equal xml, 'linux', '//ol/@platform'
+    assert_xpath_equal xml, 'linux', '//p[@outputclass="title"]/@platform'
+  end
 end

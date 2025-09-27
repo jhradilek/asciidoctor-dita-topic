@@ -43,4 +43,14 @@ class VerseTest < Minitest::Test
     assert_xpath_equal xml, 'Verse line', '//lines/text()'
     assert_xpath_equal xml, 'Citation source', '//lines/cite/text()'
   end
+
+  def test_verse_role
+    xml = <<~EOF.chomp.to_dita
+    [verse,role="platform:linux"]
+    First line
+    Second line
+    EOF
+
+    assert_xpath_equal xml, 'linux', '//lines/@platform'
+  end
 end

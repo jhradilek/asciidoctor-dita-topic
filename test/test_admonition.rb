@@ -62,4 +62,43 @@ class AdmonitionTest < Minitest::Test
 
     assert_xpath_count xml, 2, '//note[@type="tip"]/p'
   end
+
+  def test_supported_roles
+    xml = <<~EOF.chomp.to_dita
+    [role="platform:linux product:asciidoctor audience:novice otherprops:pdf"]
+    TIP: This is a tip.
+    EOF
+
+    assert_xpath_equal xml, 'linux', '//note/@platform'
+    assert_xpath_equal xml, 'asciidoctor', '//note/@product'
+    assert_xpath_equal xml, 'novice', '//note/@audience'
+    assert_xpath_equal xml, 'pdf', '//note/@otherprops'
+  end
+
+  def test_multiple_roles
+    xml = <<~EOF.chomp.to_dita
+    [role="platform:linux platform:mac"]
+    TIP: This is a tip.
+    EOF
+
+    assert_xpath_equal xml, 'linux mac', '//note/@platform'
+  end
+
+  def test_no_roles
+    xml = <<~EOF.chomp.to_dita
+    [role=""]
+    TIP: This is a tip.
+    EOF
+
+    assert_xpath_count xml, 0, '//note/@platform'
+  end
+
+  def test_invalid_roles
+    xml = <<~EOF.chomp.to_dita
+    [role="invalid:value"]
+    TIP: This is a tip.
+    EOF
+
+    assert_xpath_count xml, 0, '//note/@platform'
+  end
 end

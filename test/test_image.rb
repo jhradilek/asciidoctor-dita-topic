@@ -68,4 +68,23 @@ class ImageTest < Minitest::Test
     assert_xpath_equal xml, 'Image title', '//fig/title/text()'
     assert_xpath_equal xml, 'image.png', '//fig/image/@href'
   end
+
+  def test_image_role
+    xml = <<~EOF.chomp.to_dita
+    [role="platform:linux"]
+    image::image.png[]
+    EOF
+
+    assert_xpath_equal xml, 'linux', '//image/@platform'
+  end
+
+  def test_image_role_with_title
+    xml = <<~EOF.chomp.to_dita
+    [role="platform:linux"]
+    .Image title
+    image::image.png[]
+    EOF
+
+    assert_xpath_equal xml, 'linux', '//fig/@platform'
+  end
 end

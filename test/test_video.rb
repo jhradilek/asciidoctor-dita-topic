@@ -61,4 +61,23 @@ class VideoTest < Minitest::Test
 
     assert_xpath_equal xml, 'https://www.youtube.com/embed/lJIrF4YjHfQ?list=PL9hW1uS6HUftRY4bk3ScHu4WvvMU0wMkD', '//object/@data'
   end
+
+  def test_video_role
+    xml = <<~EOF.chomp.to_dita
+    [role="platform:linux"]
+    video::video.mp4[]
+    EOF
+
+    assert_xpath_equal xml, 'linux', '//object/@platform'
+  end
+
+  def test_video_role_with_title
+    xml = <<~EOF.chomp.to_dita
+    [role="platform:linux"]
+    .Video title
+    video::video.mp4[]
+    EOF
+
+    assert_xpath_equal xml, 'linux', '//object/@platform'
+  end
 end

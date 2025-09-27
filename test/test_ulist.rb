@@ -46,4 +46,16 @@ class UlistTest < Minitest::Test
     assert_xpath_equal xml, 'An unordered list title', '//p[@outputclass="title"]/b/text()'
     assert_xpath_count xml, 2, '//ul/li'
   end
+
+  def test_unordered_list_role
+    xml = <<~EOF.chomp.to_dita
+    [role="platform:linux"]
+    .An unordered list title
+    * Item one
+    * Item two
+    EOF
+
+    assert_xpath_equal xml, 'linux', '//ul/@platform'
+    assert_xpath_equal xml, 'linux', '//p[@outputclass="title"]/@platform'
+  end
 end

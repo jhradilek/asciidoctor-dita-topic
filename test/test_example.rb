@@ -43,4 +43,15 @@ class ExampleTest < Minitest::Test
     assert_xpath_equal xml, 'An example block title', '//example/title/text()'
     assert_xpath_equal xml, 'An example block', '//example/p/text()'
   end
+
+  def test_example_role
+    xml = <<~EOF.chomp.to_dita
+    [role="platform:linux"]
+    ====
+    An example block
+    ====
+    EOF
+
+    assert_xpath_equal xml, 'linux', '//example/@platform'
+  end
 end
