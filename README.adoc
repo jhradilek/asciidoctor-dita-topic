@@ -190,25 +190,31 @@ An introductory paragraph.
 
 Unlike AsciiDoc, DITA provides a number of semantic elements for software components such as file names, commands, or command-line options. To replicate this behavior, the `dita-topic` converter recognizes the following link:https://docs.asciidoctor.org/asciidoc/latest/attributes/role/#assign-roles-to-formatted-inline-elements[roles] assigned to monospace (```) inline text:
 
-[cols="1,1"]
+[cols="1,1,2"]
 |===
 | AsciiDoc Role
 | DITA Element
+| Description
 
 | command
 | `<cmdname>`
+| A command name.
 
 | directory
 | `<filepath>`
+| A directory name.
 
 | filename
 | `<filepath>`
+| A file name.
 
 | option
 | `<option>`
+| An command-line option.
 
 | variable
 | `<varname>`
+| A variable name.
 |===
 
 For example, to describe a file name, use the following AsciiDoc markup:
@@ -219,10 +225,46 @@ Read the [filename]`/etc/passwd` file to see the complete list of
 available user accounts.
 ----
 
+[#metadata]
+=== Adding metadata
+
+DITA provides four metadata attributes that can be used for conditional processing. To replicate this behavior, the `dita-topic` converter recognizes the following link:https://docs.asciidoctor.org/asciidoc/latest/attributes/role/#assign-roles-to-formatted-inline-elements[roles] assigned to inline and block elements:
+
+[cols="1,1,2"]
+|===
+| AsciiDoc Role
+| DITA Attribute
+| Description
+
+| `platform:__value__`
+| `platform="_value_"`
+| Operating system or hardware architecture.
+
+| `product:__value__`
+| `product="_value_"`
+| Product name.
+
+| `audience:__value__`
+| `audience="_value_"`
+| Target audience.
+
+| `otherprops:__value__`
+| `otherprops="_value_"`
+| Additional properties.
+|===
+
+For example, to indicate that a particular paragraph is relevant for Linux and macOS and is intended for beginners, use the following AsciiDoc markup:
+
+[source,asciidoc]
+----
+[role="platform:linux platform:mac audience:beginner"]
+For more information, see the *bash*(1) manual page.
+----
+
 [#warnings]
 == Warnings
 
-Despite aspiring to avoid losing content during conversion and produce a valid DITA output, there are limitations to what is possible because of the differences between the two markup languages. When the `dita-topic` converter encounters a possible problem, it prints a warning to standard error output in the following format:
+Despite aspiring to avoid losing content during conversion and produce valid DITA output, there are limitations to what is possible because of the differences between the two markup languages. When the `dita-topic` converter encounters a possible problem, it prints a warning to standard error output in the following format:
 
 [literal,subs="+quotes"]
 ....
