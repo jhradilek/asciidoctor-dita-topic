@@ -72,6 +72,15 @@ class InlineQuotedTest < Minitest::Test
     assert_xpath_equal xml, 'a variable', '//li[5]/varname/text()'
   end
 
+  def test_text_span
+    xml = <<~EOF.chomp.to_dita
+    A line with #inline text span#.
+    EOF
+
+    assert_xpath_equal xml, 'inline text span', '//ph/text()'
+  end
+
+
   def test_markup_roles
     xml = <<~EOF.chomp.to_dita
     Inline markup for [.platform:linux]_emphasis_, [.platform:linux]*strong*, [.platform:linux]`monospace`,
@@ -83,6 +92,14 @@ class InlineQuotedTest < Minitest::Test
     assert_xpath_equal xml, 'linux', '//codeph/@platform'
     assert_xpath_equal xml, 'linux', '//sup/@platform'
     assert_xpath_equal xml, 'linux', '//sub/@platform'
+  end
+
+  def test_text_span_roles
+    xml = <<~EOF.chomp.to_dita
+    A line with [.platform:linux]#inline text span#.
+    EOF
+
+    assert_xpath_equal xml, 'linux', '//ph/@platform'
   end
 
   def test_semantic_markup_roles
