@@ -540,11 +540,11 @@ class DitaTopic < Asciidoctor::Converter::Base
     node.items.each do |item|
       # Check if the list item contains multiple block elements:
       if item.blocks?
-        result << %(<li>#{item.text})
+        result << %(<li#{compose_metadata item.role}>#{item.text})
         result << item.content
         result << %(</li>)
       else
-        result << %(<li>#{item.text}</li>)
+        result << %(<li#{compose_metadata item.role}>#{item.text}</li>)
       end
     end
 
@@ -783,11 +783,11 @@ class DitaTopic < Asciidoctor::Converter::Base
 
       # Check if the list item contains multiple block elements:
       if item.blocks?
-        result << %(<li>#{check_box}#{item.text})
+        result << %(<li#{compose_metadata item.role}>#{check_box}#{item.text})
         result << item.content
         result << %(</li>)
       else
-        result << %(<li>#{check_box}#{item.text}</li>)
+        result << %(<li#{compose_metadata item.role}>#{check_box}#{item.text}</li>)
       end
     end
 
