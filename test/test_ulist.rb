@@ -58,4 +58,28 @@ class UlistTest < Minitest::Test
     assert_xpath_equal xml, 'linux', '//ul/@platform'
     assert_xpath_equal xml, 'linux', '//p[@outputclass="title"]/@platform'
   end
+
+  def test_unordered_list_item_role
+    doc = <<~EOF.chomp.parse_adoc
+    * Item one
+    * Item two
+
+    // A comment separates two lists
+
+    * Item one
+    +
+    Additional paragraph
+
+    * Item two
+    EOF
+
+    first_list = doc.blocks[0]
+    first_list.items[0].add_role 'platform:linux'
+    second_list = doc.blocks[1]
+    second_list.items[0].add_role 'platform:linux'
+    xml = doc.convert
+
+    assert_xpath_equal xml, 'linux', '//ul[1]/li[1]/@platform'
+    assert_xpath_equal xml, 'linux', '//ul[2]/li[1]/@platform'
+  end
 end

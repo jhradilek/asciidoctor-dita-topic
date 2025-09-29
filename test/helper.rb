@@ -8,6 +8,10 @@ class String
   def to_dita(doctype='article')
     return Asciidoctor.convert self, backend: 'dita-topic', standalone: true, logger: false, doctype: doctype
   end
+
+  def parse_adoc(doctype='article')
+    return Asciidoctor.load self, backend: 'dita-topic', standalone: true, logger: false, doctype: doctype
+  end
 end
 
 class Minitest::Test
