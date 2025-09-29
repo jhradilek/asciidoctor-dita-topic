@@ -501,7 +501,7 @@ class DitaTopic < Asciidoctor::Converter::Base
       # Add comments around the STEM content:
       %(<!-- latexmath start -->#{node.text}<!-- latexmath end -->)
     else
-      node.text
+      %(<ph#{compose_metadata node}>#{node.text}</ph>)
     end
   end
 
