@@ -130,7 +130,7 @@ class DitaTopic < Asciidoctor::Converter::Base
 
     # Return the XML output:
     <<~EOF.chomp
-    <note type="#{node.attr 'name'}"#{compose_metadata node}>#{node.content}</note>
+    <note type="#{node.attr 'name'}"#{compose_metadata node.role}>#{node.content}</note>
     EOF
   end
 
@@ -138,12 +138,12 @@ class DitaTopic < Asciidoctor::Converter::Base
     # Check if the audio macro has a title specified:
     if node.title?
       <<~EOF.chomp
-      <object data="#{node.media_uri(node.attr 'target')}"#{compose_metadata node}>
+      <object data="#{node.media_uri(node.attr 'target')}"#{compose_metadata node.role}>
         <desc>#{node.title}</desc>
       </object>
       EOF
     else
-      %(<object data="#{node.media_uri(node.attr 'target')}"#{compose_metadata node} />)
+      %(<object data="#{node.media_uri(node.attr 'target')}"#{compose_metadata node.role} />)
     end
   end
 
@@ -158,7 +158,7 @@ class DitaTopic < Asciidoctor::Converter::Base
     number = 0
 
     # Open the definition list:
-    result = [%(<dl outputclass="callout-list"#{compose_metadata node}>)]
+    result = [%(<dl outputclass="callout-list"#{compose_metadata node.role}>)]
 
     # Process individual list items:
     node.items.each do |item|
@@ -198,7 +198,7 @@ class DitaTopic < Asciidoctor::Converter::Base
     return compose_qanda_dlist node if node.style == 'qanda'
 
     # Open the definition list:
-    result = [%(<dl#{compose_metadata node}>)]
+    result = [%(<dl#{compose_metadata node.role}>)]
 
     # Process individual list items:
     node.items.each do |terms, description|
@@ -242,7 +242,7 @@ class DitaTopic < Asciidoctor::Converter::Base
 
     # Return the XML output:
     <<~EOF.chomp
-    <example#{compose_id node.id}#{compose_metadata node}>
+    <example#{compose_id node.id}#{compose_metadata node.role}>
     #{node.title ? %(<title>#{node.title}</title>\n) : ''}#{node.content}
     </example>
     EOF
@@ -260,7 +260,7 @@ class DitaTopic < Asciidoctor::Converter::Base
     end
 
     # Return the XML output:
-    %(<p outputclass="title sect#{node.level}"#{compose_metadata node}><b>#{node.title}</b></p>)
+    %(<p outputclass="title sect#{node.level}"#{compose_metadata node.role}><b>#{node.title}</b></p>)
   end
 
   def convert_image node
@@ -276,7 +276,7 @@ class DitaTopic < Asciidoctor::Converter::Base
     # Check if the image has a title specified:
     if node.title?
       <<~EOF.chomp
-      <fig#{compose_metadata node}>
+      <fig#{compose_metadata node.role}>
       <title>#{node.title}</title>
       <image href="#{node.image_uri(node.attr 'target')}"#{width}#{height}#{scale} placement="break">
       <alt>#{node.alt}</alt>
@@ -285,7 +285,7 @@ class DitaTopic < Asciidoctor::Converter::Base
       EOF
     else
       <<~EOF.chomp
-      <image href="#{node.image_uri(node.attr 'target')}"#{width}#{height}#{scale} placement="break"#{compose_metadata node}>
+      <image href="#{node.image_uri(node.attr 'target')}"#{width}#{height}#{scale} placement="break"#{compose_metadata node.role}>
       <alt>#{node.alt}</alt>
       </image>
       EOF
@@ -297,7 +297,7 @@ class DitaTopic < Asciidoctor::Converter::Base
     case node.type
     when :link
       # Compose an external link:
-      %(<xref href="#{node.target}" scope="external"#{compose_metadata node}>#{node.text}</xref>)
+      %(<xref href="#{node.target}" scope="external"#{compose_metadata node.role}>#{node.text}</xref>)
     when :xref
       # NOTE: While AsciiDoc is happy to reference an ID that is not
       # defined in the same AsciiDoc file, DITA requires the topic ID as
@@ -312,7 +312,7 @@ class DitaTopic < Asciidoctor::Converter::Base
         logger.warn format_message "Possible invalid reference: #{node.target}" if node.target.include? '#'
 
         # Compose a cross reference:
-        return %(<xref href="#{node.target}"#{compose_metadata node}>#{node.text || path}</xref>)
+        return %(<xref href="#{node.target}"#{compose_metadata node.role}>#{node.text || path}</xref>)
       end
 
       # Determine whether the ID reference target is in this document:
@@ -320,18 +320,18 @@ class DitaTopic < Asciidoctor::Converter::Base
         # Determine whether the ID reference target is the document id:
         if target == node.document.id
           # Compose the unchanged cross reference:
-          return node.text ? %(<xref href="##{target}"#{compose_metadata node}>#{node.text}</xref>) : %(<xref href="##{target}" />)
+          return node.text ? %(<xref href="##{target}"#{compose_metadata node.role}>#{node.text}</xref>) : %(<xref href="##{target}" />)
         end
 
         # Compose the adjusted cross reference:
-        return node.text ? %(<xref href="#./#{target}"#{compose_metadata node}>#{node.text}</xref>) : %(<xref href="#./#{target}" />)
+        return node.text ? %(<xref href="#./#{target}"#{compose_metadata node.role}>#{node.text}</xref>) : %(<xref href="#./#{target}" />)
       end
 
       # Issue a warning as the cross reference is unlikely to work:
       logger.warn format_message "Possible invalid reference: #{node.target}"
 
       # Compose the cross reference:
-      node.text ? %(<xref href="#{node.target}"#{compose_metadata node}>#{node.text}</xref>) : %(<xref href="#{node.target}" />)
+      node.text ? %(<xref href="#{node.target}"#{compose_metadata node.role}>#{node.text}</xref>) : %(<xref href="#{node.target}" />)
     when :ref
       # NOTE: DITA does not have a dedicated element for inline anchors or
       # a direct equivalent of the <span> element from HTML. The solution
@@ -403,7 +403,7 @@ class DitaTopic < Asciidoctor::Converter::Base
     height  = '' if height.include? '%'
 
     # Return the XML output:
-    %(<image href="#{node.image_uri node.target}"#{width}#{height} placement="inline"#{compose_metadata node}><alt>#{node.alt}</alt></image>)
+    %(<image href="#{node.image_uri node.target}"#{width}#{height} placement="inline"#{compose_metadata node.role}><alt>#{node.alt}</alt></image>)
   end
 
   def convert_inline_indexterm node
@@ -453,9 +453,9 @@ class DitaTopic < Asciidoctor::Converter::Base
     # Determine the inline markup type:
     case node.type
     when :emphasis
-      %(<i#{compose_metadata node}>#{node.text}</i>)
+      %(<i#{compose_metadata node.role}>#{node.text}</i>)
     when :strong
-      %(<b#{compose_metadata node}>#{node.text}</b>)
+      %(<b#{compose_metadata node.role}>#{node.text}</b>)
     when :monospaced
       # Set the default element value:
       element = 'codeph'
@@ -479,11 +479,11 @@ class DitaTopic < Asciidoctor::Converter::Base
       end
 
       # Return the result:
-      %(<#{element}#{compose_metadata node}>#{node.text}</#{element}>)
+      %(<#{element}#{compose_metadata node.role}>#{node.text}</#{element}>)
     when :superscript
-      %(<sup#{compose_metadata node}>#{node.text}</sup>)
+      %(<sup#{compose_metadata node.role}>#{node.text}</sup>)
     when :subscript
-      %(<sub#{compose_metadata node}>#{node.text}</sub>)
+      %(<sub#{compose_metadata node.role}>#{node.text}</sub>)
     when :double
       %(&#8220;#{node.text}&#8221;)
     when :single
@@ -501,7 +501,7 @@ class DitaTopic < Asciidoctor::Converter::Base
       # Add comments around the STEM content:
       %(<!-- latexmath start -->#{node.text}<!-- latexmath end -->)
     else
-      %(<ph#{compose_metadata node}>#{node.text}</ph>)
+      %(<ph#{compose_metadata node.role}>#{node.text}</ph>)
     end
   end
 
@@ -511,7 +511,7 @@ class DitaTopic < Asciidoctor::Converter::Base
 
     # Compose the XML output:
     result = <<~EOF.chomp
-    <codeblock#{language}#{compose_metadata node}>
+    <codeblock#{language}#{compose_metadata node.role}>
     #{node.content}
     </codeblock>
     EOF
@@ -523,7 +523,7 @@ class DitaTopic < Asciidoctor::Converter::Base
   def convert_literal node
     # Compose the XML output:
     result = <<~EOF.chomp
-    <pre#{compose_metadata node}>
+    <pre#{compose_metadata node.role}>
     #{node.content}
     </pre>
     EOF
@@ -534,7 +534,7 @@ class DitaTopic < Asciidoctor::Converter::Base
 
   def convert_olist node
     # Open the ordered list:
-    result = [%(<ol#{compose_metadata node}>)]
+    result = [%(<ol#{compose_metadata node.role}>)]
 
     # Process individual list items:
     node.items.each do |item|
@@ -566,12 +566,12 @@ class DitaTopic < Asciidoctor::Converter::Base
       node.content
     elsif node.content_model == :compound
       <<~EOF.chomp
-      <div#{(node.style == 'abstract') ? ' outputclass="abstract"' : ''}#{compose_metadata node}>
+      <div#{(node.style == 'abstract') ? ' outputclass="abstract"' : ''}#{compose_metadata node.role}>
       #{compose_floating_title node.title}#{node.content}
       </div>
       EOF
     else
-      %(#{compose_floating_title node.title}<p#{(node.style == 'abstract') ? ' outputclass="abstract"' : ''}#{compose_metadata node}>#{node.content}</p>)
+      %(#{compose_floating_title node.title}<p#{(node.style == 'abstract') ? ' outputclass="abstract"' : ''}#{compose_metadata node.role}>#{node.content}</p>)
     end
   end
 
@@ -587,9 +587,9 @@ class DitaTopic < Asciidoctor::Converter::Base
 
   def convert_paragraph node
     if (node.attr 'role') and (node.attr 'role').split.include? '_abstract'
-      add_block_title %(<p outputclass="abstract"#{compose_metadata node}>#{node.content}</p>), node
+      add_block_title %(<p outputclass="abstract"#{compose_metadata node.role}>#{node.content}</p>), node
     else
-      add_block_title %(<p#{compose_metadata node}>#{node.content}</p>), node
+      add_block_title %(<p#{compose_metadata node.role}>#{node.content}</p>), node
     end
   end
 
@@ -607,13 +607,13 @@ class DitaTopic < Asciidoctor::Converter::Base
     # Check if the content contains multiple block elements:
     if node.content_model == :compound
       <<~EOF.chomp
-      <lq#{compose_metadata node}>
+      <lq#{compose_metadata node.role}>
       #{compose_floating_title node.title}#{node.content}#{author}#{source}
       </lq>
       EOF
     else
       <<~EOF.chomp
-      <lq#{compose_metadata node}>
+      <lq#{compose_metadata node.role}>
       #{compose_floating_title node.title}<p>#{node.content}</p>#{author}#{source}
       </lq>
       EOF
@@ -639,7 +639,7 @@ class DitaTopic < Asciidoctor::Converter::Base
 
     # Return the XML output:
     <<~EOF.chomp
-    <section#{compose_id node.id}#{outputclass}#{compose_metadata node}>
+    <section#{compose_id node.id}#{outputclass}#{compose_metadata node.role}>
     <title>#{node.title}</title>
     #{node.content}
     </section>
@@ -659,13 +659,13 @@ class DitaTopic < Asciidoctor::Converter::Base
     # Check if the content contains multiple block elements:
     if node.content_model == :compound
       <<~EOF.chomp
-      <div outputclass="sidebar"#{compose_metadata node}>
+      <div outputclass="sidebar"#{compose_metadata node.role}>
       #{compose_floating_title node.title}#{node.content}
       </div>
       EOF
     else
       <<~EOF.chomp
-      <div outputclass="sidebar"#{compose_metadata node}>
+      <div outputclass="sidebar"#{compose_metadata node.role}>
       #{compose_floating_title node.title}<p>#{node.content}</p>
       </div>
       EOF
@@ -680,7 +680,7 @@ class DitaTopic < Asciidoctor::Converter::Base
 
   def convert_table node
     # Open the table:
-    result = [%(<table#{compose_metadata node}>)]
+    result = [%(<table#{compose_metadata node.role}>)]
 
     # Check if the title is specified:
     result << %(<title>#{node.title}</title>) if node.title?
@@ -770,7 +770,7 @@ class DitaTopic < Asciidoctor::Converter::Base
 
   def convert_ulist node
     # Open the unordered list:
-    result = [%(<ul#{compose_metadata node}>)]
+    result = [%(<ul#{compose_metadata node.role}>)]
 
     # Process individual list items:
     node.items.each do |item|
@@ -807,7 +807,7 @@ class DitaTopic < Asciidoctor::Converter::Base
 
     # Return the XML output:
     <<~EOF.chomp
-    <lines#{compose_metadata node}>
+    <lines#{compose_metadata node.role}>
     #{node.content}#{author}#{source}
     </lines>
     EOF
@@ -842,18 +842,18 @@ class DitaTopic < Asciidoctor::Converter::Base
     # Check if the audio macro has a title specified:
     if node.title?
       <<~EOF.chomp
-      <object data="#{target_url}"#{width}#{height}#{compose_metadata node}>
+      <object data="#{target_url}"#{width}#{height}#{compose_metadata node.role}>
         <desc>#{node.title}</desc>
       </object>
       EOF
     else
-      %(<object data="#{target_url}"#{width}#{height}#{compose_metadata node} />)
+      %(<object data="#{target_url}"#{width}#{height}#{compose_metadata node.role} />)
     end
   end
 
   def compose_qanda_dlist node
     # Open the ordered list:
-    result = [%(<ol#{compose_metadata node}>)]
+    result = [%(<ol#{compose_metadata node.role}>)]
 
     # Process individual list items:
     node.items.each do |terms, description|
@@ -884,7 +884,7 @@ class DitaTopic < Asciidoctor::Converter::Base
 
   def compose_horizontal_dlist node
     # Open the table:
-    result = [%(<table outputclass="horizontal-dlist"#{compose_metadata node}>)]
+    result = [%(<table outputclass="horizontal-dlist"#{compose_metadata node.role}>)]
 
     # Check if the title is specified:
     result << %(<title>#{node.title}</title>) if node.title?
@@ -962,7 +962,7 @@ class DitaTopic < Asciidoctor::Converter::Base
 
     # Return the XML output:
     <<~EOF.chomp
-    <p outputclass="title"#{compose_metadata node}><b>#{node.title}</b></p>
+    <p outputclass="title"#{compose_metadata node.role}><b>#{node.title}</b></p>
     #{content}
     EOF
   end
@@ -1024,9 +1024,9 @@ class DitaTopic < Asciidoctor::Converter::Base
     return outputclass
   end
 
-  def compose_metadata node
+  def compose_metadata roles
     # Check if the role is defined:
-    return '' unless node.role
+    return '' unless roles
 
     # Set the initial value:
     result = {}
@@ -1035,7 +1035,7 @@ class DitaTopic < Asciidoctor::Converter::Base
     valid  = ['platform', 'product', 'audience', 'otherprops']
 
     # Process each role:
-    node.role.split.each do |role|
+    roles.split.each do |role|
       # Ignore roles that do not follow the attribute:value format:
       next unless role.include? ':'
 
