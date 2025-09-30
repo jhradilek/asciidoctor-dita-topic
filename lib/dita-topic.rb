@@ -538,13 +538,50 @@ class DitaTopic < Asciidoctor::Converter::Base
 
     # Process individual list items:
     node.items.each do |item|
+      li_attribute = ""
+      role = nil
+      text_to_process = item.text.lstrip
+      # Default to the original text; it will only be changed if a valid role is found and processed.
+      cleaned_text = item.text
+
+      if text_to_process.start_with?('[') && end_index = text_to_process.index(']')
+        inner_content = text_to_process[1...end_index]
+
+        if inner_content.start_with?('.')
+          role = inner_content[1..-1]
+        elsif inner_content.include?('=')
+          key, value = inner_content.split('=', 2)
+          if key.strip == 'role'
+            raw_role = value.strip
+            # Only process if the value is properly quoted
+            if (raw_role.start_with?('"') && raw_role.end_with?('"')) || \
+               (raw_role.start_with?("'") && raw_role.end_with?("'"))
+              # It's a quoted string, so remove the first and last characters.
+                role = raw_role[1...-1]
+            end
+          end
+        end
+
+        # If a role string was successfully extracted...
+        if role
+          # PROOF OF CONCEPT so no sanitizing here except that the split succeeded
+          attribute, value = role.split ':'
+          # ...and if it's a valid attribute:value pair...
+          if value
+            # ...then build the attribute and remove the role definition from the text
+            li_attribute = %( #{attribute}="#{value}")
+            cleaned_text = text_to_process[end_index + 1..-1].lstrip
+          end
+        end
+      end
+
       # Check if the list item contains multiple block elements:
       if item.blocks?
-        result << %(<li>#{item.text})
+        result << %(<li#{li_attribute}>#{cleaned_text})
         result << item.content
         result << %(</li>)
       else
-        result << %(<li>#{item.text}</li>)
+        result << %(<li#{li_attribute}>#{cleaned_text}</li>)
       end
     end
 
