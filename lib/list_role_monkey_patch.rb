@@ -32,6 +32,9 @@ module Asciidoctor
         # Call original to get the lines
         lines = original_read_lines_for_list_item(reader, list_type, sibling_trait, has_text)
 
+        # Skip processing for dlist - Asciidoctor already handles [.role] natively for dlists
+        return lines if list_type == :dlist
+
         # Check if the last line (or last non-blank line) is a [.role]
         # Search backwards from the end to find last non-blank line
         last_line_index = nil
@@ -63,23 +66,17 @@ module Asciidoctor
         # Call the original method to get the parsed node
         list_item_or_pair = original_parse_list_item(reader, list_block, match, sibling_trait, style)
 
-        # Apply the role that was carried over FROM THE PREVIOUS item
-        if role_to_apply
-          # Get the actual list item (for dlist it's a pair [term, definition])
-          target_item = if list_block.context == :dlist
-            list_item_or_pair[1]  # Apply role to definition
-          else
-            list_item_or_pair
-          end
+        # Skip applying role for dlist - Asciidoctor handles it natively
+        return list_item_or_pair if list_block.context == :dlist
 
-          if target_item
-            # Apply the role (note: .role and attributes['role'] are synchronized,
-            # so we only need to set one)
-            if target_item.role
-              target_item.role = "#{target_item.role} #{role_to_apply}"
-            else
-              target_item.role = role_to_apply
-            end
+        # Apply the role that was carried over FROM THE PREVIOUS item
+        if role_to_apply && list_item_or_pair
+          # Apply the role (note: .role and attributes['role'] are synchronized,
+          # so we only need to set one)
+          if list_item_or_pair.role
+            list_item_or_pair.role = "#{list_item_or_pair.role} #{role_to_apply}"
+          else
+            list_item_or_pair.role = role_to_apply
           end
         end
 
