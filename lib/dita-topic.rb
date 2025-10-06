@@ -130,7 +130,7 @@ class DitaTopic < Asciidoctor::Converter::Base
 
     # Return the XML output:
     <<~EOF.chomp
-    <note type="#{node.attr 'name'}"#{compose_metadata node.role}>#{node.content}</note>
+    <note type="#{node.attr 'name'}"#{compose_id node.id}#{compose_metadata node.role}>#{node.content}</note>
     EOF
   end
 
@@ -138,12 +138,12 @@ class DitaTopic < Asciidoctor::Converter::Base
     # Check if the audio macro has a title specified:
     if node.title?
       <<~EOF.chomp
-      <object data="#{node.media_uri(node.attr 'target')}"#{compose_metadata node.role}>
+      <object data="#{node.media_uri(node.attr 'target')}"#{compose_id node.id}#{compose_metadata node.role}>
         <desc>#{node.title}</desc>
       </object>
       EOF
     else
-      %(<object data="#{node.media_uri(node.attr 'target')}"#{compose_metadata node.role} />)
+      %(<object data="#{node.media_uri(node.attr 'target')}"#{compose_id node.id}#{compose_metadata node.role} />)
     end
   end
 
@@ -158,7 +158,7 @@ class DitaTopic < Asciidoctor::Converter::Base
     number = 0
 
     # Open the definition list:
-    result = [%(<dl outputclass="callout-list"#{compose_metadata node.role}>)]
+    result = [%(<dl outputclass="callout-list"#{compose_id node.id}#{compose_metadata node.role}>)]
 
     # Process individual list items:
     node.items.each do |item|
@@ -198,7 +198,7 @@ class DitaTopic < Asciidoctor::Converter::Base
     return compose_qanda_dlist node if node.style == 'qanda'
 
     # Open the definition list:
-    result = [%(<dl#{compose_metadata node.role}>)]
+    result = [%(<dl#{compose_id node.id}#{compose_metadata node.role}>)]
 
     # Process individual list items:
     node.items.each do |terms, description|
@@ -260,7 +260,7 @@ class DitaTopic < Asciidoctor::Converter::Base
     end
 
     # Return the XML output:
-    %(<p outputclass="title sect#{node.level}"#{compose_metadata node.role}><b>#{node.title}</b></p>)
+    %(<p outputclass="title sect#{node.level}"#{compose_id node.id}#{compose_metadata node.role}><b>#{node.title}</b></p>)
   end
 
   def convert_image node
@@ -276,7 +276,7 @@ class DitaTopic < Asciidoctor::Converter::Base
     # Check if the image has a title specified:
     if node.title?
       <<~EOF.chomp
-      <fig#{compose_metadata node.role}>
+      <fig#{compose_id node.id}#{compose_metadata node.role}>
       <title>#{node.title}</title>
       <image href="#{node.image_uri(node.attr 'target')}"#{width}#{height}#{scale} placement="break">
       <alt>#{node.alt}</alt>
@@ -285,7 +285,7 @@ class DitaTopic < Asciidoctor::Converter::Base
       EOF
     else
       <<~EOF.chomp
-      <image href="#{node.image_uri(node.attr 'target')}"#{width}#{height}#{scale} placement="break"#{compose_metadata node.role}>
+      <image href="#{node.image_uri(node.attr 'target')}"#{width}#{height}#{scale} placement="break"#{compose_id node.id}#{compose_metadata node.role}>
       <alt>#{node.alt}</alt>
       </image>
       EOF
@@ -510,11 +510,7 @@ class DitaTopic < Asciidoctor::Converter::Base
     language = (node.attributes.key? 'language') ? %( outputclass="language-#{node.attributes['language']}") : ''
 
     # Compose the XML output:
-    result = <<~EOF.chomp
-    <codeblock#{language}#{compose_metadata node.role}>
-    #{node.content}
-    </codeblock>
-    EOF
+    result = %(<codeblock#{language}#{compose_id node.id}#{compose_metadata node.role}>#{node.content}</codeblock>)
 
     # Return the XML output:
     add_block_title result, node
@@ -522,11 +518,7 @@ class DitaTopic < Asciidoctor::Converter::Base
 
   def convert_literal node
     # Compose the XML output:
-    result = <<~EOF.chomp
-    <pre#{compose_metadata node.role}>
-    #{node.content}
-    </pre>
-    EOF
+    result = %(<pre#{compose_id node.id}#{compose_metadata node.role}>#{node.content}</pre>)
 
     # Return the XML output:
     add_block_title result, node
@@ -534,17 +526,17 @@ class DitaTopic < Asciidoctor::Converter::Base
 
   def convert_olist node
     # Open the ordered list:
-    result = [%(<ol#{compose_metadata node.role}>)]
+    result = [%(<ol#{compose_id node.id}#{compose_metadata node.role}>)]
 
     # Process individual list items:
     node.items.each do |item|
       # Check if the list item contains multiple block elements:
       if item.blocks?
-        result << %(<li#{compose_metadata item.role}>#{item.text})
+        result << %(<li#{compose_id item.id}#{compose_metadata item.role}>#{item.text})
         result << item.content
         result << %(</li>)
       else
-        result << %(<li#{compose_metadata item.role}>#{item.text}</li>)
+        result << %(<li#{compose_id item.id}#{compose_metadata item.role}>#{item.text}</li>)
       end
     end
 
@@ -566,12 +558,12 @@ class DitaTopic < Asciidoctor::Converter::Base
       node.content
     elsif node.content_model == :compound
       <<~EOF.chomp
-      <div#{(node.style == 'abstract') ? ' outputclass="abstract"' : ''}#{compose_metadata node.role}>
+      <div#{(node.style == 'abstract') ? ' outputclass="abstract"' : ''}#{compose_id node.id}#{compose_metadata node.role}>
       #{compose_floating_title node.title}#{node.content}
       </div>
       EOF
     else
-      %(#{compose_floating_title node.title}<p#{(node.style == 'abstract') ? ' outputclass="abstract"' : ''}#{compose_metadata node.role}>#{node.content}</p>)
+      %(#{compose_floating_title node.title}<p#{(node.style == 'abstract') ? ' outputclass="abstract"' : ''}#{compose_id node.id}#{compose_metadata node.role}>#{node.content}</p>)
     end
   end
 
@@ -587,9 +579,9 @@ class DitaTopic < Asciidoctor::Converter::Base
 
   def convert_paragraph node
     if (node.attr 'role') and (node.attr 'role').split.include? '_abstract'
-      add_block_title %(<p outputclass="abstract"#{compose_metadata node.role}>#{node.content}</p>), node
+      add_block_title %(<p outputclass="abstract"#{compose_id node.id}#{compose_metadata node.role}>#{node.content}</p>), node
     else
-      add_block_title %(<p#{compose_metadata node.role}>#{node.content}</p>), node
+      add_block_title %(<p#{compose_id node.id}#{compose_metadata node.role}>#{node.content}</p>), node
     end
   end
 
@@ -607,13 +599,13 @@ class DitaTopic < Asciidoctor::Converter::Base
     # Check if the content contains multiple block elements:
     if node.content_model == :compound
       <<~EOF.chomp
-      <lq#{compose_metadata node.role}>
+      <lq#{compose_id node.id}#{compose_metadata node.role}>
       #{compose_floating_title node.title}#{node.content}#{author}#{source}
       </lq>
       EOF
     else
       <<~EOF.chomp
-      <lq#{compose_metadata node.role}>
+      <lq#{compose_id node.id}#{compose_metadata node.role}>
       #{compose_floating_title node.title}<p>#{node.content}</p>#{author}#{source}
       </lq>
       EOF
@@ -659,13 +651,13 @@ class DitaTopic < Asciidoctor::Converter::Base
     # Check if the content contains multiple block elements:
     if node.content_model == :compound
       <<~EOF.chomp
-      <div outputclass="sidebar"#{compose_metadata node.role}>
+      <div outputclass="sidebar"#{compose_id node.id}#{compose_metadata node.role}>
       #{compose_floating_title node.title}#{node.content}
       </div>
       EOF
     else
       <<~EOF.chomp
-      <div outputclass="sidebar"#{compose_metadata node.role}>
+      <div outputclass="sidebar"#{compose_id node.id}#{compose_metadata node.role}>
       #{compose_floating_title node.title}<p>#{node.content}</p>
       </div>
       EOF
@@ -680,7 +672,7 @@ class DitaTopic < Asciidoctor::Converter::Base
 
   def convert_table node
     # Open the table:
-    result = [%(<table#{compose_metadata node.role}>)]
+    result = [%(<table#{compose_id node.id}#{compose_metadata node.role}>)]
 
     # Check if the title is specified:
     result << %(<title>#{node.title}</title>) if node.title?
@@ -770,7 +762,7 @@ class DitaTopic < Asciidoctor::Converter::Base
 
   def convert_ulist node
     # Open the unordered list:
-    result = [%(<ul#{compose_metadata node.role}>)]
+    result = [%(<ul#{compose_id node.id}#{compose_metadata node.role}>)]
 
     # Process individual list items:
     node.items.each do |item|
@@ -783,11 +775,11 @@ class DitaTopic < Asciidoctor::Converter::Base
 
       # Check if the list item contains multiple block elements:
       if item.blocks?
-        result << %(<li#{compose_metadata item.role}>#{check_box}#{item.text})
+        result << %(<li#{compose_id item.id}#{compose_metadata item.role}>#{check_box}#{item.text})
         result << item.content
         result << %(</li>)
       else
-        result << %(<li#{compose_metadata item.role}>#{check_box}#{item.text}</li>)
+        result << %(<li#{compose_id item.id}#{compose_metadata item.role}>#{check_box}#{item.text}</li>)
       end
     end
 
@@ -807,7 +799,7 @@ class DitaTopic < Asciidoctor::Converter::Base
 
     # Return the XML output:
     <<~EOF.chomp
-    <lines#{compose_metadata node.role}>
+    <lines#{compose_id node.id}#{compose_metadata node.role}>
     #{node.content}#{author}#{source}
     </lines>
     EOF
@@ -842,18 +834,18 @@ class DitaTopic < Asciidoctor::Converter::Base
     # Check if the audio macro has a title specified:
     if node.title?
       <<~EOF.chomp
-      <object data="#{target_url}"#{width}#{height}#{compose_metadata node.role}>
+      <object data="#{target_url}"#{width}#{height}#{compose_id node.id}#{compose_metadata node.role}>
         <desc>#{node.title}</desc>
       </object>
       EOF
     else
-      %(<object data="#{target_url}"#{width}#{height}#{compose_metadata node.role} />)
+      %(<object data="#{target_url}"#{width}#{height}#{compose_id node.id}#{compose_metadata node.role} />)
     end
   end
 
   def compose_qanda_dlist node
     # Open the ordered list:
-    result = [%(<ol#{compose_metadata node.role}>)]
+    result = [%(<ol#{compose_id node.id}#{compose_metadata node.role}>)]
 
     # Process individual list items:
     node.items.each do |terms, description|
@@ -884,7 +876,7 @@ class DitaTopic < Asciidoctor::Converter::Base
 
   def compose_horizontal_dlist node
     # Open the table:
-    result = [%(<table outputclass="horizontal-dlist"#{compose_metadata node.role}>)]
+    result = [%(<table outputclass="horizontal-dlist"#{compose_id node.id}#{compose_metadata node.role}>)]
 
     # Check if the title is specified:
     result << %(<title>#{node.title}</title>) if node.title?

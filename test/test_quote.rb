@@ -82,4 +82,48 @@ class QuoteTest < Minitest::Test
 
     assert_xpath_equal xml, 'linux', '//lq/@platform'
   end
+
+  def test_quote_id
+    xml = <<~EOF.chomp.to_dita
+    [quote,Author Name,Quote source,id="quote-id"]
+    Quoted line
+    EOF
+
+    assert_xpath_equal xml, 'quote-id', '//lq/@id'
+  end
+
+  def test_delimited_quote_id
+    xml = <<~EOF.chomp.to_dita
+    [quote,Author Name,Quote source,id="quote-id"]
+    ____
+    First line
+
+    Second line
+    ____
+    EOF
+
+    assert_xpath_equal xml, 'quote-id', '//lq/@id'
+  end
+
+  def test_quote_no_id
+    xml = <<~EOF.chomp.to_dita
+    [quote,Author Name,Quote source]
+    Quoted line
+    EOF
+
+    assert_xpath_count xml, 0, '//lq/@id'
+  end
+
+  def test_delimited_quote_no_id
+    xml = <<~EOF.chomp.to_dita
+    [quote,Author Name,Quote source]
+    ____
+    First line
+
+    Second line
+    ____
+    EOF
+
+    assert_xpath_count xml, 0, '//lq/@id'
+  end
 end

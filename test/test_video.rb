@@ -80,4 +80,40 @@ class VideoTest < Minitest::Test
 
     assert_xpath_equal xml, 'linux', '//object/@platform'
   end
+
+  def test_video_id
+    xml = <<~EOF.chomp.to_dita
+    [#video-id]
+    video::video.mp4[]
+    EOF
+
+    assert_xpath_equal xml, 'video-id', '//object/@id'
+  end
+
+  def test_video_id_with_title
+    xml = <<~EOF.chomp.to_dita
+    [#video-id]
+    .Video title
+    video::video.mp4[]
+    EOF
+
+    assert_xpath_equal xml, 'video-id', '//object/@id'
+  end
+
+  def test_video_no_id
+    xml = <<~EOF.chomp.to_dita
+    video::video.mp4[]
+    EOF
+
+    assert_xpath_count xml, 0, '//object/@id'
+  end
+
+  def test_video_no_id_with_title
+    xml = <<~EOF.chomp.to_dita
+    .Video title
+    video::video.mp4[]
+    EOF
+
+    assert_xpath_count xml, 0, '//object/@id'
+  end
 end

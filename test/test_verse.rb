@@ -53,4 +53,24 @@ class VerseTest < Minitest::Test
 
     assert_xpath_equal xml, 'linux', '//lines/@platform'
   end
+
+  def test_verse_id
+    xml = <<~EOF.chomp.to_dita
+    [verse,id="verse-id"]
+    First line
+    Second line
+    EOF
+
+    assert_xpath_equal xml, 'verse-id', '//lines/@id'
+  end
+
+  def test_verse_no_id
+    xml = <<~EOF.chomp.to_dita
+    [verse]
+    First line
+    Second line
+    EOF
+
+    assert_xpath_count xml, 0, '//lines/@id'
+  end
 end

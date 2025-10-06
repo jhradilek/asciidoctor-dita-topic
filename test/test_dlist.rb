@@ -72,4 +72,25 @@ class DlistTest < Minitest::Test
     assert_xpath_equal xml, 'linux', '//dl/@platform'
     assert_xpath_equal xml, 'linux', '//p[@outputclass="title"]/@platform'
   end
+
+  def test_description_list_id
+    xml = <<~EOF.chomp.to_dita
+    [#dlist-id]
+    .A description list title
+    Term1:: Definition one
+    Term2:: Definition two
+    EOF
+
+    assert_xpath_equal xml, 'dlist-id', '//dl/@id'
+    assert_xpath_count xml, 0, '//p[@outputclass="title"]/@id'
+  end
+
+  def test_description_list_no_id
+    xml = <<~EOF.chomp.to_dita
+    Term1:: Definition one
+    Term2:: Definition two
+    EOF
+
+    assert_xpath_count xml, 0, '//dl/@id'
+  end
 end

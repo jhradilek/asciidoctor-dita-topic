@@ -55,4 +55,26 @@ class QuandaDlistTest < Minitest::Test
     assert_xpath_equal xml, 'linux', '//ol/@platform'
     assert_xpath_equal xml, 'linux', '//p[@outputclass="title"]/@platform'
   end
+
+  def test_qanda_list_id
+    xml = <<~EOF.chomp.to_dita
+    [qanda,id="list-id"]
+    .A quanda list title
+    Question 1:: Answer one
+    Question 2:: Answer two
+    EOF
+
+    assert_xpath_equal xml, 'list-id', '//ol/@id'
+    assert_xpath_count xml, 0, '//p[@outputclass="title"]/@id'
+  end
+
+  def test_qanda_list_no_id
+    xml = <<~EOF.chomp.to_dita
+    [qanda]
+    Question 1:: Answer one
+    Question 2:: Answer two
+    EOF
+
+    assert_xpath_count xml, 0, '//ol/@id'
+  end
 end

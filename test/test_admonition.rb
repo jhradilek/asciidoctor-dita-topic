@@ -101,4 +101,21 @@ class AdmonitionTest < Minitest::Test
 
     assert_xpath_count xml, 0, '//note/@platform'
   end
+
+  def test_admonition_id
+    xml = <<~EOF.chomp.to_dita
+    [#admonition-id]
+    TIP: This is a tip.
+    EOF
+
+    assert_xpath_equal xml, 'admonition-id', '//note/@id'
+  end
+
+  def test_admonition_no_id
+    xml = <<~EOF.chomp.to_dita
+    TIP: This is a tip.
+    EOF
+
+    assert_xpath_count xml, 0, '//note/@id'
+  end
 end

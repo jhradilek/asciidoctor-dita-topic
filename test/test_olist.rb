@@ -70,4 +70,67 @@ class OlistTest < Minitest::Test
     assert_xpath_equal xml, 'linux', '//ol[1]/li[1]/@platform'
     assert_xpath_equal xml, 'linux', '//ol[2]/li[1]/@platform'
   end
+
+  def test_ordered_list_id
+    xml = <<~EOF.chomp.to_dita
+    [#list-id]
+    .An ordered list title
+    . Item one
+    . Item two
+    EOF
+
+    assert_xpath_equal xml, 'list-id', '//ol/@id'
+    assert_xpath_count xml, 0, '//ol/li/@id'
+    assert_xpath_count xml, 0, '//p[@outputclass="title"]/@id'
+  end
+
+  def test_ordered_list_no_id
+    xml = <<~EOF.chomp.to_dita
+    . Item one
+    . Item two
+    EOF
+
+    assert_xpath_count xml, 0, '//ol/@id'
+  end
+
+  def test_ordered_list_item_id
+    doc = <<~EOF.chomp.parse_adoc
+    . Item one
+    . Item two
+
+    // A comment separates two lists
+
+    . Item one
+    +
+    Additional paragraph
+
+    . Item two
+    EOF
+
+    first_list = doc.blocks[0]
+    first_list.items[0].id = 'first-id'
+    second_list = doc.blocks[1]
+    second_list.items[0].id = 'second-id'
+    xml = doc.convert
+
+    assert_xpath_equal xml, 'first-id', '//ol[1]/li[1]/@id'
+    assert_xpath_equal xml, 'second-id', '//ol[2]/li[1]/@id'
+  end
+
+  def test_ordered_list_item_no_id
+    xml = <<~EOF.chomp.to_dita
+    . Item one
+    . Item two
+
+    // A comment separates two lists
+
+    . Item one
+    +
+    Additional paragraph
+
+    . Item two
+    EOF
+
+    assert_xpath_count xml, 0, '//ol/li/@id'
+  end
 end

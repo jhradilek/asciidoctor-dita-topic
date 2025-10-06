@@ -87,4 +87,40 @@ class ImageTest < Minitest::Test
 
     assert_xpath_equal xml, 'linux', '//fig/@platform'
   end
+
+  def test_image_id
+    xml = <<~EOF.chomp.to_dita
+    [#image-id]
+    image::image.png[]
+    EOF
+
+    assert_xpath_equal xml, 'image-id', '//image/@id'
+  end
+
+  def test_image_id_with_title
+    xml = <<~EOF.chomp.to_dita
+    [#image-id]
+    .Image title
+    image::image.png[]
+    EOF
+
+    assert_xpath_equal xml, 'image-id', '//fig/@id'
+  end
+
+  def test_image_no_id
+    xml = <<~EOF.chomp.to_dita
+    image::image.png[]
+    EOF
+
+    assert_xpath_count xml, 0, '//image/@id'
+  end
+
+  def test_image_no_id_with_title
+    xml = <<~EOF.chomp.to_dita
+    .Image title
+    image::image.png[]
+    EOF
+
+    assert_xpath_count xml, 0, '//fig/@id'
+  end
 end
