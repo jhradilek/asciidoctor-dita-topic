@@ -453,9 +453,9 @@ class DitaTopic < Asciidoctor::Converter::Base
     # Determine the inline markup type:
     case node.type
     when :emphasis
-      %(<i#{compose_metadata node.role}>#{node.text}</i>)
+      %(<i#{compose_id node.id}#{compose_metadata node.role}>#{node.text}</i>)
     when :strong
-      %(<b#{compose_metadata node.role}>#{node.text}</b>)
+      %(<b#{compose_id node.id}#{compose_metadata node.role}>#{node.text}</b>)
     when :monospaced
       # Set the default element value:
       element = 'codeph'
@@ -479,11 +479,11 @@ class DitaTopic < Asciidoctor::Converter::Base
       end
 
       # Return the result:
-      %(<#{element}#{compose_metadata node.role}>#{node.text}</#{element}>)
+      %(<#{element}#{compose_id node.id}#{compose_metadata node.role}>#{node.text}</#{element}>)
     when :superscript
-      %(<sup#{compose_metadata node.role}>#{node.text}</sup>)
+      %(<sup#{compose_id node.id}#{compose_metadata node.role}>#{node.text}</sup>)
     when :subscript
-      %(<sub#{compose_metadata node.role}>#{node.text}</sub>)
+      %(<sub#{compose_id node.id}#{compose_metadata node.role}>#{node.text}</sub>)
     when :double
       %(&#8220;#{node.text}&#8221;)
     when :single
@@ -501,7 +501,7 @@ class DitaTopic < Asciidoctor::Converter::Base
       # Add comments around the STEM content:
       %(<!-- latexmath start -->#{node.text}<!-- latexmath end -->)
     else
-      %(<ph#{compose_metadata node.role}>#{node.text}</ph>)
+      %(<ph#{compose_id node.id}#{compose_metadata node.role}>#{node.text}</ph>)
     end
   end
 
