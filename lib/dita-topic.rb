@@ -297,7 +297,7 @@ class DitaTopic < Asciidoctor::Converter::Base
     case node.type
     when :link
       # Compose an external link:
-      %(<xref href="#{node.target}" scope="external"#{compose_metadata node.role}>#{node.text}</xref>)
+      %(<xref href="#{node.target}" scope="external"#{compose_id node.id}#{compose_metadata node.role}>#{node.text}</xref>)
     when :xref
       # NOTE: While AsciiDoc is happy to reference an ID that is not
       # defined in the same AsciiDoc file, DITA requires the topic ID as
