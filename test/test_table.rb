@@ -148,4 +148,32 @@ class TableTest < Minitest::Test
 
     assert_xpath_equal xml, 'linux', '//table/@platform'
   end
+
+  def test_table_id
+    xml = <<~EOF.chomp.to_dita
+    [cols="1, 1",id="table-id"]
+    |===
+    |Column 1 header|Column 2 header
+
+    |Column 1
+    |Column 2
+    |===
+    EOF
+
+    assert_xpath_equal xml, 'table-id', '//table/@id'
+  end
+
+  def test_table_no_id
+    xml = <<~EOF.chomp.to_dita
+    [cols="1, 1"]
+    |===
+    |Column 1 header|Column 2 header
+
+    |Column 1
+    |Column 2
+    |===
+    EOF
+
+    assert_xpath_count xml, 0, '//table/@id'
+  end
 end

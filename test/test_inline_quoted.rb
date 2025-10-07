@@ -80,7 +80,6 @@ class InlineQuotedTest < Minitest::Test
     assert_xpath_equal xml, 'inline text span', '//ph/text()'
   end
 
-
   def test_markup_roles
     xml = <<~EOF.chomp.to_dita
     Inline markup for [.platform:linux]_emphasis_, [.platform:linux]*strong*, [.platform:linux]`monospace`,
@@ -116,5 +115,80 @@ class InlineQuotedTest < Minitest::Test
     assert_xpath_equal xml, 'linux', '//li[3]/filepath/@platform'
     assert_xpath_equal xml, 'linux', '//li[4]/option/@platform'
     assert_xpath_equal xml, 'linux', '//li[5]/varname/@platform'
+  end
+
+  def test_markup_id
+    xml = <<~EOF.chomp.to_dita
+    Inline markup for [#emphasis-id]_emphasis_, [#strong-id]*strong*,
+    [#monospace-id]`monospace`, [#superscript-id]^superscript^, and
+    [#subscript-id]~subscript~.
+    EOF
+
+    assert_xpath_equal xml, 'emphasis-id', '//i/@id'
+    assert_xpath_equal xml, 'strong-id', '//b/@id'
+    assert_xpath_equal xml, 'monospace-id', '//codeph/@id'
+    assert_xpath_equal xml, 'superscript-id', '//sup/@id'
+    assert_xpath_equal xml, 'subscript-id', '//sub/@id'
+  end
+
+  def test_text_span_id
+    xml = <<~EOF.chomp.to_dita
+    A line with [#span-id]#inline text span#.
+    EOF
+
+    assert_xpath_equal xml, 'span-id', '//ph/@id'
+  end
+
+  def test_semantic_markup_id
+    xml = <<~EOF.chomp.to_dita
+    * [#command-id.command]`a command`
+    * [#directory-id.directory]`a directory name`
+    * [#filename-id.filename]`a file name`
+    * [#option-id.option]`an option`
+    * [#variable-id.variable]`a variable`
+    EOF
+
+    assert_xpath_equal xml, 'command-id', '//li[1]/cmdname/@id'
+    assert_xpath_equal xml, 'directory-id', '//li[2]/filepath/@id'
+    assert_xpath_equal xml, 'filename-id', '//li[3]/filepath/@id'
+    assert_xpath_equal xml, 'option-id', '//li[4]/option/@id'
+    assert_xpath_equal xml, 'variable-id', '//li[5]/varname/@id'
+  end
+
+  def test_markup_no_id
+    xml = <<~EOF.chomp.to_dita
+    Inline markup for _emphasis_, *strong*, `monospace`, ^superscript^,
+    and ~subscript~.
+    EOF
+
+    assert_xpath_count xml, 0, '//i/@id'
+    assert_xpath_count xml, 0, '//b/@id'
+    assert_xpath_count xml, 0, '//codeph/@id'
+    assert_xpath_count xml, 0, '//sup/@id'
+    assert_xpath_count xml, 0, '//sub/@id'
+  end
+
+  def test_text_span_no_id
+    xml = <<~EOF.chomp.to_dita
+    A line with #inline text span#.
+    EOF
+
+    assert_xpath_count xml, 0, '//ph/@id'
+  end
+
+  def test_semantic_markup_no_id
+    xml = <<~EOF.chomp.to_dita
+    * `a command`
+    * `a directory name`
+    * `a file name`
+    * `an option`
+    * `a variable`
+    EOF
+
+    assert_xpath_count xml, 0, '//li[1]/cmdname/@id'
+    assert_xpath_count xml, 0, '//li[2]/filepath/@id'
+    assert_xpath_count xml, 0, '//li[3]/filepath/@id'
+    assert_xpath_count xml, 0, '//li[4]/option/@id'
+    assert_xpath_count xml, 0, '//li[5]/varname/@id'
   end
 end

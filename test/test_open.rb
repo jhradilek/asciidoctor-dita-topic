@@ -116,4 +116,85 @@ class OpenTest < Minitest::Test
 
     assert_xpath_equal xml, 'linux', '//body/section/p/@platform'
   end
+
+  def test_simple_abstract_id
+    xml = <<~EOF.chomp.to_dita
+    = A document header
+
+    [abstract,id="abstract-id"]
+    An abstract.
+    EOF
+
+    assert_xpath_equal xml, 'abstract-id', '//body/p/@id'
+  end
+
+  def test_compound_abstract_id
+    xml = <<~EOF.chomp.to_dita
+    = A document header
+
+    [abstract,id="abstract-id"]
+    --
+    An abstract.
+
+    An abstract continued.
+    --
+    EOF
+
+    assert_xpath_equal xml, 'abstract-id', '//body/div/@id'
+  end
+
+  def test_part_introduction_id
+    xml = <<~EOF.chomp.to_dita 'book'
+    = A document header
+
+    A paragraph.
+
+    = A part header
+
+    [#introduction-id]
+    A part introduction.
+    EOF
+
+    assert_xpath_equal xml, 'introduction-id', '//body/section/p/@id'
+  end
+
+  def test_simple_abstract_no_id
+    xml = <<~EOF.chomp.to_dita
+    = A document header
+
+    [abstract]
+    An abstract.
+    EOF
+
+    assert_xpath_count xml, 0, '//body/p/@id'
+  end
+
+  def test_compound_abstract_no_id
+    xml = <<~EOF.chomp.to_dita
+    = A document header
+
+    [abstract]
+    --
+    An abstract.
+
+    An abstract continued.
+    --
+    EOF
+
+    assert_xpath_count xml, 0, '//body/div/@id'
+  end
+
+  def test_part_introduction_no_id
+    xml = <<~EOF.chomp.to_dita 'book'
+    = A document header
+
+    A paragraph.
+
+    = A part header
+
+    A part introduction.
+    EOF
+
+    assert_xpath_count xml, 0, '//body/section/p/@id'
+  end
 end

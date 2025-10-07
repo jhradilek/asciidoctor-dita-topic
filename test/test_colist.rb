@@ -41,8 +41,6 @@ class ColistTest < Minitest::Test
 
   def test_colist_role
     xml = <<~EOF.chomp.to_dita
-    :dita-topic-callouts: on
-
     ----
     Code line <1>
     ----
@@ -51,5 +49,28 @@ class ColistTest < Minitest::Test
     EOF
 
     assert_xpath_equal xml, 'linux', '//dl/@platform'
+  end
+
+  def test_colist_id
+    xml = <<~EOF.chomp.to_dita
+    ----
+    Code line <1>
+    ----
+    [#colist-id]
+    <1> Code description
+    EOF
+
+    assert_xpath_equal xml, 'colist-id', '//dl/@id'
+  end
+
+  def test_colist_no_id
+    xml = <<~EOF.chomp.to_dita
+    ----
+    Code line <1>
+    ----
+    <1> Code description
+    EOF
+
+    assert_xpath_count xml, 0, '//dl/@id'
   end
 end

@@ -67,4 +67,43 @@ class SidebarTest < Minitest::Test
 
     assert_xpath_equal xml, 'linux', '//div/@platform'
   end
+
+  def test_sidebar_id
+    xml = <<~EOF.chomp.to_dita
+    [sidebar,id="sidebar-id"]
+    Sidebar text
+    EOF
+
+    assert_xpath_equal xml, 'sidebar-id', '//div/@id'
+  end
+
+  def test_delimited_sidebar_id
+    xml = <<~EOF.chomp.to_dita
+    [#sidebar-id]
+    ****
+    Sidebar text
+    ****
+    EOF
+
+    assert_xpath_equal xml, 'sidebar-id', '//div/@id'
+  end
+
+  def test_sidebar_no_id
+    xml = <<~EOF.chomp.to_dita
+    [sidebar]
+    Sidebar text
+    EOF
+
+    assert_xpath_count xml, 0, '//div/@id'
+  end
+
+  def test_delimited_sidebar_no_id
+    xml = <<~EOF.chomp.to_dita
+    ****
+    Sidebar text
+    ****
+    EOF
+
+    assert_xpath_count xml, 0, '//div/@id'
+  end
 end

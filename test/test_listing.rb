@@ -87,4 +87,24 @@ class ListingTest < Minitest::Test
     assert_xpath_equal xml, 'linux', '//codeblock/@platform'
     assert_xpath_equal xml, 'linux', '//p[@outputclass="title"]/@platform'
   end
+
+  def test_source_block_id
+    xml = <<~EOF.chomp.to_dita
+    [source,id="source-id"]
+    .A listing block title
+    A source code block
+    EOF
+
+    assert_xpath_equal xml, 'source-id', '//codeblock/@id'
+    assert_xpath_count xml, 0, '//p[@outputclass="title"]/@id'
+  end
+
+  def test_source_block_no_id
+    xml = <<~EOF.chomp.to_dita
+    [source]
+    A source code block
+    EOF
+
+    assert_xpath_count xml, 0, '//codeblock/@id'
+  end
 end

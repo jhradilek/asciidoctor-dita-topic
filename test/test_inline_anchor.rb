@@ -147,4 +147,20 @@ class InlineAnchorTest < Minitest::Test
 
     assert_xpath_equal xml, 'linux', '//xref/@platform'
   end
+
+  def test_external_link_id
+    xml = <<~EOF.chomp.to_dita
+    A paragraph with an link:https://example.com[external link,id="link-id"].
+    EOF
+
+    assert_xpath_equal xml, 'link-id', '//xref/@id'
+  end
+
+  def test_external_link_no_id
+    xml = <<~EOF.chomp.to_dita
+    A paragraph with an link:https://example.com[external link].
+    EOF
+
+    assert_xpath_count xml, 0, '//xref/@id'
+  end
 end

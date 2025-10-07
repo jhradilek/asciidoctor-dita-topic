@@ -21,17 +21,6 @@ class ExampleTest < Minitest::Test
     assert_xpath_equal xml, 'An example block', '//example/p/text()'
   end
 
-  def test_example_block_id
-    xml = <<~EOF.chomp.to_dita
-    [#example-id]
-    ====
-    An example block
-    ====
-    EOF
-
-    assert_xpath_equal xml, 'example-id', '//example/@id'
-  end
-
   def test_example_block_title
     xml = <<~EOF.chomp.to_dita
     .An example block title
@@ -53,5 +42,26 @@ class ExampleTest < Minitest::Test
     EOF
 
     assert_xpath_equal xml, 'linux', '//example/@platform'
+  end
+
+  def test_example_block_id
+    xml = <<~EOF.chomp.to_dita
+    [#example-id]
+    ====
+    An example block
+    ====
+    EOF
+
+    assert_xpath_equal xml, 'example-id', '//example/@id'
+  end
+
+  def test_example_block_no_id
+    xml = <<~EOF.chomp.to_dita
+    ====
+    An example block
+    ====
+    EOF
+
+    assert_xpath_count xml, 0, '//example/@id'
   end
 end

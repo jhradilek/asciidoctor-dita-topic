@@ -74,4 +74,47 @@ class ParagraphTest < Minitest::Test
     assert_xpath_equal xml, 'linux', '//p[2]/@platform'
     assert_xpath_equal xml, 'linux', '//p[1][@outputclass="title"]/@platform'
   end
+
+  def test_paragraph_id
+    xml = <<~EOF.chomp.to_dita
+    [#paragraph-id]
+    .A paragraph title
+    First paragraph.
+    EOF
+
+    assert_xpath_equal xml, 'paragraph-id', '//p[2]/@id'
+    assert_xpath_count xml, 0, '//p[1][@outputclass="title"]/@id'
+  end
+
+  def test_abstract_paragraph_id
+    xml = <<~EOF.chomp.to_dita
+    [role="_abstract",id="paragraph-id"]
+    .An abstract paragraph title
+    An abstract.
+
+    A paragraph.
+    EOF
+
+    assert_xpath_equal xml, 'paragraph-id', '//p[2]/@id'
+    assert_xpath_count xml, 0, '//p[1][@outputclass="title"]/@id'
+  end
+
+  def test_paragraph_no_id
+    xml = <<~EOF.chomp.to_dita
+    First paragraph.
+    EOF
+
+    assert_xpath_count xml, 0, '//p/@id'
+  end
+
+  def test_abstract_paragraph_no_id
+    xml = <<~EOF.chomp.to_dita
+    [role="_abstract"]
+    An abstract.
+
+    A paragraph.
+    EOF
+
+    assert_xpath_count xml, 0, '//p/@id'
+  end
 end

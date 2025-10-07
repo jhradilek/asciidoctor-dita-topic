@@ -52,4 +52,24 @@ class LiteralTest < Minitest::Test
     assert_xpath_equal xml, 'linux', '//pre/@platform'
     assert_xpath_equal xml, 'linux', '//p[@outputclass="title"]/@platform'
   end
+
+  def test_literal_block_id
+    xml = <<~EOF.chomp.to_dita
+    [literal,id="literal-id"]
+    .A literal block title
+    A literal block
+    EOF
+
+    assert_xpath_equal xml, 'literal-id', '//pre/@id'
+    assert_xpath_count xml, 0, '//p[@outputclass="title"]/@id'
+  end
+
+  def test_literal_block_no_id
+    xml = <<~EOF.chomp.to_dita
+    [literal]
+    A literal block
+    EOF
+
+    assert_xpath_count xml, 0, '//pre/@id'
+  end
 end
