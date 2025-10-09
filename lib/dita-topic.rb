@@ -530,13 +530,17 @@ class DitaTopic < Asciidoctor::Converter::Base
 
     # Process individual list items:
     node.items.each do |item|
+      # Compose the metadata attributes:
+      metadata, text = extract_attributes item.text
+      metadata = compose_metadata item.role if item.role
+
       # Check if the list item contains multiple block elements:
       if item.blocks?
-        result << %(<li#{compose_id item.id}#{compose_metadata item.role}>#{item.text})
+        result << %(<li#{compose_id item.id}#{metadata}>#{text})
         result << item.content
         result << %(</li>)
       else
-        result << %(<li#{compose_id item.id}#{compose_metadata item.role}>#{item.text}</li>)
+        result << %(<li#{compose_id item.id}#{metadata}>#{text}</li>)
       end
     end
 
@@ -766,6 +770,10 @@ class DitaTopic < Asciidoctor::Converter::Base
 
     # Process individual list items:
     node.items.each do |item|
+      # Compose the metadata attributes:
+      metadata, text = extract_attributes item.text
+      metadata = compose_metadata item.role if item.role
+
       # Check if the list item is part of a checklist:
       unless item.attr? 'checkbox'
         check_box = ''
@@ -775,11 +783,11 @@ class DitaTopic < Asciidoctor::Converter::Base
 
       # Check if the list item contains multiple block elements:
       if item.blocks?
-        result << %(<li#{compose_id item.id}#{compose_metadata item.role}>#{check_box}#{item.text})
+        result << %(<li#{compose_id item.id}#{metadata}>#{check_box}#{text})
         result << item.content
         result << %(</li>)
       else
-        result << %(<li#{compose_id item.id}#{compose_metadata item.role}>#{check_box}#{item.text}</li>)
+        result << %(<li#{compose_id item.id}#{metadata}>#{check_box}#{text}</li>)
       end
     end
 
@@ -1050,6 +1058,15 @@ class DitaTopic < Asciidoctor::Converter::Base
       return ''
     else
       return ' ' + result.map { |k, v| %(#{k}="#{v}") unless v.empty? }.join(' ')
+    end
+  end
+
+  def extract_attributes text
+    # Extract metadata attributes from an empty ph element:
+    if /^\s*<ph(?<attributes> [^>]+)><\/ph>\s*/ =~ text
+      return attributes, text.sub(/^\s*<ph[^>]+><\/ph>\s*/, '')
+    else
+      return '', text
     end
   end
 
