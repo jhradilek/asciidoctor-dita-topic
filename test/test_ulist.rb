@@ -63,24 +63,28 @@ class UlistTest < Minitest::Test
     doc = <<~EOF.chomp.parse_adoc
     * Item one
     * Item two
-
-    // A comment separates two lists
-
-    * Item one
     +
     Additional paragraph
 
-    * Item two
+    // A comment separates two lists
+
+    * [.platform:linux]#\{empty\}# Item one
+    * [.platform:linux]#\{empty\}# Item two
+    +
+    Additional paragraph
     EOF
 
     first_list = doc.blocks[0]
     first_list.items[0].add_role 'platform:linux'
-    second_list = doc.blocks[1]
-    second_list.items[0].add_role 'platform:linux'
+    first_list.items[1].add_role 'platform:linux'
     xml = doc.convert
 
     assert_xpath_equal xml, 'linux', '//ul[1]/li[1]/@platform'
+    assert_xpath_equal xml, 'linux', '//ul[1]/li[2]/@platform'
     assert_xpath_equal xml, 'linux', '//ul[2]/li[1]/@platform'
+    assert_xpath_equal xml, 'linux', '//ul[2]/li[2]/@platform'
+    assert_xpath_equal xml, 'Item one', '//ul[2]/li[1]/text()'
+    assert_xpath_equal xml, 'Item two', '//ul[2]/li[2]/text()'
   end
 
   def test_unordered_list_id
