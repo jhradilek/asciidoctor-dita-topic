@@ -29,8 +29,8 @@ class ListingTest < Minitest::Test
     ----
     EOF
 
-    assert_xpath_equal xml, 'A listing block title', '//p[@outputclass="title"]/b/text()'
-    assert_xpath_equal xml, 'A listing block', '//codeblock/text()'
+    assert_xpath_equal xml, 'A listing block title', '//fig/title/text()'
+    assert_xpath_equal xml, 'A listing block', '//fig/codeblock/text()'
   end
 
   def test_explicit_source_block
@@ -62,8 +62,8 @@ class ListingTest < Minitest::Test
     ----
     EOF
 
-    assert_xpath_equal xml, 'A source block title', '//p[@outputclass="title"]/b/text()'
-    assert_xpath_equal xml, 'A source block', '//codeblock/text()'
+    assert_xpath_equal xml, 'A source block title', '//fig/title/text()'
+    assert_xpath_equal xml, 'A source block', '//fig/codeblock/text()'
   end
 
   def test_source_block_language
@@ -84,8 +84,7 @@ class ListingTest < Minitest::Test
     A source code block
     EOF
 
-    assert_xpath_equal xml, 'linux', '//codeblock/@platform'
-    assert_xpath_equal xml, 'linux', '//p[@outputclass="title"]/@platform'
+    assert_xpath_equal xml, 'linux', '//fig/@platform'
   end
 
   def test_source_block_id
@@ -95,8 +94,7 @@ class ListingTest < Minitest::Test
     A source code block
     EOF
 
-    assert_xpath_equal xml, 'source-id', '//codeblock/@id'
-    assert_xpath_count xml, 0, '//p[@outputclass="title"]/@id'
+    assert_xpath_equal xml, 'source-id', '//fig/@id'
   end
 
   def test_source_block_no_id
