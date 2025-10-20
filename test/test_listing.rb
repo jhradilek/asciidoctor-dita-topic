@@ -85,6 +85,7 @@ class ListingTest < Minitest::Test
     EOF
 
     assert_xpath_equal xml, 'linux', '//fig/@platform'
+    assert_xpath_count xml, 0, '//fig/codeblock/@platform'
   end
 
   def test_source_block_id
@@ -95,6 +96,7 @@ class ListingTest < Minitest::Test
     EOF
 
     assert_xpath_equal xml, 'source-id', '//fig/@id'
+    assert_xpath_count xml, 0, '//fig/codeblock/@id'
   end
 
   def test_source_block_no_id
