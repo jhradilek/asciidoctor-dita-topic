@@ -59,6 +59,18 @@ class HorizontalDlistTest < Minitest::Test
     assert_xpath_equal xml, 'linux', '//table/@platform'
   end
 
+  def test_horizontal_dlist_item_role
+    xml = <<~EOF.chomp.to_dita
+    [horizontal]
+    [.platform:linux]#\{empty\}# Term1:: Definition one
+    [.platform:linux]#\{empty\}# Term2:: Definition two
+    EOF
+
+    assert_xpath_equal xml, 'linux', '//row[1]/@platform'
+    assert_xpath_equal xml, 'linux', '//row[1]/@platform'
+    assert_xpath_count xml, 0, '//ph'
+  end
+
   def test_horizontal_dlist_id
     xml = <<~EOF.chomp.to_dita
     [horizontal,id="list-id"]
