@@ -149,6 +149,22 @@ class TableTest < Minitest::Test
     assert_xpath_equal xml, 'linux', '//table/@platform'
   end
 
+  def test_table_row_role
+    xml = <<~EOF.chomp.to_dita
+    [cols="1, 1"]
+    |===
+    |[.platform:linux]#\{empty\}# Column 1 header|Column 2 header
+
+    |[.platform:linux]#\{empty\}# Column 1
+    |Column 2
+    |===
+    EOF
+
+    assert_xpath_equal xml, 'linux', '//thead/row/@platform'
+    assert_xpath_equal xml, 'linux', '//tbody/row/@platform'
+    assert_xpath_count xml, 0, '//ph'
+  end
+
   def test_table_id
     xml = <<~EOF.chomp.to_dita
     [cols="1, 1",id="table-id"]
