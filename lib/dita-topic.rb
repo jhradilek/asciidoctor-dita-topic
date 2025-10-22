@@ -202,8 +202,11 @@ class DitaTopic < Asciidoctor::Converter::Base
 
     # Process individual list items:
     node.items.each do |terms, description|
+      # Compose the metadata attributes:
+      metadata, terms[0].text = extract_attributes terms[0].text
+
       # Open the definition entry:
-      result << %(<dlentry>)
+      result << %(<dlentry#{metadata}>)
 
       # Process individual terms:
       terms.each do |item|
@@ -857,8 +860,11 @@ class DitaTopic < Asciidoctor::Converter::Base
 
     # Process individual list items:
     node.items.each do |terms, description|
+      # Compose the metadata attributes:
+      metadata, terms[0].text = extract_attributes terms[0].text
+
       # Open the list item:
-      result << %(<li>)
+      result << %(<li#{metadata}>)
 
       # Process individual terms:
       terms.each do |item|
@@ -897,8 +903,11 @@ class DitaTopic < Asciidoctor::Converter::Base
 
     # Process individual list items:
     node.items.each do |terms, description|
+      # Compose the metadata attributes:
+      metadata, terms[0].text = extract_attributes terms[0].text
+
       # Open the table row:
-      result << %(<row>)
+      result << %(<row#{metadata}>)
 
       # Check the number of terms to process:
       if terms.count == 1
