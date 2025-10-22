@@ -708,8 +708,11 @@ class DitaTopic < Asciidoctor::Converter::Base
 
       # Process each row:
       rows.each do |row|
+        # Compose the metadata attributes:
+        metadata, row[0].text = extract_attributes row[0].text
+
         # Open the row:
-        result << %(<row>)
+        result << %(<row#{metadata}>)
 
         # Process each cell:
         row.each do |cell|
