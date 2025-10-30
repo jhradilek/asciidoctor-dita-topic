@@ -512,19 +512,31 @@ class DitaTopic < Asciidoctor::Converter::Base
     # Check whether the source language is defined:
     language = (node.attributes.key? 'language') ? %( outputclass="language-#{node.attributes['language']}") : ''
 
-    # Compose the XML output:
-    result = %(<codeblock#{language}#{compose_id node.id}#{compose_metadata node.role}>#{node.content}</codeblock>)
-
-    # Return the XML output:
-    add_block_title result, node
+    # Check if the listing has a title specified:
+    if node.title?
+      <<~EOF.chomp
+      <fig#{compose_id node.id}#{compose_metadata node.role}>
+      <title>#{node.title}</title>
+      <codeblock#{language}>#{node.content}</codeblock>
+      </fig>
+      EOF
+    else
+      %(<codeblock#{language}#{compose_id node.id}#{compose_metadata node.role}>#{node.content}</codeblock>)
+    end
   end
 
   def convert_literal node
-    # Compose the XML output:
-    result = %(<pre#{compose_id node.id}#{compose_metadata node.role}>#{node.content}</pre>)
-
-    # Return the XML output:
-    add_block_title result, node
+    # Check if the literal block has a title specified:
+    if node.title?
+      <<~EOF.chomp
+      <fig#{compose_id node.id}#{compose_metadata node.role}>
+      <title>#{node.title}</title>
+      <pre>#{node.content}</pre>
+      </fig>
+      EOF
+    else
+      %(<pre#{compose_id node.id}#{compose_metadata node.role}>#{node.content}</pre>)
+    end
   end
 
   def convert_olist node
