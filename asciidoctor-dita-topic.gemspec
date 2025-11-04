@@ -1,12 +1,23 @@
+require_relative 'lib/dita-topic/version'
+
 Gem::Specification.new do |s|
   # General information:
   s.name        = 'asciidoctor-dita-topic'
-  s.version     = '1.3.4'
+  s.version     = AsciidoctorDitaTopic::VERSION
   s.summary     = 'A custom AsciiDoc converter that generates individual DITA topics'
   s.description = 'An extension for AsciiDoctor that converts a single AsciiDoc file to a DITA topic.'
   s.authors     = ['Jaromir Hradilek']
   s.email       = 'jhradilek@gmail.com'
-  s.files       = ['lib/dita-topic.rb', 'LICENSE', 'AUTHORS', 'README.adoc']
+  s.bindir      = 'bin'
+  s.executables = ['dita-topic']
+  s.files       = [
+    'lib/dita-topic.rb',
+    'lib/dita-topic/cli.rb',
+    'lib/dita-topic/version.rb',
+    'LICENSE',
+    'AUTHORS',
+    'README.adoc'
+  ]
   s.homepage    = 'https://github.com/jhradilek/asciidoctor-dita-topic'
   s.license     = 'MIT'
 
