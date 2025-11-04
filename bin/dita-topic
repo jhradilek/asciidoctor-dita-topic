@@ -26,5 +26,9 @@
 require (cli = File.absolute_path '../lib/dita-topic/cli.rb', __dir__) ? cli : 'dita-topic/cli'
 require (ver = File.absolute_path '../lib/dita-topic/version.rb', __dir__) ? ver : 'dita-topic/version'
 
-converter = AsciidoctorDitaTopic::Cli.new ARGV
-converter.run
+begin
+  converter = AsciidoctorDitaTopic::Cli.new ARGV
+  converter.run
+rescue OptionParser::InvalidArgument, OptionParser::InvalidOption, OptionParser::MissingArgument => error
+  abort "#{AsciidoctorDitaTopic::NAME}: #{error.message}"
+end

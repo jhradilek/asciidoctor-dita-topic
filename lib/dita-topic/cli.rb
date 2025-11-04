@@ -52,7 +52,18 @@ module AsciidoctorDitaTopic
         end
       end
 
-      return parser.parse argv
+      args = parser.parse argv
+
+      if args.length == 0
+        raise OptionParser::MissingArgument, "specify one or more files"
+      end
+
+      args.each do |file|
+        raise OptionParser::InvalidArgument, "not a file: #{file}" unless File.exist? file and File.file? file
+        raise OptionParser::InvalidArgument, "file not readable: #{file}" unless File.readable? file
+      end
+
+      return args
     end
 
     def run
