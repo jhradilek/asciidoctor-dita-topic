@@ -37,8 +37,28 @@ module AsciidoctorDitaTopic
         opt.banner  = "Usage: #{NAME} [OPTION...] FILE...\n"
         opt.banner += "       #{NAME} -h|-v\n\n"
 
-        opt.on('-a', '--attribute=name[=value]', 'a document attribute to set in the form of name, name!, or name=value pair') do |value|
+        opt.on('-a', '--attribute=value', 'a document attribute to set in the form of name, name!, or name=value pair') do |value|
           @attr.append value
+        end
+
+        opt.on('-l', '--author-line', 'enable processing of author lines as metadata') do
+          @attr.append 'dita-topic-authors=on'
+        end
+
+        opt.on('-s', '--section-type', 'add content type as outputclass to sections') do
+          @attr.append 'dita-topic-type=on'
+        end
+
+        opt.on('-C', '--no-callouts', 'disable processing of callouts') do
+          @attr.append 'dita-topic-callouts=off'
+        end
+
+        opt.on('-S', '--no-sidebars', 'disable processing of sidebars') do
+          @attr.append 'dita-topic-sidebars=off'
+        end
+
+        opt.on('-T', '--no-titles', 'disable processing of floating titles') do
+          @attr.append 'dita-topic-titles=off'
         end
 
         opt.on('-h', '--help', 'display this help and exit') do
