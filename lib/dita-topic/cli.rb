@@ -24,11 +24,14 @@
 # frozen_string_literal: true
 
 require 'optparse'
+require 'asciidoctor'
+require_relative '../dita-topic'
 
 module AsciidoctorDitaTopic
   class Cli
     def initialize argv
       @attr = ['experimental']
+      @opts = {:output => true}
       @args = self.parse_args argv
     end
 
@@ -37,7 +40,11 @@ module AsciidoctorDitaTopic
         opt.banner  = "Usage: #{NAME} [OPTION...] FILE...\n"
         opt.banner += "       #{NAME} -h|-v\n\n"
 
-        opt.on('-a', '--attribute=value', 'a document attribute to set in the form of name, name!, or name=value pair') do |value|
+        opt.on('-o', '--out-file FILE', 'output file; by default, the output file name is based on the input file') do |output|
+          @opts[:output] = (output.strip == '-') ? $stdout : output
+        end
+
+        opt.on('-a', '--attribute ATTRIBUTE', 'document attribute to set in the form of name, name!, or name=value pair') do |value|
           @attr.append value
         end
 
@@ -87,7 +94,9 @@ module AsciidoctorDitaTopic
     end
 
     def run
-      puts @attr.to_s
+      @args.each do |file|
+        Asciidoctor.convert_file file, backend: 'dita-topic', standalone: true, attributes: @attr, to_file: @opts[:output]
+      end
     end
   end
 end
