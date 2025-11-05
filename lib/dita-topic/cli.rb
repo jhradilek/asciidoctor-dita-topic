@@ -102,11 +102,9 @@ module AsciidoctorDitaTopic
 
       args = parser.parse argv
 
-      if args.length == 0
-        raise OptionParser::MissingArgument, "specify one or more files"
+      if args.length == 0 or args[0].strip == '-'
+        return [$stdin]
       end
-
-      return [$stdin] if args[0].strip == '-'
 
       args.each do |file|
         raise OptionParser::InvalidArgument, "not a file: #{file}" unless File.exist? file and File.file? file
@@ -118,8 +116,13 @@ module AsciidoctorDitaTopic
 
     def run
       @args.each do |file|
-        input  = (file == $stdin) ? $stdin.read : File.read(file)
-        output = (@opts[:output] == true) ? Pathname.new(file).sub_ext('.dita').to_s : @opts[:output]
+        if file == $stdin
+          input  = $stdin.read
+          output = (@opts[:output] == true) ? $stdout : @opts[:output]
+        else
+          input  = File.read(file)
+          output = (@opts[:output] == true) ? Pathname.new(file).sub_ext('.dita').to_s : @opts[:output]
+        end
 
         input.gsub!(Asciidoctor::IncludeDirectiveRx, '//\&') unless @opts[:includes]
 
