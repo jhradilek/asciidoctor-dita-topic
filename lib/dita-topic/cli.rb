@@ -23,21 +23,23 @@
 
 require 'optparse'
 require 'asciidoctor'
+require_relative 'version'
 require_relative '../dita-topic'
 
 module AsciidoctorDitaTopic
   class Cli
-    def initialize argv
+    def initialize name, argv
       @attr = ['experimental']
       @opts = {:output => true, :includes => true}
       @prep = ''
+      @name = name
       @args = self.parse_args argv
     end
 
     def parse_args argv
       parser = OptionParser.new do |opt|
-        opt.banner  = "Usage: #{NAME} [OPTION...] FILE...\n"
-        opt.banner += "       #{NAME} -h|-v\n\n"
+        opt.banner  = "Usage: #{@name} [OPTION...] FILE...\n"
+        opt.banner += "       #{@name} -h|-v\n\n"
 
         opt.on('-o', '--out-file FILE', 'output file; by default, the output file name is based on the input file') do |output|
           @opts[:output] = (output.strip == '-') ? $stdout : output
@@ -89,7 +91,7 @@ module AsciidoctorDitaTopic
         end
 
         opt.on('-v', '--version', 'display version information and exit') do
-          puts "#{NAME} #{VERSION}"
+          puts "#{@name} #{VERSION}"
           exit
         end
       end
