@@ -21,8 +21,6 @@
 # ARISING FROM,  OUT OF OR IN CONNECTION WITH  THE SOFTWARE  OR  THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
-# frozen_string_literal: true
-
 require 'optparse'
 require 'asciidoctor'
 require_relative '../dita-topic'
@@ -32,6 +30,7 @@ module AsciidoctorDitaTopic
     def initialize argv
       @attr = ['experimental']
       @opts = {:output => true}
+      @prep = ''
       @args = self.parse_args argv
     end
 
@@ -42,6 +41,14 @@ module AsciidoctorDitaTopic
 
         opt.on('-o', '--out-file FILE', 'output file; by default, the output file name is based on the input file') do |output|
           @opts[:output] = (output.strip == '-') ? $stdout : output
+        end
+
+        opt.on('-p', '--prepend-file FILE', 'file to prepend to all input files') do |file|
+          raise OptionParser::InvalidArgument, "not a file: #{file}" unless File.exist? file and File.file? file
+          raise OptionParser::InvalidArgument, "file not readable: #{file}" unless File.readable? file
+
+          @prep << File.read(file)
+          @prep << "\n"
         end
 
         opt.on('-a', '--attribute ATTRIBUTE', 'document attribute to set in the form of name, name!, or name=value pair') do |value|
@@ -94,8 +101,16 @@ module AsciidoctorDitaTopic
     end
 
     def run
-      @args.each do |file|
-        Asciidoctor.convert_file file, backend: 'dita-topic', standalone: true, attributes: @attr, to_file: @opts[:output]
+      if @prep.empty?
+        @args.each do |file|
+          Asciidoctor.convert_file file, backend: 'dita-topic', standalone: true, attributes: @attr, to_file: @opts[:output]
+        end
+      else
+        @args.each do |file|
+          input  = File.read(file)
+          output = (@opts[:output] == true) ? Pathname.new(file).sub_ext('.dita').to_s : @opts[:output]
+          Asciidoctor.convert @prep + input, backend: 'dita-topic', standalone: true, attributes: @attr, to_file: output
+        end
       end
     end
   end
