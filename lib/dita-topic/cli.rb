@@ -30,7 +30,7 @@ module AsciidoctorDitaTopic
   class Cli
     def initialize name, argv
       @attr = ['experimental']
-      @opts = {:output => true, :includes => true}
+      @opts = {:output => true, :includes => true, :standalone => true}
       @prep = ''
       @name = name
       @args = self.parse_args argv
@@ -61,13 +61,17 @@ module AsciidoctorDitaTopic
           @opts[:includes] = false
         end
 
+        opt.on('-s', '--no-header-footer', 'disable enclosing the content in <topic> and generating <title>') do
+          @opts[:standalone] = false
+        end
+
         opt.separator ''
 
         opt.on('-l', '--author-line', 'enable processing of author lines as metadata') do
           @attr.append 'dita-topic-authors=on'
         end
 
-        opt.on('-s', '--section-type', 'add content type as outputclass to sections') do
+        opt.on('-t', '--section-type', 'add content type as outputclass to sections') do
           @attr.append 'dita-topic-type=on'
         end
 
@@ -119,7 +123,7 @@ module AsciidoctorDitaTopic
 
         input.gsub!(Asciidoctor::IncludeDirectiveRx, '//\&') unless @opts[:includes]
 
-        Asciidoctor.convert @prep + input, backend: 'dita-topic', standalone: true, safe: :unsafe, attributes: @attr, to_file: output
+        Asciidoctor.convert @prep + input, backend: 'dita-topic', standalone: @opts[:standalone], safe: :unsafe, attributes: @attr, to_file: output
       end
     end
   end
