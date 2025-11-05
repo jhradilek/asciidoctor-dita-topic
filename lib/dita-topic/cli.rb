@@ -55,6 +55,8 @@ module AsciidoctorDitaTopic
           @attr.append value
         end
 
+        opt.separator ''
+
         opt.on('-l', '--author-line', 'enable processing of author lines as metadata') do
           @attr.append 'dita-topic-authors=on'
         end
@@ -74,6 +76,8 @@ module AsciidoctorDitaTopic
         opt.on('-T', '--no-titles', 'disable processing of floating titles') do
           @attr.append 'dita-topic-titles=off'
         end
+
+        opt.separator ''
 
         opt.on('-h', '--help', 'display this help and exit') do
           puts opt
