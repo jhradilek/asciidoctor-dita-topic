@@ -15,6 +15,50 @@ class CliTest < Minitest::Test
     assert_equal [], prep
   end
 
+  def test_missing_file
+    file = 'file.adoc'
+
+    File.stub :exist?, false do
+      File.stub :file?, true do
+        error = assert_raises OptionParser::InvalidArgument do
+          AsciidoctorDitaTopic::Cli.new 'script-name', [file]
+        end
+
+        assert_match(/not a file: #{file}/, error.message)
+      end
+    end
+  end
+
+  def test_not_a_file
+    file = 'file.adoc'
+
+    File.stub :exist?, true do
+      File.stub :file?, false do
+        error = assert_raises OptionParser::InvalidArgument do
+          AsciidoctorDitaTopic::Cli.new 'script-name', [file]
+        end
+
+        assert_match(/not a file: #{file}/, error.message)
+      end
+    end
+  end
+
+  def test_file_not_readable
+    file = 'file.adoc'
+
+    File.stub :exist?, true do
+      File.stub :file?, true do
+        File.stub :readable?, false do
+          error = assert_raises OptionParser::InvalidArgument do
+            AsciidoctorDitaTopic::Cli.new 'script-name', [file]
+          end
+
+          assert_match(/file not readable: #{file}/, error.message)
+        end
+      end
+    end
+  end
+
   def test_out_file_short
     cli  = AsciidoctorDitaTopic::Cli.new 'script-name', ['-o', 'file.dita']
     opts = cli.instance_variable_get :@opts
@@ -92,6 +136,50 @@ class CliTest < Minitest::Test
 
           assert_includes prep, first
           assert_includes prep, second
+        end
+      end
+    end
+  end
+
+  def test_prepend_file_missing_file
+    file = 'attributes.adoc'
+
+    File.stub :exist?, false do
+      File.stub :file?, true do
+        error = assert_raises OptionParser::InvalidArgument do
+          AsciidoctorDitaTopic::Cli.new 'script-name', ['-p', file]
+        end
+
+        assert_match(/not a file: #{file}/, error.message)
+      end
+    end
+  end
+
+  def test_prepend_file_not_a_file
+    file = 'attributes.adoc'
+
+    File.stub :exist?, true do
+      File.stub :file?, false do
+        error = assert_raises OptionParser::InvalidArgument do
+          AsciidoctorDitaTopic::Cli.new 'script-name', ['-p', file]
+        end
+
+        assert_match(/not a file: #{file}/, error.message)
+      end
+    end
+  end
+
+  def test_prepend_file_not_readable
+    file = 'attributes.adoc'
+
+    File.stub :exist?, true do
+      File.stub :file?, true do
+        File.stub :readable?, false do
+          error = assert_raises OptionParser::InvalidArgument do
+            AsciidoctorDitaTopic::Cli.new 'script-name', ['-p', file]
+          end
+
+          assert_match(/file not readable: #{file}/, error.message)
         end
       end
     end
