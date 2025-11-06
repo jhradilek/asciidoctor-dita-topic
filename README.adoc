@@ -15,7 +15,7 @@ $ *vale _source_file.adoc_*
 +
 [literal,subs="+quotes"]
 ....
-$ *asciidoctor -r dita-topic -b dita-topic _source_file.adoc_*
+$ *dita-topic _source_file.adoc_*
 ....
 
 . Convert the generic DITA topic to a specialized DITA concept, reference, or task:
@@ -50,27 +50,34 @@ On macOS, `asciidoctor` installed with Homebrew expects Ruby gems in a different
 [#use]
 == Usage
 
-To use the custom converter on the command line, load it with the `-r dita-topic` option and then select `dita-topic` as the backend output format with `-b dita-topic`:
+To convert an AsciiDoc file to a generic DITA topic, run the supplied `dita-topic` command-line interface as follows:
 
 [literal,subs="+quotes"]
 ....
-$ *asciidoctor -r dita-topic -b dita-topic _your_file_.adoc*
+$ *dita-topic _your_file_.adoc*
 ....
 
 This creates a new file, `_your_file_.dita`, in the same directory as `_your_file_.adoc`. You can also convert multiple files at the same time:
 
 [literal,subs="+quotes"]
 ....
-$ **asciidoctor -r dita-topic -b dita-topic *.adoc**
+$ **dita-topic *.adoc**
+....
+
+The command-line interface simplifies the code execution and provides a few options in addition to the conversion. However, if you prefer to use Asciidoctor directly, load the converter with the `-r dita-topic` option and then select `dita-topic` as the backend output format with `-b dita-topic`:
+
+[literal,subs="+quotes"]
+....
+$ *asciidoctor -r dita-topic -b dita-topic _your_file_.adoc*
 ....
 
 [IMPORTANT]
 ====
-`dita-topic` does not validate the converted content. If you have link:https://www.dita-ot.org/[DITA Open Toolkit] installed, you can check that the converted file can be built as follows:
+`dita-topic` does not validate the converted content. If you have link:https://www.dita-ot.org/[DITA Open Toolkit] installed, you can verify that the converted file can be built as follows:
 
 [literal,subs="+quotes"]
 ....
-$ **dita -i _converted_file_.dita -f xhtml**
+$ **dita -i _your_file_.dita -f xhtml**
 ....
 
 To produce slightly more readable errors, you can also use `xmlstarlet`:
@@ -82,45 +89,51 @@ $ **xmlstarlet val -e -s _path_to_dita-ot_directory_/plugins/org.oasis-open.dita
 ====
 
 [#attributes]
-=== Supplying attribute definitions
+=== Supplying individual attribute definitions
 
 If your AsciiDoc files use attributes that are defined outside of these files, you can supply the attribute definitions on the command line with the `-a _attribute_=_value_` option:
+
+[literal,subs="+quotes"]
+....
+$ **dita-topic -a _attribute_=_value_ _your_file_.adoc**
+....
+
+If you prefer to use Asciidoctor directly, supply the attribute definitions with the `-a _attribute_=_value_` option as follows:
 
 [literal,subs="+quotes"]
 ....
 $ **asciidoctor -r dita-topic -b dita-topic -a _attribute_=_value_ _your_file_.adoc**
 ....
 
-You can provide multiple `-a _attribute_=_value_` options at the same time. Providing relevant attribute definitions is especially important if your document contains conditional content.
+You can provide multiple `-a` options at the same time. Providing relevant attribute definitions is especially important if your document contains conditional content.
 
-.Providing a product version to resolve `ifeval` conditions
-====
-Your AsciiDoc files include a number of `ifeval` statements that provide different content for different versions of the product you are documenting:
+[#attribute_files]
+=== Supplying attribute definition files
 
-[source]
-----
-\ifeval::["{ProductNumber}" == "1"]
-...
-\endif::[]
-\ifeval::["{ProductNumber}" == "2"]
-...
-\endif::[]
-----
-
-To ensure that the converted DITA files include all content for version 2 of your product, run:
+If listing individual attribute definitions is impractical, you can use the `-p _definition_file_.adoc` option to supply another AsciiDoc file with attribute definitions in it:
 
 [literal,subs="+quotes"]
 ....
-$ **asciidoctor -r dita-topic -b dita-topic -a ProductNumber=2 *.adoc**
+$ **dita-topic -p _definition_file_.adoc _your_file_.adoc**
 ....
-====
+
+The supplied file is automatically prepended to each AsciiDoc file during conversion. You can provide multiple `-p` options at the same time or use a combination `-p` and `-a` options to construct your attribute definitions. If you define the same attribute twice this way, the value defined by using the `-a` option takes precedence.
+
+This functionality is not available in standard Asciidoctor.
 
 [#authors]
 === Enabling author lines
 
 AsciiDoc topics are expected to be included in other files and therefore should not contain link:https://docs.asciidoctor.org/asciidoc/latest/document/author-line/[author line] definitions. In most cases, lines that directly follow the topic title are intended as first paragraphs. For this reason, author lines are disabled by default. To avoid losing content during conversion, as a workaround, the `dita-topic` converter interprets the raw content of the author line as a paragraph and issues a warning.
 
-To enable processing of author lines as metadata, set the value of the `dita-topic-authors` to `on`:
+To enable processing of author lines as metadata, run the `dita-topic` command with the `-l` option:
+
+[literal,subs="+quotes"]
+....
+$ **dita-topic -l _your_file_.adoc**
+....
+
+If you prefer to use Asciidoctor directly, set the value of the `dita-topic-authors` to `on`:
 
 [literal,subs="+quotes"]
 ....
@@ -137,7 +150,14 @@ Unlike AsciiDoc, DITA does not support floating titles and only allows titles to
 <p outputclass="title"><b>Floating title</b></p>
 ----
 
-To disable this behavior, set the value of the `dita-topic-titles` to `off`:
+To disable this behavior, run the `dita-topic` command with the `-T` option:
+
+[literal,subs="+quotes"]
+....
+$ **dita-topic -T _your_file_.adoc**
+....
+
+If you prefer to use Asciidoctor directly, set the value of the `dita-topic-titles` to `off`:
 
 [literal,subs="+quotes"]
 ....
@@ -149,7 +169,14 @@ $ **asciidoctor -r dita-topic -b dita-topic -a dita-topic-titles=off _your_file_
 
 Unlike AsciiDoc, DITA does not support callouts as a method to add annotations to specific lines in verbatim blocks. To avoid losing content during conversion, as a workaround, the `dita-topic` converter uses XML entities for circled numbers.
 
-To disable this behavior, set the value of the `dita-topic-callouts` to `off`:
+To disable this behavior, run the `dita-topic` command with the `-C` option:
+
+[literal,subs="+quotes"]
+....
+$ **dita-topic -C _your_file_.adoc**
+....
+
+If you prefer to use Asciidoctor directly, set the value of the `dita-topic-callouts` to `off`:
 
 [literal,subs="+quotes"]
 ....
@@ -159,12 +186,21 @@ $ **asciidoctor -r dita-topic -b dita-topic -a dita-topic-callouts=off _your_fil
 [#includes]
 === Disabling include directives
 
-By default, Asciidoctor resolves all `include` directives before converting the file. To only convert the contents of the selected file, specify the `-S secure` option:
+By default, Asciidoctor resolves all `include` directives before converting the file. To only convert the contents of the selected file, run the `dita-topic` command with the `-I` option:
+
+[literal,subs="+quotes"]
+....
+$ **dita-topic -I _your_file_.adoc**
+....
+
+If you prefer to use Asciidoctor directly, there is no direct equivalent to this functionality. As a workaround, you can specify the `-S secure` option:
 
 [literal,subs="+quotes"]
 ....
 $ **asciidoctor -r dita-topic -b dita-topic -S secure _your_file_.adoc**
 ....
+
+This disables processing of the include directives, but leaves cross references to the included files in the converted output.
 
 [#abstracts]
 === Adding short descriptions
