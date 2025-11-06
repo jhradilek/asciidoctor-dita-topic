@@ -31,7 +31,7 @@ module AsciidoctorDitaTopic
     def initialize name, argv
       @attr = ['experimental']
       @opts = {:output => true, :includes => true, :standalone => true}
-      @prep = ''
+      @prep = []
       @name = name
       @args = self.parse_args argv
     end
@@ -53,8 +53,7 @@ module AsciidoctorDitaTopic
           raise OptionParser::InvalidArgument, "not a file: #{file}" unless File.exist? file and File.file? file
           raise OptionParser::InvalidArgument, "file not readable: #{file}" unless File.readable? file
 
-          @prep << File.read(file)
-          @prep << "\n"
+          @prep.append file
         end
 
         opt.on('-I', '--no-includes', 'disable processing of include directives') do
@@ -115,6 +114,13 @@ module AsciidoctorDitaTopic
     end
 
     def run
+      prepended = ''
+
+      @prep.each do |file|
+        prepended << File.read(file)
+        prepended << "\n"
+      end
+
       @args.each do |file|
         if file == $stdin
           input  = $stdin.read
@@ -126,7 +132,7 @@ module AsciidoctorDitaTopic
 
         input.gsub!(Asciidoctor::IncludeDirectiveRx, '//\&') unless @opts[:includes]
 
-        Asciidoctor.convert @prep + input, backend: 'dita-topic', standalone: @opts[:standalone], safe: :unsafe, attributes: @attr, to_file: output
+        Asciidoctor.convert prepended + input, backend: 'dita-topic', standalone: @opts[:standalone], safe: :unsafe, attributes: @attr, to_file: output
       end
     end
   end
