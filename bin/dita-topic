@@ -31,4 +31,6 @@ begin
   converter.run
 rescue OptionParser::InvalidArgument, OptionParser::InvalidOption, OptionParser::MissingArgument => error
   abort "#{name}: #{error.message}"
+rescue Interrupt
+  exit 130
 end
