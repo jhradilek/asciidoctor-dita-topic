@@ -7,7 +7,7 @@ class InlineAnchorTest < Minitest::Test
     Links can look like https://example.com, <https://example.com>, https://example.com[my site], or link:++https://example.com++[my site].
     EOF
 
-    assert_xpath_count xml, 4, '//xref[@href="https://example.com" and @scope="external"]'
+    assert_xpath_count xml, 4, '//xref[@href="https://example.com" and @scope="external" and @format="html"]'
   end
 
   def test_external_email
