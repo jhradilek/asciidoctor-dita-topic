@@ -38,8 +38,8 @@ class LiteralTest < Minitest::Test
     ....
     EOF
 
-    assert_xpath_equal xml, 'A literal block title', '//p[@outputclass="title"]/b/text()'
-    assert_xpath_equal xml, 'A literal block', '//pre/text()'
+    assert_xpath_equal xml, 'A literal block title', '//fig/title/text()'
+    assert_xpath_equal xml, 'A literal block', '//fig/pre/text()'
   end
 
   def test_literal_block_role
@@ -49,8 +49,8 @@ class LiteralTest < Minitest::Test
     A literal block
     EOF
 
-    assert_xpath_equal xml, 'linux', '//pre/@platform'
-    assert_xpath_equal xml, 'linux', '//p[@outputclass="title"]/@platform'
+    assert_xpath_equal xml, 'linux', '//fig/@platform'
+    assert_xpath_count xml, 0, '//fig/pre/@platform'
   end
 
   def test_literal_block_id
@@ -60,8 +60,8 @@ class LiteralTest < Minitest::Test
     A literal block
     EOF
 
-    assert_xpath_equal xml, 'literal-id', '//pre/@id'
-    assert_xpath_count xml, 0, '//p[@outputclass="title"]/@id'
+    assert_xpath_equal xml, 'literal-id', '//fig/@id'
+    assert_xpath_count xml, 0, '//fig/pre/@id'
   end
 
   def test_literal_block_no_id
