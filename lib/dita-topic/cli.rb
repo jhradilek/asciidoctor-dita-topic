@@ -38,7 +38,7 @@ module AsciidoctorDitaTopic
 
     def parse_args argv
       parser = OptionParser.new do |opt|
-        opt.banner  = "Usage: #{@name} [OPTION...] FILE...\n"
+        opt.banner  = "Usage: #{@name} [OPTION...] [FILE...]\n"
         opt.banner += "       #{@name} -h|-v\n\n"
 
         opt.on('-o', '--out-file FILE', 'output file; by default, the output file name is based on the input file') do |output|
