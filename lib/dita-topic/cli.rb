@@ -30,7 +30,12 @@ module AsciidoctorDitaTopic
   class Cli
     def initialize name, argv
       @attr = ['experimental']
-      @opts = {:output => true, :includes => true, :standalone => true}
+      @opts = {
+        :output => false,
+        :includes => true,
+        :standalone => true,
+        :map => false
+      }
       @prep = []
       @name = name
       @args = self.parse_args argv
@@ -41,15 +46,25 @@ module AsciidoctorDitaTopic
         opt.banner  = "Usage: #{@name} [OPTION...] [FILE...]\n"
         opt.banner += "       #{@name} -h|-v\n\n"
 
-        opt.on('-o', '--out-file FILE', 'output file; by default, the output file name is based on the input file') do |output|
+        opt.on('-o', '--out-file FILE', 'specify the output file; by default, the output file name is based on the input file') do |output|
           @opts[:output] = (output.strip == '-') ? $stdout : output
         end
 
-        opt.on('-a', '--attribute ATTRIBUTE', 'document attribute to set in the form of name, name!, or name=value pair') do |value|
+        opt.on('-a', '--attribute ATTRIBUTE', 'set a document attribute in the form of name, name!, or name=value pair; can be supplied multiple times') do |value|
           @attr.append value
         end
 
-        opt.on('-p', '--prepend-file FILE', 'file to prepend to all input files') do |file|
+        opt.on('-s', '--no-header-footer', 'disable enclosing the content in <topic> and generating <title>') do
+          @opts[:standalone] = false
+        end
+
+        opt.separator ''
+
+        opt.on('-m', '--dita-map', 'generate a DITA map instead of a topic') do
+          @opts[:map] = true
+        end
+
+        opt.on('-p', '--prepend-file FILE', 'prepend a file to all input files; can be supplied multiple times') do |file|
           raise OptionParser::InvalidArgument, "not a file: #{file}" unless File.exist? file and File.file? file
           raise OptionParser::InvalidArgument, "file not readable: #{file}" unless File.readable? file
 
@@ -58,10 +73,6 @@ module AsciidoctorDitaTopic
 
         opt.on('-I', '--no-includes', 'disable processing of include directives') do
           @opts[:includes] = false
-        end
-
-        opt.on('-s', '--no-header-footer', 'disable enclosing the content in <topic> and generating <title>') do
-          @opts[:standalone] = false
         end
 
         opt.separator ''
@@ -124,10 +135,11 @@ module AsciidoctorDitaTopic
       @args.each do |file|
         if file == $stdin
           input  = $stdin.read
-          output = (@opts[:output] == true) ? $stdout : @opts[:output]
+          output = @opts[:output] ? @opts[:output] : $stdout
         else
+          suffix = @opts[:map] ? '.ditamap' : '.dita'
           input  = File.read(file)
-          output = (@opts[:output] == true) ? Pathname.new(file).sub_ext('.dita').to_s : @opts[:output]
+          output = @opts[:output] ? @opts[:output] : Pathname.new(file).sub_ext(suffix).to_s
         end
 
         input.gsub!(Asciidoctor::IncludeDirectiveRx, '//\&') unless @opts[:includes]
