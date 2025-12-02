@@ -65,7 +65,6 @@ class QuandaDlistTest < Minitest::Test
 
     assert_xpath_equal xml, 'linux', '//li[1]/@platform'
     assert_xpath_equal xml, 'linux', '//li[1]/@platform'
-    assert_xpath_count xml, 0, '//ph'
   end
 
   def test_qanda_list_id

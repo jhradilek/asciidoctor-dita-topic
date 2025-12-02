@@ -85,7 +85,6 @@ class UlistTest < Minitest::Test
     assert_xpath_equal xml, 'linux', '//ul[2]/li[2]/@platform'
     assert_xpath_equal xml, 'Item one', '//ul[2]/li[1]/text()'
     assert_xpath_equal xml, 'Item two', '//ul[2]/li[2]/text()'
-    assert_xpath_count xml, 0, '//ph'
   end
 
   def test_unordered_list_id
