@@ -203,7 +203,7 @@ class DitaTopic < Asciidoctor::Converter::Base
     # Process individual list items:
     node.items.each do |terms, description|
       # Compose the metadata attributes:
-      metadata, terms[0].text = extract_attributes terms[0].text
+      metadata = extract_attributes terms[0].text
 
       # Open the definition entry:
       result << %(<dlentry#{metadata}>)
@@ -534,16 +534,16 @@ class DitaTopic < Asciidoctor::Converter::Base
     # Process individual list items:
     node.items.each do |item|
       # Compose the metadata attributes:
-      metadata, text = extract_attributes item.text
+      metadata = extract_attributes item.text
       metadata = compose_metadata item.role if item.role
 
       # Check if the list item contains multiple block elements:
       if item.blocks?
-        result << %(<li#{compose_id item.id}#{metadata}>#{text})
+        result << %(<li#{compose_id item.id}#{metadata}>#{item.text})
         result << item.content
         result << %(</li>)
       else
-        result << %(<li#{compose_id item.id}#{metadata}>#{text}</li>)
+        result << %(<li#{compose_id item.id}#{metadata}>#{item.text}</li>)
       end
     end
 
@@ -709,7 +709,7 @@ class DitaTopic < Asciidoctor::Converter::Base
       # Process each row:
       rows.each do |row|
         # Compose the metadata attributes:
-        metadata, row[0].text = extract_attributes row[0].text
+        metadata = extract_attributes row[0].text
 
         # Open the row:
         result << %(<row#{metadata}>)
@@ -777,7 +777,7 @@ class DitaTopic < Asciidoctor::Converter::Base
     # Process individual list items:
     node.items.each do |item|
       # Compose the metadata attributes:
-      metadata, text = extract_attributes item.text
+      metadata = extract_attributes item.text
       metadata = compose_metadata item.role if item.role
 
       # Check if the list item is part of a checklist:
@@ -789,11 +789,11 @@ class DitaTopic < Asciidoctor::Converter::Base
 
       # Check if the list item contains multiple block elements:
       if item.blocks?
-        result << %(<li#{compose_id item.id}#{metadata}>#{check_box}#{text})
+        result << %(<li#{compose_id item.id}#{metadata}>#{check_box}#{item.text})
         result << item.content
         result << %(</li>)
       else
-        result << %(<li#{compose_id item.id}#{metadata}>#{check_box}#{text}</li>)
+        result << %(<li#{compose_id item.id}#{metadata}>#{check_box}#{item.text}</li>)
       end
     end
 
@@ -864,7 +864,7 @@ class DitaTopic < Asciidoctor::Converter::Base
     # Process individual list items:
     node.items.each do |terms, description|
       # Compose the metadata attributes:
-      metadata, terms[0].text = extract_attributes terms[0].text
+      metadata = extract_attributes terms[0].text
 
       # Open the list item:
       result << %(<li#{metadata}>)
@@ -907,7 +907,7 @@ class DitaTopic < Asciidoctor::Converter::Base
     # Process individual list items:
     node.items.each do |terms, description|
       # Compose the metadata attributes:
-      metadata, terms[0].text = extract_attributes terms[0].text
+      metadata = extract_attributes terms[0].text
 
       # Open the table row:
       result << %(<row#{metadata}>)
@@ -1076,9 +1076,9 @@ class DitaTopic < Asciidoctor::Converter::Base
   def extract_attributes text
     # Extract metadata attributes from an empty ph element:
     if /^\s*<ph(?<attributes> [^>]+)><\/ph>\s*/ =~ text
-      return attributes, text.sub(/^\s*<ph[^>]+><\/ph>\s*/, '')
+      return attributes
     else
-      return '', text
+      return ''
     end
   end
 
