@@ -24,5 +24,5 @@
 # frozen_string_literal: true
 
 module AsciidoctorDitaTopic
-  VERSION     = '1.4.2'
+  VERSION     = '1.4.3'
 end
