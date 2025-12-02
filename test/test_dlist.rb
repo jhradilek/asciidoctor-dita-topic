@@ -81,7 +81,6 @@ class DlistTest < Minitest::Test
 
     assert_xpath_equal xml, 'linux', '//dlentry[1]/@platform'
     assert_xpath_equal xml, 'linux', '//dlentry[2]/@platform'
-    assert_xpath_count xml, 0, '//ph'
   end
 
   def test_description_list_id

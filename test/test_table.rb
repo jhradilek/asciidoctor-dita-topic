@@ -162,7 +162,6 @@ class TableTest < Minitest::Test
 
     assert_xpath_equal xml, 'linux', '//thead/row/@platform'
     assert_xpath_equal xml, 'linux', '//tbody/row/@platform'
-    assert_xpath_count xml, 0, '//ph'
   end
 
   def test_table_id

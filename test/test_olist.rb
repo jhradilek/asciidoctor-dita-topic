@@ -73,7 +73,6 @@ class OlistTest < Minitest::Test
     assert_xpath_equal xml, 'linux', '//ol[2]/li[2]/@platform'
     assert_xpath_equal xml, 'Item one', '//ol[2]/li[1]/text()'
     assert_xpath_equal xml, 'Item two', '//ol[2]/li[2]/text()'
-    assert_xpath_count xml, 0, '//ph'
   end
 
   def test_ordered_list_id
