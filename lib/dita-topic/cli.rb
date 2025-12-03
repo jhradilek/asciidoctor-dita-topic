@@ -141,8 +141,6 @@ module AsciidoctorDitaTopic
       return unless sections
 
       title      = (sections.first.level == 0 and sections.first.title) ? sections.first.title : false
-      last_level = 0
-      last_file  = ''
 
       if @opts[:standalone]
         result   = ["<?xml version='1.0' encoding='utf-8' ?>"]
@@ -153,10 +151,13 @@ module AsciidoctorDitaTopic
         result   = []
       end
 
+      last_level = 0
+      last_file  = ''
+
       sections.each_index do |i|
         section  = sections[i]
         level    = section.level
-        title    = section.title
+        title    = section.title.gsub(/"|<[^>]*>|[<>]/, '')
         filename = section.file ? Pathname.new(section.file).sub_ext('.dita').relative_path_from(base_dir) : Pathname.new(file)
         current  = last_level
 
