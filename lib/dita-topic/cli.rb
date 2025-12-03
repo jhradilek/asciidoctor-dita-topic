@@ -22,6 +22,7 @@
 # OTHER DEALINGS IN THE SOFTWARE.
 
 require 'optparse'
+require 'pathname'
 require 'asciidoctor'
 require_relative 'version'
 require_relative '../dita-topic'
@@ -30,7 +31,12 @@ module AsciidoctorDitaTopic
   class Cli
     def initialize name, argv
       @attr = ['experimental']
-      @opts = {:output => true, :includes => true, :standalone => true}
+      @opts = {
+        :output => false,
+        :includes => true,
+        :standalone => true,
+        :map => false
+      }
       @prep = []
       @name = name
       @args = self.parse_args argv
@@ -41,15 +47,25 @@ module AsciidoctorDitaTopic
         opt.banner  = "Usage: #{@name} [OPTION...] [FILE...]\n"
         opt.banner += "       #{@name} -h|-v\n\n"
 
-        opt.on('-o', '--out-file FILE', 'output file; by default, the output file name is based on the input file') do |output|
+        opt.on('-o', '--out-file FILE', 'specify the output file; by default, the output file name is based on the input file') do |output|
           @opts[:output] = (output.strip == '-') ? $stdout : output
         end
 
-        opt.on('-a', '--attribute ATTRIBUTE', 'document attribute to set in the form of name, name!, or name=value pair') do |value|
+        opt.on('-a', '--attribute ATTRIBUTE', 'set a document attribute in the form of name, name!, or name=value pair; can be supplied multiple times') do |value|
           @attr.append value
         end
 
-        opt.on('-p', '--prepend-file FILE', 'file to prepend to all input files') do |file|
+        opt.on('-s', '--no-header-footer', 'disable enclosing the content in <topic> and generating <title>') do
+          @opts[:standalone] = false
+        end
+
+        opt.separator ''
+
+        opt.on('-m', '--dita-map', 'generate a DITA map instead of a topic') do
+          @opts[:map] = true
+        end
+
+        opt.on('-p', '--prepend-file FILE', 'prepend a file to all input files; can be supplied multiple times') do |file|
           raise OptionParser::InvalidArgument, "not a file: #{file}" unless File.exist? file and File.file? file
           raise OptionParser::InvalidArgument, "file not readable: #{file}" unless File.readable? file
 
@@ -58,10 +74,6 @@ module AsciidoctorDitaTopic
 
         opt.on('-I', '--no-includes', 'disable processing of include directives') do
           @opts[:includes] = false
-        end
-
-        opt.on('-s', '--no-header-footer', 'disable enclosing the content in <topic> and generating <title>') do
-          @opts[:standalone] = false
         end
 
         opt.separator ''
@@ -113,6 +125,89 @@ module AsciidoctorDitaTopic
       return args
     end
 
+    def convert_map file, input, output
+      if file == $stdin
+        base_dir = Pathname.new(Dir.pwd).expand_path
+        offset   = 0
+      else
+        base_dir = Pathname.new(file).dirname.expand_path
+        file     = Pathname.new(file).sub_ext('.dita').basename
+        offset   = 1
+      end
+
+      doc        = Asciidoctor.load input, backend: 'dita-topic', safe: :unsafe, attributes: @attr, base_dir: base_dir, sourcemap: true
+      sections   = doc.find_by context: :section
+
+      return unless sections
+
+      title      = (sections.first.level == 0 and sections.first.title) ? sections.first.title : false
+
+      if @opts[:standalone]
+        result   = ["<?xml version='1.0' encoding='utf-8' ?>"]
+        result  << %(<!DOCTYPE map PUBLIC "-//OASIS//DTD DITA Map//EN" "map.dtd">)
+        result  << %(<map>)
+        result  << %(  <title>#{title}</title>) if title
+      else
+        result   = []
+      end
+
+      last_level = 0
+      last_file  = ''
+
+      sections.each_index do |i|
+        section  = sections[i]
+        level    = section.level
+        title    = section.title.gsub(/"|<[^>]*>|[<>]/, '')
+        filename = section.file ? Pathname.new(section.file).sub_ext('.dita').relative_path_from(base_dir) : Pathname.new(file)
+        current  = last_level
+
+        next if filename == last_file
+
+        while current > level
+          current -= 1
+          result << '  ' * (current + offset) + %(</topicref>)
+        end
+
+        if level - last_level > 1
+          warn "WARNING: #{filename.basename}: line #{section.lineno}: section title out of sequence: expected level #{last_level + 1}, got level #{level}"
+          level = last_level + 1
+        end
+
+        indent  = '  ' * (level + offset)
+        parent  = (sections[i + 1] and sections[i + 1].level > level) ? true : false
+        result << indent + %(<topicref href="#{filename}" navtitle="#{title}"#{parent ? '>' : ' />'}) unless filename == $stdin
+
+        last_level = level
+        last_file  = filename
+      end
+
+      while last_level > 0
+        last_level -= 1
+        break if last_level == 0 and file == $stdin
+        result << '  ' * (last_level + offset) + %(</topicref>)
+      end
+
+      if @opts[:standalone]
+        result << %(</map>)
+      end
+
+      if output == $stdout
+        $stdout.write result.join("\n")
+      else
+        File.write output, result.join("\n")
+      end
+    end
+
+    def convert_topic file, input, output
+      if file == $stdin
+        base_dir = Pathname.new(Dir.pwd).expand_path
+      else
+        base_dir = Pathname.new(file).dirname.expand_path
+      end
+
+      Asciidoctor.convert input, backend: 'dita-topic', standalone: @opts[:standalone], safe: :unsafe, attributes: @attr, to_file: output, base_dir: base_dir
+    end
+
     def run
       prepended = ''
 
@@ -124,15 +219,20 @@ module AsciidoctorDitaTopic
       @args.each do |file|
         if file == $stdin
           input  = $stdin.read
-          output = (@opts[:output] == true) ? $stdout : @opts[:output]
+          output = @opts[:output] ? @opts[:output] : $stdout
         else
+          suffix = @opts[:map] ? '.ditamap' : '.dita'
           input  = File.read(file)
-          output = (@opts[:output] == true) ? Pathname.new(file).sub_ext('.dita').to_s : @opts[:output]
+          output = @opts[:output] ? @opts[:output] : Pathname.new(file).sub_ext(suffix)
         end
 
         input.gsub!(Asciidoctor::IncludeDirectiveRx, '//\&') unless @opts[:includes]
 
-        Asciidoctor.convert prepended + input, backend: 'dita-topic', standalone: @opts[:standalone], safe: :unsafe, attributes: @attr, to_file: output
+        if @opts[:map]
+          convert_map file, prepended + input, output
+        else
+          convert_topic file, prepended + input, output
+        end
       end
     end
   end
