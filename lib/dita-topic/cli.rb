@@ -157,7 +157,7 @@ module AsciidoctorDitaTopic
         section  = sections[i]
         level    = section.level
         title    = section.title
-        filename = section.file ? Pathname.new(section.file).sub_ext('.dita').relative_path_from(base_dir) : file
+        filename = section.file ? Pathname.new(section.file).sub_ext('.dita').relative_path_from(base_dir) : Pathname.new(file)
         current  = last_level
 
         next if filename == last_file
@@ -165,6 +165,11 @@ module AsciidoctorDitaTopic
         while current > level
           current -= 1
           result << '  ' * (current + offset) + %(</topicref>)
+        end
+
+        if level - last_level > 1
+          warn "WARNING: #{filename.basename}: line #{section.lineno}: section title out of sequence: expected level #{last_level + 1}, got level #{level}"
+          level = last_level + 1
         end
 
         indent  = '  ' * (level + offset)
