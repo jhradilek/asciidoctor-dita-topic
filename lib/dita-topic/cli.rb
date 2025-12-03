@@ -222,7 +222,7 @@ module AsciidoctorDitaTopic
         else
           suffix = @opts[:map] ? '.ditamap' : '.dita'
           input  = File.read(file)
-          output = @opts[:output] ? @opts[:output] : Pathname.new(file).sub_ext(suffix).to_s
+          output = @opts[:output] ? @opts[:output] : Pathname.new(file).sub_ext(suffix)
         end
 
         input.gsub!(Asciidoctor::IncludeDirectiveRx, '//\&') unless @opts[:includes]
