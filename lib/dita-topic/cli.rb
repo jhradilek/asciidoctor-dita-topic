@@ -198,14 +198,8 @@ module AsciidoctorDitaTopic
       end
     end
 
-    def convert_topic file, input, output
-      if file == $stdin
-        base_dir = Pathname.new(Dir.pwd).expand_path
-      else
-        base_dir = Pathname.new(file).dirname.expand_path
-      end
-
-      Asciidoctor.convert input, backend: 'dita-topic', standalone: @opts[:standalone], safe: :unsafe, attributes: @attr, to_file: output, base_dir: base_dir
+    def convert_topic input, output
+      Asciidoctor.convert input, backend: 'dita-topic', standalone: @opts[:standalone], safe: :unsafe, attributes: @attr, to_file: output
     end
 
     def run
@@ -223,7 +217,7 @@ module AsciidoctorDitaTopic
         else
           suffix = @opts[:map] ? '.ditamap' : '.dita'
           input  = File.read(file)
-          output = @opts[:output] ? @opts[:output] : Pathname.new(file).sub_ext(suffix)
+          output = @opts[:output] ? @opts[:output] : Pathname.new(file).sub_ext(suffix).to_s
         end
 
         input.gsub!(Asciidoctor::IncludeDirectiveRx, '//\&') unless @opts[:includes]
@@ -231,7 +225,7 @@ module AsciidoctorDitaTopic
         if @opts[:map]
           convert_map file, prepended + input, output
         else
-          convert_topic file, prepended + input, output
+          convert_topic prepended + input, output
         end
       end
     end
