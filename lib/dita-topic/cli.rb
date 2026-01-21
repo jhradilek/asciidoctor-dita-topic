@@ -61,7 +61,7 @@ module AsciidoctorDitaTopic
 
         opt.separator ''
 
-        opt.on('-m', '--dita-map', 'generate a DITA map instead of a topic') do
+        opt.on('-m', '--dita-map', 'generate a DITA map instead of a topic; this functionality is experimental and not yet fully tested') do
           @opts[:map] = true
         end
 
