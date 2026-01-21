@@ -125,12 +125,10 @@ module AsciidoctorDitaTopic
       return args
     end
 
-    def convert_map file, input, output
+    def convert_map file, input, base_dir
       if file == $stdin
-        base_dir = Pathname.new(Dir.pwd).expand_path
         offset   = 0
       else
-        base_dir = Pathname.new(file).dirname.expand_path
         file     = Pathname.new(file).sub_ext('.dita').basename
         offset   = 1
       end
@@ -191,15 +189,11 @@ module AsciidoctorDitaTopic
         result << %(</map>)
       end
 
-      if output == $stdout
-        $stdout.write result.join("\n")
-      else
-        File.write output, result.join("\n")
-      end
+      return result.join("\n")
     end
 
-    def convert_topic input, output
-      Asciidoctor.convert input, backend: 'dita-topic', standalone: @opts[:standalone], safe: :unsafe, attributes: @attr, to_file: output
+    def convert_topic input, base_dir
+      return Asciidoctor.convert input, backend: 'dita-topic', standalone: @opts[:standalone], safe: :unsafe, attributes: @attr, base_dir: base_dir
     end
 
     def run
@@ -212,20 +206,28 @@ module AsciidoctorDitaTopic
 
       @args.each do |file|
         if file == $stdin
-          input  = $stdin.read
-          output = @opts[:output] ? @opts[:output] : $stdout
+          base_dir = Pathname.new(Dir.pwd).expand_path
+          input    = $stdin.read
+          output   = @opts[:output] ? @opts[:output] : $stdout
         else
-          suffix = @opts[:map] ? '.ditamap' : '.dita'
-          input  = File.read(file)
-          output = @opts[:output] ? @opts[:output] : Pathname.new(file).sub_ext(suffix).to_s
+          suffix   = @opts[:map] ? '.ditamap' : '.dita'
+          base_dir = Pathname.new(file).dirname.expand_path
+          input    = File.read(file)
+          output   = @opts[:output] ? @opts[:output] : Pathname.new(file).sub_ext(suffix).to_s
         end
 
         input.gsub!(Asciidoctor::IncludeDirectiveRx, '//\&') unless @opts[:includes]
 
         if @opts[:map]
-          convert_map file, prepended + input, output
+          result = convert_map file, prepended + input, base_dir
         else
-          convert_topic prepended + input, output
+          result = convert_topic prepended + input, base_dir
+        end
+
+        if output == $stdout
+          $stdout.write result
+        else
+          File.write output, result
         end
       end
     end
