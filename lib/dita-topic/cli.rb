@@ -216,6 +216,7 @@ module AsciidoctorDitaTopic
           output   = @opts[:output] ? @opts[:output] : Pathname.new(file).sub_ext(suffix).to_s
         end
 
+        prepended.gsub!(/^:_(?:mod-docs-content|content|module)-type:[ \t]+\S/, '//\&')
         input.gsub!(Asciidoctor::IncludeDirectiveRx, '//\&') unless @opts[:includes]
 
         if @opts[:map]
