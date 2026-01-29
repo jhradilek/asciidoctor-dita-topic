@@ -33,9 +33,9 @@ module AsciidoctorDitaTopic
       @attr = ['experimental']
       @opts = {
         :output => false,
-        :includes => true,
         :standalone => true,
-        :map => false
+        :map => false,
+        :no_includes => 0
       }
       @prep = []
       @name = name
@@ -72,8 +72,8 @@ module AsciidoctorDitaTopic
           @prep.append file
         end
 
-        opt.on('-I', '--no-includes', 'disable processing of include directives') do
-          @opts[:includes] = false
+        opt.on('-I', '--no-includes', 'disable processing of include directives; specify this option twice to also apply on prepended files') do
+          @opts[:no_includes] += 1
         end
 
         opt.separator ''
@@ -217,7 +217,8 @@ module AsciidoctorDitaTopic
         end
 
         prepended.gsub!(/^:_(?:mod-docs-content|content|module)-type:[ \t]+\S/, '//\&')
-        input.gsub!(Asciidoctor::IncludeDirectiveRx, '//\&') unless @opts[:includes]
+        prepended.gsub!(Asciidoctor::IncludeDirectiveRx, '//\&') if @opts[:no_includes] > 1
+        input.gsub!(Asciidoctor::IncludeDirectiveRx, '//\&') if @opts[:no_includes] > 0
 
         if @opts[:map]
           result = convert_map file, prepended + input, base_dir
