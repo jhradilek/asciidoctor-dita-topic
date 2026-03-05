@@ -37,5 +37,6 @@ Gem::Specification.new do |s|
   # Development gems:
   s.add_development_dependency 'rake', '~> 13.3', '>= 13.3.1'
   s.add_development_dependency 'minitest', '~> 6.0', '>= 6.0.2'
+  s.add_development_dependency 'minitest-mock', '~> 5.27'
   s.add_development_dependency 'rexml', '~> 3.4', '>= 3.4.4'
 end
