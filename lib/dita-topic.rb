@@ -1,5 +1,5 @@
 # A custom AsciiDoc converter that generates individual DITA topics
-# Copyright (C) 2024, 2025 Jaromir Hradilek
+# Copyright (C) 2024-2026 Jaromir Hradilek
 
 # MIT License
 #
@@ -38,6 +38,9 @@ class DitaTopic < Asciidoctor::Converter::Base
     # Disable the author line by default:
     @authors_allowed = false
 
+    # Enable processing of semantic markup by default:
+    @semantic_allowed = true
+
     # Enable callouts by default:
     @callouts_allowed = true
 
@@ -54,6 +57,9 @@ class DitaTopic < Asciidoctor::Converter::Base
   def convert_document node
     # Check if the author line is enabled:
     @authors_allowed = true if (node.attr 'dita-topic-authors') == 'on'
+
+    # Check if semantic markup is enabled:
+    @semantic_allowed = false if (node.attr 'dita-topic-semantic') == 'off'
 
     # Check if callouts are enabled:
     @callouts_allowed = false if (node.attr 'dita-topic-callouts') == 'off'
@@ -463,8 +469,8 @@ class DitaTopic < Asciidoctor::Converter::Base
       # Set the default element value:
       element = 'codeph'
 
-      # Check if the role is provided:
-      if node.role
+      # Check if semantic markup is enabled and the role is provided:
+      if @semantic_allowed and node.role
         # Define supported roles:
         semantic_markup = {
           'command'   => 'cmdname',

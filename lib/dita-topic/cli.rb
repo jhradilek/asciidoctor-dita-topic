@@ -85,6 +85,10 @@ module AsciidoctorDitaTopic
           @attr.append 'dita-topic-callouts=off'
         end
 
+        opt.on('-M', '--no-semantic-markup', 'disable processing of semantic markup') do
+          @attr.append 'dita-topic-semantic=off'
+        end
+
         opt.on('-S', '--no-sidebars', 'disable processing of sidebars') do
           @attr.append 'dita-topic-sidebars=off'
         end
