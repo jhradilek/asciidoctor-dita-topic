@@ -133,7 +133,7 @@ To enable processing of author lines as metadata, run the `dita-topic` command w
 $ **dita-topic -l _your_file_.adoc**
 ....
 
-If you prefer to use Asciidoctor directly, set the value of the `dita-topic-authors` to `on`:
+If you prefer to use Asciidoctor directly, set the value of the `dita-topic-authors` attribute to `on`:
 
 [literal,subs="+quotes"]
 ....
@@ -157,7 +157,7 @@ To disable this behavior, run the `dita-topic` command with the `-T` option:
 $ **dita-topic -T _your_file_.adoc**
 ....
 
-If you prefer to use Asciidoctor directly, set the value of the `dita-topic-titles` to `off`:
+If you prefer to use Asciidoctor directly, set the value of the `dita-topic-titles` attribute to `off`:
 
 [literal,subs="+quotes"]
 ....
@@ -176,7 +176,7 @@ To disable this behavior, run the `dita-topic` command with the `-C` option:
 $ **dita-topic -C _your_file_.adoc**
 ....
 
-If you prefer to use Asciidoctor directly, set the value of the `dita-topic-callouts` to `off`:
+If you prefer to use Asciidoctor directly, set the value of the `dita-topic-callouts` attribute to `off`:
 
 [literal,subs="+quotes"]
 ....
@@ -261,6 +261,20 @@ Read the [filename]`/etc/passwd` file to see the complete list of
 available user accounts.
 ----
 
+To disable this behavior, for example when the source files do not annotate semantic markup consistently, run the `dita-topic` command with the `-M` option:
+
+[literal,subs="+quotes"]
+....
+$ **dita-topic -M _your_file_.adoc**
+....
+
+If you prefer to use Asciidoctor directly, set the value of the `dita-topic-semantic` attribute to `off`:
+
+[literal,subs="+quotes"]
+....
+$ **asciidoctor -r dita-topic -b dita-topic -a dita-topic-semantic=off _your_file_.adoc**
+....
+
 [#metadata]
 === Adding metadata
 
@@ -341,6 +355,6 @@ Thematic breaks not supported in DITA:: Asciidoc allows you to use `'''`, `---`,
 [#copyright]
 == Copyright
 
-Copyright (C) 2024, 2025 Jaromir Hradilek
+Copyright (C) 2024–2026 Jaromir Hradilek
 
 This program is free software, released under the terms of the link:LICENSE[MIT license]. It is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.

@@ -72,6 +72,24 @@ class InlineQuotedTest < Minitest::Test
     assert_xpath_equal xml, 'a variable', '//li[5]/varname/text()'
   end
 
+  def test_semantic_markup_off
+    xml = <<~EOF.chomp.to_dita
+    :dita-topic-semantic: off
+    * [command]`a command`
+    * [directory]`a directory name`
+    * [filename]`a file name`
+    * [option]`an option`
+    * [variable]`a variable`
+    EOF
+
+    assert_xpath_count xml, 5, '//li'
+    assert_xpath_equal xml, 'a command', '//li[1]/codeph/text()'
+    assert_xpath_equal xml, 'a directory name', '//li[2]/codeph/text()'
+    assert_xpath_equal xml, 'a file name', '//li[3]/codeph/text()'
+    assert_xpath_equal xml, 'an option', '//li[4]/codeph/text()'
+    assert_xpath_equal xml, 'a variable', '//li[5]/codeph/text()'
+  end
+
   def test_text_span
     xml = <<~EOF.chomp.to_dita
     A line with #inline text span#.

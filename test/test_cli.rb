@@ -251,6 +251,17 @@ class CliTest < Minitest::Test
     assert_includes cli.instance_variable_get(:@attr), 'dita-topic-callouts=off'
   end
 
+  def test_no_semantic_markup_short
+    cli  = AsciidoctorDitaTopic::Cli.new 'script-name', ['-M']
+    assert_includes cli.instance_variable_get(:@attr), 'dita-topic-semantic=off'
+  end
+
+  def test_no_semantic_markup_long
+    cli  = AsciidoctorDitaTopic::Cli.new 'script-name', ['--no-semantic-markup']
+    assert_includes cli.instance_variable_get(:@attr), 'dita-topic-semantic=off'
+  end
+
+
   def test_no_sidebars_short
     cli  = AsciidoctorDitaTopic::Cli.new 'script-name', ['-S']
     assert_includes cli.instance_variable_get(:@attr), 'dita-topic-sidebars=off'
