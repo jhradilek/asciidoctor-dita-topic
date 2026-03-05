@@ -1,4 +1,5 @@
 require 'minitest/autorun'
+require 'minitest/mock'
 require_relative '../lib/dita-topic/cli'
 
 class CliTest < Minitest::Test

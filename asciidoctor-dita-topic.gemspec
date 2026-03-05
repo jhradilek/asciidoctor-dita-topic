@@ -32,10 +32,11 @@ Gem::Specification.new do |s|
   s.required_ruby_version = '>= 3.0'
 
   # Required gems:
-  s.add_runtime_dependency 'asciidoctor', '~> 2.0', '>= 2.0.0'
+  s.add_runtime_dependency 'asciidoctor', '~> 2.0', '>= 2.0.26'
 
   # Development gems:
-  s.add_development_dependency 'rake', '~> 12.3.0'
-  s.add_development_dependency 'minitest', '~> 5.22.0'
-  s.add_development_dependency 'rexml', '~> 3.2.6'
+  s.add_development_dependency 'rake', '~> 13.3', '>= 13.3.1'
+  s.add_development_dependency 'minitest', '~> 6.0', '>= 6.0.2'
+  s.add_development_dependency 'minitest-mock', '~> 5.27'
+  s.add_development_dependency 'rexml', '~> 3.4', '>= 3.4.4'
 end
