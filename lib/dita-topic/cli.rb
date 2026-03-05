@@ -149,6 +149,8 @@ module AsciidoctorDitaTopic
 
         result = convert_topic prepended + input, base_dir
 
+        result.gsub!(/<ph (?:(?:platform|product|audience|otherprops)="[^"]+" ?)+><\/ph> */, '')
+
         if output == $stdout
           $stdout.write result
         else
