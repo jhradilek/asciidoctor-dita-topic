@@ -11,7 +11,6 @@ class CliTest < Minitest::Test
     assert_includes attr, 'experimental'
     assert_equal false, opts[:output]
     assert_equal true, opts[:standalone]
-    assert_equal false, opts[:map]
     assert_equal 0, opts[:no_includes]
     assert_equal [], prep
   end
@@ -219,20 +218,6 @@ class CliTest < Minitest::Test
     opts = cli.instance_variable_get :@opts
 
     assert_equal false, opts[:standalone]
-  end
-
-  def test_dita_map_short
-    cli  = AsciidoctorDitaTopic::Cli.new 'script-name', ['-m']
-    opts = cli.instance_variable_get :@opts
-
-    assert_equal true, opts[:map]
-  end
-
-  def test_dita_map_long
-    cli  = AsciidoctorDitaTopic::Cli.new 'script-name', ['--dita-map']
-    opts = cli.instance_variable_get :@opts
-
-    assert_equal true, opts[:map]
   end
 
   def test_author_line_short

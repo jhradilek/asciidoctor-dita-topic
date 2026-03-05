@@ -1,4 +1,4 @@
-# Copyright (C) 2025 Jaromir Hradilek
+# Copyright (C) 2025, 2026 Jaromir Hradilek
 
 # MIT License
 #
@@ -34,7 +34,6 @@ module AsciidoctorDitaTopic
       @opts = {
         :output => false,
         :standalone => true,
-        :map => false,
         :no_includes => 0
       }
       @prep = []
@@ -60,10 +59,6 @@ module AsciidoctorDitaTopic
         end
 
         opt.separator ''
-
-        opt.on('-m', '--dita-map', 'generate a DITA map instead of a topic; this functionality is experimental and not yet fully tested') do
-          @opts[:map] = true
-        end
 
         opt.on('-p', '--prepend-file FILE', 'prepend a file to all input files; can be supplied multiple times') do |file|
           raise OptionParser::InvalidArgument, "not a file: #{file}" unless File.exist? file and File.file? file
@@ -125,73 +120,6 @@ module AsciidoctorDitaTopic
       return args
     end
 
-    def convert_map file, input, base_dir
-      if file == $stdin
-        offset   = 0
-      else
-        file     = Pathname.new(file).sub_ext('.dita').basename
-        offset   = 1
-      end
-
-      doc        = Asciidoctor.load input, backend: 'dita-topic', safe: :unsafe, attributes: @attr, base_dir: base_dir, sourcemap: true
-      sections   = doc.find_by context: :section
-
-      return unless sections
-
-      title      = (sections.first.level == 0 and sections.first.title) ? sections.first.title : false
-
-      if @opts[:standalone]
-        result   = ["<?xml version='1.0' encoding='utf-8' ?>"]
-        result  << %(<!DOCTYPE map PUBLIC "-//OASIS//DTD DITA Map//EN" "map.dtd">)
-        result  << %(<map>)
-        result  << %(  <title>#{title}</title>) if title
-      else
-        result   = []
-      end
-
-      last_level = 0
-      last_file  = ''
-
-      sections.each_index do |i|
-        section  = sections[i]
-        level    = section.level
-        title    = section.title.gsub(/"|<[^>]*>|[<>]/, '')
-        filename = section.file ? Pathname.new(section.file).sub_ext('.dita').relative_path_from(base_dir) : Pathname.new(file)
-        current  = last_level
-
-        next if filename == last_file
-
-        while current > level
-          current -= 1
-          result << '  ' * (current + offset) + %(</topicref>)
-        end
-
-        if level - last_level > 1
-          warn "WARNING: #{filename.basename}: line #{section.lineno}: section title out of sequence: expected level #{last_level + 1}, got level #{level}"
-          level = last_level + 1
-        end
-
-        indent  = '  ' * (level + offset)
-        parent  = (sections[i + 1] and sections[i + 1].level > level) ? true : false
-        result << indent + %(<topicref href="#{filename}" navtitle="#{title}"#{parent ? '>' : ' />'}) unless filename == $stdin
-
-        last_level = level
-        last_file  = filename
-      end
-
-      while last_level > 0
-        last_level -= 1
-        break if last_level == 0 and file == $stdin
-        result << '  ' * (last_level + offset) + %(</topicref>)
-      end
-
-      if @opts[:standalone]
-        result << %(</map>)
-      end
-
-      return result.join("\n")
-    end
-
     def convert_topic input, base_dir
       return Asciidoctor.convert input, backend: 'dita-topic', standalone: @opts[:standalone], safe: :unsafe, attributes: @attr, base_dir: base_dir
     end
@@ -210,21 +138,16 @@ module AsciidoctorDitaTopic
           input    = $stdin.read
           output   = @opts[:output] ? @opts[:output] : $stdout
         else
-          suffix   = @opts[:map] ? '.ditamap' : '.dita'
           base_dir = Pathname.new(file).dirname.expand_path
           input    = File.read(file)
-          output   = @opts[:output] ? @opts[:output] : Pathname.new(file).sub_ext(suffix).to_s
+          output   = @opts[:output] ? @opts[:output] : Pathname.new(file).sub_ext('.dita').to_s
         end
 
         prepended.gsub!(/^:_(?:mod-docs-content|content|module)-type:[ \t]+\S/, '//\&')
         prepended.gsub!(Asciidoctor::IncludeDirectiveRx, '//\&') if @opts[:no_includes] > 1
         input.gsub!(Asciidoctor::IncludeDirectiveRx, '//\&') if @opts[:no_includes] > 0
 
-        if @opts[:map]
-          result = convert_map file, prepended + input, base_dir
-        else
-          result = convert_topic prepended + input, base_dir
-        end
+        result = convert_topic prepended + input, base_dir
 
         if output == $stdout
           $stdout.write result
