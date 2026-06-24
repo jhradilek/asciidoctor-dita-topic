@@ -25,6 +25,7 @@ require 'optparse'
 require 'pathname'
 require 'asciidoctor'
 require_relative 'version'
+require_relative 'filter'
 require_relative '../dita-topic'
 
 module AsciidoctorDitaTopic
@@ -34,6 +35,7 @@ module AsciidoctorDitaTopic
       @opts = {
         :output => false,
         :standalone => true,
+        :modules => true,
         :no_includes => 0
       }
       @prep = []
@@ -69,6 +71,10 @@ module AsciidoctorDitaTopic
 
         opt.on('-I', '--no-includes', 'disable processing of include directives; specify this option twice to also apply on prepended files') do
           @opts[:no_includes] += 1
+        end
+
+        opt.on('-A', '--no-modules', 'disable processing of include directives with assemblies and modules') do
+          @opts[:modules] = false
         end
 
         opt.separator ''
@@ -125,6 +131,11 @@ module AsciidoctorDitaTopic
     end
 
     def convert_topic input, base_dir
+      if not @opts[:modules]
+        Asciidoctor::Extensions.register do
+          include_processor FilterIncludeDirectives
+        end
+      end
       return Asciidoctor.convert input, backend: 'dita-topic', standalone: @opts[:standalone], safe: :unsafe, attributes: @attr, base_dir: base_dir
     end
 
