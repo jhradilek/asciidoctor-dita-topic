@@ -184,7 +184,7 @@ $ **asciidoctor -r dita-topic -b dita-topic -a dita-topic-callouts=off _your_fil
 ....
 
 [#includes]
-=== Disabling include directives
+=== Disabling all include directives
 
 By default, Asciidoctor resolves all `include` directives before converting the file. To only convert the contents of the selected file, run the `dita-topic` command with the `-I` option:
 
@@ -201,6 +201,32 @@ $ **asciidoctor -r dita-topic -b dita-topic -S secure _your_file_.adoc**
 ....
 
 This disables processing of the include directives, but leaves cross references to the included files in the converted output.
+
+[#include_filter]
+=== Disabling inclusion of assemblies and modules
+
+By default, Asciidoctor resolves all `include` directives before converting the file. To only include content from files explicitly marked as attributes or snippets, run the `dita-topic` command with the `-A` option:
+
+[literal,subs="+quotes"]
+....
+$ **dita-topic -A _your_file_.adoc**
+....
+
+To mark a file as an attribute definition file, add the following line at the top of it:
+
+[source,asciidoc]
+----
+:_mod-docs-content-type: ATTRIBUTES
+----
+
+To mark a file as a snippet file, add the following line at the top of it:
+
+[source,asciidoc]
+----
+:_mod-docs-content-type: SNIPPET
+----
+
+Any other files are ignored. This functionality is not available in standard Asciidoctor.
 
 [#abstracts]
 === Adding short descriptions
