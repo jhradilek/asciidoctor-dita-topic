@@ -31,7 +31,13 @@ class FilterIncludeDirectives < Asciidoctor::Extensions::IncludeProcessor
 
   def process doc, reader, target, attributes
     file_path   = Pathname.new(doc.base_dir) + target
-    include_doc = Asciidoctor.load_file file_path, safe: :secure, logger: false
+
+    begin
+      logger = Asciidoctor::LoggerManager.logger
+      include_doc = Asciidoctor.load_file file_path, safe: :secure, logger: false
+    ensure
+      Asciidoctor::LoggerManager.logger = logger
+    end
 
     return reader unless supported_type? include_doc.attributes
 
