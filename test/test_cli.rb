@@ -12,6 +12,7 @@ class CliTest < Minitest::Test
     assert_includes attr, 'experimental'
     assert_equal false, opts[:output]
     assert_equal true, opts[:standalone]
+    assert_equal true, opts[:modules]
     assert_equal 0, opts[:no_includes]
     assert_equal [], prep
   end
@@ -205,6 +206,20 @@ class CliTest < Minitest::Test
     opts = cli.instance_variable_get :@opts
 
     assert_equal 2, opts[:no_includes]
+  end
+
+  def test_no_modules_short
+    cli  = AsciidoctorDitaTopic::Cli.new 'script-name', ['-A']
+    opts = cli.instance_variable_get :@opts
+
+    assert_equal false, opts[:modules]
+  end
+
+  def test_no_modules_long
+    cli  = AsciidoctorDitaTopic::Cli.new 'script-name', ['--no-modules']
+    opts = cli.instance_variable_get :@opts
+
+    assert_equal false, opts[:modules]
   end
 
   def test_no_header_footer_short

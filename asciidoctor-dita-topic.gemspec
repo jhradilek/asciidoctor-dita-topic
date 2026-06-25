@@ -13,6 +13,7 @@ Gem::Specification.new do |s|
   s.files       = [
     'lib/dita-topic.rb',
     'lib/dita-topic/cli.rb',
+    'lib/dita-topic/filter.rb',
     'lib/dita-topic/version.rb',
     'LICENSE',
     'AUTHORS',
