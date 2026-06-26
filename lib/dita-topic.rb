@@ -1050,7 +1050,12 @@ class DitaTopic < Asciidoctor::Converter::Base
     result = {}
 
     # Define supported metadata attributes:
-    valid  = ['platform', 'product', 'audience', 'otherprops']
+    valid  = {
+      'pl' => 'platform',
+      'pr' => 'product',
+      'au' => 'audience',
+      'op' => 'otherprops'
+    }
 
     # Process each role:
     roles.split.each do |role|
@@ -1060,8 +1065,11 @@ class DitaTopic < Asciidoctor::Converter::Base
       # Separate the attribute name from its value:
       attribute, value = role.split ':'
 
+      # Expand the short attribute variant:
+      attribute = valid[attribute] if valid.key? attribute
+
       # Ignore unsupported attribute names:
-      next unless valid.include? attribute
+      next unless valid.value? attribute
 
       # Append the value to the attribute:
       if result.key? attribute
