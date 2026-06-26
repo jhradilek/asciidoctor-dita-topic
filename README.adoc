@@ -312,19 +312,23 @@ DITA provides four metadata attributes that can be used for conditional processi
 | DITA Attribute
 | Description
 
-| `platform:__value__`
+| `platform:__value__` +
+`pl:__value__`
 | `platform="_value_"`
 | Operating system or hardware architecture.
 
-| `product:__value__`
+| `product:__value__` +
+`pr:__value__`
 | `product="_value_"`
 | Product name.
 
-| `audience:__value__`
+| `audience:__value__` +
+`au:__value__`
 | `audience="_value_"`
 | Target audience.
 
-| `otherprops:__value__`
+| `otherprops:__value__` +
+`op:__value__`
 | `otherprops="_value_"`
 | Additional properties.
 |===
@@ -333,7 +337,7 @@ For example, to indicate that a particular paragraph is relevant for Linux and m
 
 [source,asciidoc]
 ----
-[role="platform:linux platform:mac audience:beginner"]
+[role="pl:linux pl:mac au:beginner"]
 For more information, see the *bash*(1) manual page.
 ----
 
