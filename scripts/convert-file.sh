@@ -198,11 +198,15 @@ export -f log banner
 export -f convert_file convert_to_map convert_to_topic
 
 # Process command-line options:
-while getopts ':ha:w' OPTION; do
+while getopts ':ha:p:w' OPTION; do
   case "$OPTION" in
     a)
-      # Append the option to the list of conversion tooling options:
+      # Append the attribute definition to the list of common options:
       OPT_OPTS+=('-a' "$OPTARG")
+      ;;
+    p)
+      # Append the prepended file to the list of common options:
+      OPT_OPTS+=('-p' "$OPTARG")
       ;;
     w)
       # Enable continuous processing of the supplied file:
@@ -210,11 +214,16 @@ while getopts ':ha:w' OPTION; do
       ;;
     h)
       # Print usage information to standard output:
-      echo "Usage: $NAME [-w] [-a ATTRIBUTE] FILE"
-      echo -e "       $NAME -h\n"
-      echo "  -a      set a document attribute in the form of name, name!, or"
-      echo "          name=value pair; can be supplied multiple times"
-      echo "  -w      watch the file and reconvert it whenever it changes"
+      echo "Usage: $NAME [-w] [-a ATTRIBUTE] [-p FILE] FILE"
+      echo "       $NAME -h"
+      echo
+      echo "  -w               watch the file and reconvert it whenever it changes"
+      echo "  -a ATTRIBUTE     set a document attribute in the form of name, name!,"
+      echo "                   or name=value pair; can be supplied multiple times"
+      echo "  -p FILE          prepend a file to the input file, typically to bring"
+      echo "                   in attribute definitions; can be supplied multiple"
+      echo "                   times"
+      echo
       echo "  -h      display this help and exit"
 
       # Terminate the script:
