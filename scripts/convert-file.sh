@@ -42,13 +42,11 @@ function exit_with_error {
   exit $exit_status
 }
 
-# Print a formatted error message to standard error output.
+# Print a formatted message to standard error output.
 #
-# Usage: err MESSAGE
-function err {
-  local -r message="$1"
-
-  gum log --structured --time TimeOnly --level error "$@"
+# Usage: log MESSAGE...
+function log {
+  gum log --structured --time TimeOnly --level info "$@"
 }
 
 # Print a formatted warning message to standard error output.
@@ -60,11 +58,22 @@ function warn {
   gum log --structured --time TimeOnly --level warn "$@"
 }
 
-# Print a formatted message to standard error output.
+# Print a formatted error message to standard error output.
 #
-# Usage: log MESSAGE...
-function log {
-  gum log --structured --time TimeOnly --level info "$@"
+# Usage: err MESSAGE
+function err {
+  local -r message="$1"
+
+  gum log --structured --time TimeOnly --level error "$@"
+}
+
+# Print a formatted fatal message to standard error output.
+#
+# Usage: fail MESSAGE
+function fail {
+  local -r message="$1"
+
+  gum log --structured --time TimeOnly --level fatal "$@"
 }
 
 # Print a banner with a formatted message to standard outptut.
@@ -74,7 +83,7 @@ function banner {
   gum style --width 70 --border thick --border-foreground 4 --align center --margin "1 2" --padding "2 4" "$@"
 }
 
-# Convert a file marked as an assembly or a map to a DITA map.
+# Convert the supplied file to a DITA map.
 #
 # Usage: convert_to_map FILE_NAME CONTENT_TYPE
 function convert_to_map {
@@ -82,37 +91,90 @@ function convert_to_map {
   local -r content_type="$2"
 
   # Derive the output file name:
-  local -r output_file=${file_name%.adoc}.ditamap
+  local -r output_file="${file_name%.adoc}.ditamap"
+
+  # Create a temporary to capture error log:
+  local -r error_log=$(mktemp --tmpdir "$NAME".XXXXXXXXXX)
 
   # Convert the file to a DITA map:
   if [[ "$content_type" == 'assembly' ]]; then
-    local -r error_log=$(dita-map --include-self "$file_name" 2>&1)
+    dita-map --include-self "$file_name" 2> "$error_log"
   else
-    local -r error_log=$(dita-map --zero-offset "$file_name" 2>&1)
+    dita-map --zero-offset "$file_name" 2> "$error_log"
   fi
 
   # Capture the exit status:
   local -r exit_code="$?"
 
   # Filter and report any warnings:
-  echo "$error_log" | sed -ne 's|^dita-map: warning: ||p' | while read line; do
+  sed -ne 's/^dita-map: warning: //ip' "$error_log" | while read line; do
     warn "$line" output "$output_file" input "$file_name"
   done
 
   # Filter and report any errors:
-  echo "$error_log" | sed -ne 's|^dita-map: error: ||p' | while read line; do
+  sed -ne 's/^dita-map: error: //ip' "$error_log" | while read line; do
     err "$line" output "$output_file" input "$file_name"
   done
 
+  # Remove the temporary file:
+  rm "$error_log"
+
   # Check if the conversion succeeded:
   if [[ "$exit_code" -ne 0 ]]; then
-    err "Unable to create a DITA map" output "$output_file" input "$file_name"
+    fail "Unable to create a DITA map" output "$output_file" input "$file_name"
     return
   fi
 
   # Report success:
-  log "Created a DITA map" output "$output_file" input "$file_name" 
+  log "Created a DITA map" output "$output_file" input "$file_name"
 }
+
+# Convert the supplied file to a DITA concept, reference, or task.
+#
+# Usage: convert_to_topic FILE_NAME CONTENT_TYPE
+function convert_to_topic {
+  local -r file_name="$1"
+  local -r content_type="$2"
+
+  # Derive the output file name:
+  local -r output_file="${file_name%.adoc}.dita"
+
+  # Create a temporary to capture error log:
+  local -r error_log=$(mktemp --tmpdir "$NAME".XXXXXXXXXX)
+
+  # Convert the file to a DITA topic:
+  if [[ "$content_type" == 'assembly' ]]; then
+    (dita-topic --no-module --out-file - "$file_name" | dita-convert --generated --output "$output_file") 2> "$error_log"
+  else
+    (dita-topic --out-file - "$file_name" | dita-convert --generated --output "$output_file") 2> "$error_log"
+  fi
+
+  # Capture the exit status:
+  local exit_code="$?"
+
+  # Filter and report any warnings:
+  sed -ne 's/^\(dita-convert: WARNING\|[^:]*: WARNING: dita-topic\): //ip' "$error_log" | while read line; do
+    warn "$line" output "$output_file" input "$file_name"
+  done
+
+  # Filter and report any errors:
+  sed -ne 's/^\(dita-convert: ERROR\|[^:]*: ERROR: dita-topic\): //ip' "$error_log" | while read line; do
+    err "$line" output "$output_file" input "$file_name"
+  done
+
+  # Remove the temporary file:
+  rm "$error_log"
+
+  # Check if the conversion succeeded:
+  if [[ "$exit_code" -ne 0 ]]; then
+    fail "Unable to create a DITA ${content_type/#assembly/concept}" output "$output_file" input "$file_name"
+    return
+  fi
+
+  # Report success:
+  log "Created a DITA ${content_type/#assembly/concept}" output "$output_file" input "$file_name"
+}
+
 
 # Determine the content type of the supplied AsciiDoc file and convert
 # it to the corresponding DITA topic or a map.
@@ -134,6 +196,11 @@ function convert_file {
   if [[ "$content_type" =~ ^(assembly|map)$ ]]; then
     convert_to_map "$file_name" "$content_type"
   fi
+
+  # Convert the file to a DITA topic:
+  if [[ "$content_type" =~ ^(assembly|concept|reference|task)$ ]]; then
+    convert_to_topic "$file_name" "$content_type"
+  fi
 }
 
 # Watch the supplied AsciiDoc file and re-convert it whenever its contents
@@ -151,8 +218,8 @@ function watch_file {
 }
 
 # Export functions that must be available in subshells:
-export -f err warn log banner
-export -f convert_file convert_to_map
+export -f log warn err fail banner
+export -f convert_file convert_to_map convert_to_topic
 
 # Process command-line options:
 while getopts ':hw' OPTION; do
