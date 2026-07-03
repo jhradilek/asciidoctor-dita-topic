@@ -29,6 +29,7 @@ declare -r NAME=${0##*/}
 
 # Set the default options:
 declare -i OPT_WATCH=0
+declare -a OPT_OPTS=()
 
 # Print a message to standard error output and terminate the script with
 # the selected exit status.
@@ -74,9 +75,9 @@ function convert_to_map {
 
   # Convert the file to a DITA map:
   if [[ "$content_type" == 'assembly' ]]; then
-    dita-map --include-self "$file_name" 2> "$error_log"
+    dita-map "${OPT_OPTS[@]}" --include-self "$file_name" 2> "$error_log"
   else
-    dita-map --zero-offset "$file_name" 2> "$error_log"
+    dita-map "${OPT_OPTS[@]}" --zero-offset "$file_name" 2> "$error_log"
   fi
 
   # Capture the exit status:
@@ -120,9 +121,9 @@ function convert_to_topic {
 
   # Convert the file to a DITA topic:
   if [[ "$content_type" == 'assembly' ]]; then
-    (dita-topic --no-module --out-file - "$file_name" | dita-convert --generated --output "$output_file") 2> "$error_log"
+    (dita-topic "${OPT_OPTS[@]}" --no-module --out-file - "$file_name" | dita-convert --generated --output "$output_file") 2> "$error_log"
   else
-    (dita-topic --out-file - "$file_name" | dita-convert --generated --output "$output_file") 2> "$error_log"
+    (dita-topic "${OPT_OPTS[@]}" --out-file - "$file_name" | dita-convert --generated --output "$output_file") 2> "$error_log"
   fi
 
   # Capture the exit status:
@@ -197,16 +198,22 @@ export -f log banner
 export -f convert_file convert_to_map convert_to_topic
 
 # Process command-line options:
-while getopts ':hw' OPTION; do
+while getopts ':ha:w' OPTION; do
   case "$OPTION" in
+    a)
+      # Append the option to the list of conversion tooling options:
+      OPT_OPTS+=('-a' "$OPTARG")
+      ;;
     w)
       # Enable continuous processing of the supplied file:
       OPT_WATCH=1
       ;;
     h)
       # Print usage information to standard output:
-      echo "Usage: $NAME FILE"
+      echo "Usage: $NAME [-w] [-a ATTRIBUTE] FILE"
       echo -e "       $NAME -h\n"
+      echo "  -a      set a document attribute in the form of name, name!, or"
+      echo "          name=value pair; can be supplied multiple times"
       echo "  -w      watch the file and reconvert it whenever it changes"
       echo "  -h      display this help and exit"
 
