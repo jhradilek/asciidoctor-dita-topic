@@ -164,7 +164,7 @@ function convert_file {
 
   # Report an unsupported content type:
   if [[ ! "$content_type" =~ ^(assembly|concept|reference|task|map)$ ]]; then
-    log warn "Unsuppported content type" type "$content_type" input "$file_name"
+    log fatal "Unsuppported content type" type "$content_type" input "$file_name"
     return
   fi
 
@@ -177,6 +177,22 @@ function convert_file {
   if [[ "$content_type" =~ ^(assembly|concept|reference|task)$ ]]; then
     convert_to_topic "$file_name" "$content_type"
   fi
+}
+
+# Watch AsciiDoc files in the supplied directory and re-convert them whenever
+# their contents changes.
+#
+# Usage: watch_directory DIRECTORY_NAME
+function watch_directory {
+  local -r directory_name="$1"
+
+  # Print the banner:
+  banner "Monitoring the supplied directory for changes." "To exit this mode, press ^C (Ctrl+C)."
+
+  # Watch the directory for updates and continuously convert it:
+  inotifywait -qme close_write --include '.*\.adoc$' "$directory_name" | while read -r dir event file; do
+    convert_file "$dir$file"
+  done
 }
 
 # Watch the supplied AsciiDoc file and re-convert it whenever its contents
@@ -214,8 +230,11 @@ while getopts ':ha:p:w' OPTION; do
       ;;
     h)
       # Print usage information to standard output:
-      echo "Usage: $NAME [-w] [-a ATTRIBUTE] [-p FILE] FILE"
+      echo "Usage: $NAME [-w] [-a ATTRIBUTE] [-p FILE] FILE|DIRECTORY"
       echo "       $NAME -h"
+      echo
+      echo "  Convert an AsciiDoc FILE or all AsciiDoc files in the supplied DIRECTORY"
+      echo "  to a DITA concept, task, reference, or map."
       echo
       echo "  -w               watch the file and reconvert it whenever it changes"
       echo "  -a ATTRIBUTE     set a document attribute in the form of name, name!,"
@@ -243,23 +262,35 @@ shift $(($OPTIND - 1))
 [[ "$#" -eq 1 ]] || exit_with_error 'Invalid number of arguments' 22
 
 # Get the name of the file to convert:
-declare -r file="$1"
+declare -r target="$1"
 
 # Verify that the file exists:
-[[ -e "$file" ]] || exit_with_error "$file: No such file or directory" 2
-[[ -r "$file" ]] || exit_with_error "$file: Permission denied" 13
-[[ -f "$file" ]] || exit_with_error "$file: Not a file" 21
+[[ -e "$target" ]] || exit_with_error "$target: No such file or directory" 2
+[[ -r "$target" ]] || exit_with_error "$target: Permission denied" 13
+[[ -f "$target" || -d "$target" ]] || exit_with_error "$target: Not a file or directory" 22
 
-# Verify that the file has the a valid AsciiDoc file extension:
-[[ "$file" =~ .*\.a(doc|sciidoc|sc|d)$ ]] || exit_with_error "$file: Not an AsciiDoc file" 22
+# Check if the target is a file or a directory:
+if [[ -f "$target" ]]; then
+  # Verify that the file has the a valid AsciiDoc file extension:
+  [[ "$target" =~ .*\.a(doc|sciidoc|sc|d)$ ]] || exit_with_error "$target: Not an AsciiDoc file" 22
 
-# Determine which mode to run in:
-if [[ "$OPT_WATCH" -eq 0 ]]; then
-  # Convert the file one time:
-  convert_file "$file" || exit 1
+  # Determine which mode to run in:
+  if [[ "$OPT_WATCH" -eq 0 ]]; then
+    # Convert the file one time:
+    convert_file "$target" || exit 1
+  else
+    # Watch the file for updates and continuously convert it:
+    watch_file "$target"
+  fi
 else
-  # Watch the file for updates and continuously convert it:
-  watch_file "$file"
+  # Determine which mode to run in:
+  if [[ "$OPT_WATCH" -eq 0 ]]; then
+    # Convert all AsciiDoc files in the directory one time:
+    find "$target" -maxdepth 1 -type f -regex '.*\.a\(doc\|sciidoc\|sc\|d\)' | xargs -I %% bash -c 'convert_file %%'
+  else
+    # Watch the directory for updates and continuously convert it:
+    watch_directory "$target"
+  fi
 fi
 
 # Terminate the script:
