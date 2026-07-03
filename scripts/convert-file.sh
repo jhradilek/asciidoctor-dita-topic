@@ -99,7 +99,7 @@ function convert_to_map {
   # Check if the conversion succeeded:
   if [[ "$exit_code" -ne 0 ]]; then
     log fatal "Unable to create a DITA map" output "$output_file" input "$file_name"
-    return
+    return 1
   fi
 
   # Report success:
@@ -145,7 +145,7 @@ function convert_to_topic {
   # Check if the conversion succeeded:
   if [[ "$exit_code" -ne 0 ]]; then
     log fatal "Unable to create a DITA ${content_type/#assembly/concept}" output "$output_file" input "$file_name"
-    return
+    return 1
   fi
 
   # Report success:
@@ -256,7 +256,7 @@ declare -r file="$1"
 # Determine which mode to run in:
 if [[ "$OPT_WATCH" -eq 0 ]]; then
   # Convert the file one time:
-  convert_file "$file"
+  convert_file "$file" || exit 1
 else
   # Watch the file for updates and continuously convert it:
   watch_file "$file"
