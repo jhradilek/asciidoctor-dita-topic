@@ -44,36 +44,12 @@ function exit_with_error {
 
 # Print a formatted message to standard error output.
 #
-# Usage: log MESSAGE...
+# Usage: log LEVEL MESSAGE...
 function log {
-  gum log --structured --time TimeOnly --level info "$@"
-}
+  local -r level="$1"
+  shift 1
 
-# Print a formatted warning message to standard error output.
-#
-# Usage: warn MESSAGE
-function warn {
-  local -r message="$1"
-
-  gum log --structured --time TimeOnly --level warn "$@"
-}
-
-# Print a formatted error message to standard error output.
-#
-# Usage: err MESSAGE
-function err {
-  local -r message="$1"
-
-  gum log --structured --time TimeOnly --level error "$@"
-}
-
-# Print a formatted fatal message to standard error output.
-#
-# Usage: fail MESSAGE
-function fail {
-  local -r message="$1"
-
-  gum log --structured --time TimeOnly --level fatal "$@"
+  gum log --structured --time TimeOnly --level "$level" "$@"
 }
 
 # Print a banner with a formatted message to standard outptut.
@@ -108,12 +84,12 @@ function convert_to_map {
 
   # Filter and report any warnings:
   sed -ne 's/^dita-map: warning: //ip' "$error_log" | while read line; do
-    warn "$line" output "$output_file" input "$file_name"
+    log warn "$line" output "$output_file" input "$file_name"
   done
 
   # Filter and report any errors:
   sed -ne 's/^dita-map: error: //ip' "$error_log" | while read line; do
-    err "$line" output "$output_file" input "$file_name"
+    log error "$line" output "$output_file" input "$file_name"
   done
 
   # Remove the temporary file:
@@ -121,12 +97,12 @@ function convert_to_map {
 
   # Check if the conversion succeeded:
   if [[ "$exit_code" -ne 0 ]]; then
-    fail "Unable to create a DITA map" output "$output_file" input "$file_name"
+    log fatal "Unable to create a DITA map" output "$output_file" input "$file_name"
     return
   fi
 
   # Report success:
-  log "Created a DITA map" output "$output_file" input "$file_name"
+  log info "Created a DITA map" output "$output_file" input "$file_name"
 }
 
 # Convert the supplied file to a DITA concept, reference, or task.
@@ -154,12 +130,12 @@ function convert_to_topic {
 
   # Filter and report any warnings:
   sed -ne 's/^\(dita-convert: WARNING\|[^:]*: WARNING: dita-topic\): //ip' "$error_log" | while read line; do
-    warn "$line" output "$output_file" input "$file_name"
+    log warn "$line" output "$output_file" input "$file_name"
   done
 
   # Filter and report any errors:
   sed -ne 's/^\(dita-convert: ERROR\|[^:]*: ERROR: dita-topic\): //ip' "$error_log" | while read line; do
-    err "$line" output "$output_file" input "$file_name"
+    log error "$line" output "$output_file" input "$file_name"
   done
 
   # Remove the temporary file:
@@ -167,14 +143,13 @@ function convert_to_topic {
 
   # Check if the conversion succeeded:
   if [[ "$exit_code" -ne 0 ]]; then
-    fail "Unable to create a DITA ${content_type/#assembly/concept}" output "$output_file" input "$file_name"
+    log fatal "Unable to create a DITA ${content_type/#assembly/concept}" output "$output_file" input "$file_name"
     return
   fi
 
   # Report success:
-  log "Created a DITA ${content_type/#assembly/concept}" output "$output_file" input "$file_name"
+  log info "Created a DITA ${content_type/#assembly/concept}" output "$output_file" input "$file_name"
 }
-
 
 # Determine the content type of the supplied AsciiDoc file and convert
 # it to the corresponding DITA topic or a map.
@@ -188,7 +163,7 @@ function convert_file {
 
   # Report an unsupported content type:
   if [[ ! "$content_type" =~ ^(assembly|concept|reference|task|map)$ ]]; then
-    warn "Unsuppported content type" type "$content_type" input "$file_name"
+    log warn "Unsuppported content type" type "$content_type" input "$file_name"
     return
   fi
 
@@ -218,7 +193,7 @@ function watch_file {
 }
 
 # Export functions that must be available in subshells:
-export -f log warn err fail banner
+export -f log banner
 export -f convert_file convert_to_map convert_to_topic
 
 # Process command-line options:
