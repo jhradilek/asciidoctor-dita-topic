@@ -43,6 +43,26 @@ function exit_with_error {
   exit $exit_status
 }
 
+# Print usage information to standard output.
+#
+# Usage: print_usage
+function print_usage {
+  echo "Usage: $NAME [-w] [-a ATTRIBUTE] [-p FILE] FILE|DIRECTORY"
+  echo "       $NAME -h"
+  echo
+  echo "  Convert an AsciiDoc FILE or all AsciiDoc files in the supplied DIRECTORY"
+  echo "  to a DITA concept, task, reference, or map."
+  echo
+  echo "  -w               watch the file and reconvert it whenever it changes"
+  echo "  -a ATTRIBUTE     set a document attribute in the form of name, name!,"
+  echo "                   or name=value pair; can be supplied multiple times"
+  echo "  -p FILE          prepend a file to the input file, typically to bring"
+  echo "                   in attribute definitions; can be supplied multiple"
+  echo "                   times"
+  echo
+  echo "  -h      display this help and exit"
+}
+
 # Print a formatted message to standard error output.
 #
 # Usage: log LEVEL MESSAGE...
@@ -242,20 +262,7 @@ while getopts ':ha:p:w' OPTION; do
       ;;
     h)
       # Print usage information to standard output:
-      echo "Usage: $NAME [-w] [-a ATTRIBUTE] [-p FILE] FILE|DIRECTORY"
-      echo "       $NAME -h"
-      echo
-      echo "  Convert an AsciiDoc FILE or all AsciiDoc files in the supplied DIRECTORY"
-      echo "  to a DITA concept, task, reference, or map."
-      echo
-      echo "  -w               watch the file and reconvert it whenever it changes"
-      echo "  -a ATTRIBUTE     set a document attribute in the form of name, name!,"
-      echo "                   or name=value pair; can be supplied multiple times"
-      echo "  -p FILE          prepend a file to the input file, typically to bring"
-      echo "                   in attribute definitions; can be supplied multiple"
-      echo "                   times"
-      echo
-      echo "  -h      display this help and exit"
+      print_usage
 
       # Terminate the script:
       exit 0
@@ -269,6 +276,12 @@ done
 
 # Shift positional parameters:
 shift $(($OPTIND - 1))
+
+# Print usage information when no arguments are supplied:
+if [[ "$#" -eq 0 ]]; then
+  print_usage >&2
+  exit 0
+fi
 
 # Verify the number of command line arguments:
 [[ "$#" -eq 1 ]] || exit_with_error 'Invalid number of arguments' 22
