@@ -28,8 +28,9 @@
 declare -r NAME=${0##*/}
 
 # Set the default options:
-declare -i OPT_WATCH=0
 declare -a OPT_OPTS=()
+declare -i OPT_RECURSIVE=0
+declare -i OPT_WATCH=0
 
 # Print a message to standard error output and terminate the script with
 # the selected exit status.
@@ -54,6 +55,8 @@ function print_usage {
   echo "  to a DITA concept, task, reference, or map."
   echo
   echo "  -w               watch the file and reconvert it whenever it changes"
+  echo "  -r               search for relevant files recursively if a DIRECTORY"
+  echo "                   is specified"
   echo "  -a ATTRIBUTE     set a document attribute in the form of name, name!,"
   echo "                   or name=value pair; can be supplied multiple times"
   echo "  -p FILE          prepend a file to the input file, typically to bring"
@@ -206,8 +209,14 @@ function convert_file {
 function convert_directory {
   local -r directory_name="$1"
 
-  # Convert all AsciiDoc files in the directory:
-  find "$target" -maxdepth 1 -type f -regex '.*\.a\(doc\|sciidoc\|sc\|d\)' | xargs -I %% bash -c 'convert_file %%'
+  # Determine whether to traverse directories recursively:
+  if [[ "$OPT_RECURSIVE" -eq 1 ]]; then
+    # Convert all AsciiDoc files in the directory:
+    find "$target" -type f -regex '.*\.a\(doc\|sciidoc\|sc\|d\)' | xargs -I %% bash -c 'convert_file %%'
+  else
+    # Convert all AsciiDoc files in the directory:
+    find "$target" -maxdepth 1 -type f -regex '.*\.a\(doc\|sciidoc\|sc\|d\)' | xargs -I %% bash -c 'convert_file %%'
+  fi
 }
 
 # Watch the supplied AsciiDoc file and re-convert it whenever its contents
@@ -234,10 +243,19 @@ function watch_directory {
   # Print the banner:
   banner "Monitoring the supplied directory for changes." "To exit this mode, press ^C (Ctrl+C)."
 
-  # Watch the directory for updates and continuously convert it:
-  inotifywait -qme close_write --include '.*\.a(doc|asciidoc|sc|d)$' "$directory_name" | while read -r dir event file; do
-    convert_file "$dir$file"
-  done
+
+  # Determine whether to traverse directories recursively:
+  if [[ "$OPT_RECURSIVE" -eq 1 ]]; then
+    # Watch the directory for updates and continuously convert it:
+    inotifywait -qrme close_write --include '.*\.a(doc|sciidoc|sc|d)$' "$directory_name" | while read -r dir event file; do
+      convert_file "$dir$file"
+    done
+  else
+    # Watch the directory for updates and continuously convert it:
+    inotifywait -qme close_write --include '.*\.a(doc|sciidoc|sc|d)$' "$directory_name" | while read -r dir event file; do
+      convert_file "$dir$file"
+    done
+  fi
 }
 
 # Export functions that must be available in subshells:
@@ -245,7 +263,7 @@ export -f log banner
 export -f convert_file convert_to_map convert_to_topic
 
 # Process command-line options:
-while getopts ':ha:p:w' OPTION; do
+while getopts ':ha:p:rw' OPTION; do
   case "$OPTION" in
     a)
       # Append the attribute definition to the list of common options:
@@ -254,6 +272,10 @@ while getopts ':ha:p:w' OPTION; do
     p)
       # Append the prepended file to the list of common options:
       OPT_OPTS+=('-p' "$OPTARG")
+      ;;
+    r)
+      # Enable recursive traversal of the supplied directory:
+      OPT_RECURSIVE=1
       ;;
     w)
       # Enable continuous processing of the supplied file:
