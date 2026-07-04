@@ -235,11 +235,10 @@ function watch_directory {
   banner "Monitoring the supplied directory for changes." "To exit this mode, press ^C (Ctrl+C)."
 
   # Watch the directory for updates and continuously convert it:
-  inotifywait -qme close_write --include '.*\.adoc$' "$directory_name" | while read -r dir event file; do
+  inotifywait -qme close_write --include '.*\.a(doc|asciidoc|sc|d)$' "$directory_name" | while read -r dir event file; do
     convert_file "$dir$file"
   done
 }
-
 
 # Export functions that must be available in subshells:
 export -f log banner
