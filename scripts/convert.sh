@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# convert-file - convert an AsciiDoc file to a DITA topic or a DITA map
+# convert - convert an AsciiDoc file to a DITA topic or a DITA map
 # Copyright (C) 2026 Jaromir Hradilek
 
 # MIT License
