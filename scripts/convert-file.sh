@@ -179,6 +179,31 @@ function convert_file {
   fi
 }
 
+# Discover AsciiDoc files in the supplied directory and convert them to the
+# corresponding DITA topic or a map.
+#
+# Usage: convert_directory DIRECTORY_NAME
+function convert_directory {
+  local -r directory_name="$1"
+
+  # Convert all AsciiDoc files in the directory:
+  find "$target" -maxdepth 1 -type f -regex '.*\.a\(doc\|sciidoc\|sc\|d\)' | xargs -I %% bash -c 'convert_file %%'
+}
+
+# Watch the supplied AsciiDoc file and re-convert it whenever its contents
+# changes.
+#
+# Usage: watch_file FILE_NAME
+function watch_file {
+  local -r file_name="$1"
+
+  # Print the banner:
+  banner "Monitoring the supplied file for changes." "To exit this mode, press ^C (Ctrl+C)."
+
+  # Monitor the file for changes:
+  echo "$file_name" | entr -r bash -c "convert_file \"$file_name\""
+}
+
 # Watch AsciiDoc files in the supplied directory and re-convert them whenever
 # their contents changes.
 #
@@ -195,19 +220,6 @@ function watch_directory {
   done
 }
 
-# Watch the supplied AsciiDoc file and re-convert it whenever its contents
-# changes.
-#
-# Usage: watch_file FILE_NAME
-function watch_file {
-  local -r file_name="$1"
-
-  # Print the banner:
-  banner "Monitoring the supplied file for changes." "To exit this mode, press ^C (Ctrl+C)."
-
-  # Monitor the file for changes:
-  echo "$file_name" | entr -r bash -c "convert_file \"$file_name\""
-}
 
 # Export functions that must be available in subshells:
 export -f log banner
@@ -286,7 +298,7 @@ else
   # Determine which mode to run in:
   if [[ "$OPT_WATCH" -eq 0 ]]; then
     # Convert all AsciiDoc files in the directory one time:
-    find "$target" -maxdepth 1 -type f -regex '.*\.a\(doc\|sciidoc\|sc\|d\)' | xargs -I %% bash -c 'convert_file %%'
+    convert_directory "$target"
   else
     # Watch the directory for updates and continuously convert it:
     watch_directory "$target"
