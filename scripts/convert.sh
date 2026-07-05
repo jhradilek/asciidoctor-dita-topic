@@ -91,16 +91,16 @@ function convert_to_map {
   local -r content_type="$2"
 
   # Derive the output file name:
-  local -r output_file="${file_name%.adoc}.ditamap"
+  local -r output_file=$(echo "$file_name" | sed -e 's/\.a\(doc\|sciidoc\|sc\|d\)$/.ditamap/')
 
   # Create a temporary to capture error log:
   local -r error_log=$(mktemp --tmpdir "$NAME".XXXXXXXXXX)
 
   # Convert the file to a DITA map:
   if [[ "$content_type" == 'assembly' ]]; then
-    dita-map "${OPT_OPTS[@]}" --include-self "$file_name" 2> "$error_log"
+    dita-map "${OPT_OPTS[@]}" --include-self "$file_name" --out-file "$output_file" 2> "$error_log"
   else
-    dita-map "${OPT_OPTS[@]}" --zero-offset "$file_name" 2> "$error_log"
+    dita-map "${OPT_OPTS[@]}" --zero-offset "$file_name" --out-file "$output_file" 2> "$error_log"
   fi
 
   # Capture the exit status:
@@ -137,7 +137,7 @@ function convert_to_topic {
   local -r content_type="$2"
 
   # Derive the output file name:
-  local -r output_file="${file_name%.adoc}.dita"
+  local -r output_file=$(echo "$file_name" | sed -e 's/\.a\(doc\|sciidoc\|sc\|d\)$/.dita/')
 
   # Create a temporary to capture error log:
   local -r error_log=$(mktemp --tmpdir "$NAME".XXXXXXXXXX)
