@@ -1,5 +1,7 @@
 FROM fedora-minimal:latest
 
+ENV TERM=xterm-256color
+
 RUN microdnf install -y python3-pip rubygems inotify-tools entr gum elinks less tput
 RUN gem install asciidoctor-{dita-topic,dita-map,list-content}
 RUN pip install --root-user-action=ignore dita-{convert,cleanup}

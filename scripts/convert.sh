@@ -34,11 +34,11 @@ declare -i OPT_WATCH=0
 
 # Set default colors:
 declare -r CLR_BOLD=$(tput bold)
-declare -r CLR_INFO=$(tput setaf 6)
-declare -r CLR_WARNING=$(tput setaf 3)
-declare -r CLR_ERROR=$(tput setaf 1)
-declare -r CLR_FATAL=$(tput setaf 5)
-declare -r CLR_KEYWORD=$(tput setaf 4)
+declare -r CLR_INFO=$(tput setaf 14)
+declare -r CLR_WARNING=$(tput setaf 11)
+declare -r CLR_ERROR=$(tput setaf 9)
+declare -r CLR_FATAL=$(tput setaf 13)
+declare -r CLR_KEYWORD=$(tput setaf 12)
 declare -r CLR_RESET=$(tput sgr0)
 
 # Print a message to standard error output and terminate the script with
