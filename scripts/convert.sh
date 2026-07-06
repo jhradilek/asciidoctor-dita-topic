@@ -32,6 +32,15 @@ declare -a OPT_OPTS=()
 declare -i OPT_RECURSIVE=0
 declare -i OPT_WATCH=0
 
+# Set default colors:
+declare -r CLR_BOLD=$(tput bold)
+declare -r CLR_INFO=$(tput setaf 6)
+declare -r CLR_WARNING=$(tput setaf 3)
+declare -r CLR_ERROR=$(tput setaf 1)
+declare -r CLR_FATAL=$(tput setaf 5)
+declare -r CLR_KEYWORD=$(tput setaf 4)
+declare -r CLR_RESET=$(tput sgr0)
+
 # Print a message to standard error output and terminate the script with
 # the selected exit status.
 #
@@ -71,9 +80,36 @@ function print_usage {
 # Usage: log LEVEL MESSAGE...
 function log {
   local -r level="$1"
-  shift 1
+  local -r message="$2"
+  shift 2
 
-  gum log --structured --time TimeOnly --level "$level" "$@"
+  # Compose the first part of the log message:
+  case "$level" in
+    fatal)
+      local result="$CLR_BOLD$CLR_FATAL${level^^}$CLR_RESET $message"
+      ;;
+    error)
+      local result="$CLR_BOLD$CLR_ERROR${level^^}$CLR_RESET $message"
+      ;;
+    info)
+      local result="$CLR_BOLD$CLR_INFO${level^^}$CLR_RESET $message"
+      ;;
+    *)
+      local result="$CLR_BOLD$CLR_WARNING${level^^}$CLR_RESET $message"
+      ;;
+  esac
+
+  # Append the key and value pairs:
+  while [[ "$#" -ge 2 ]]; do
+    result+=" $CLR_KEYWORD$1=$CLR_RESET$2"
+    shift 2
+  done
+
+  # Append any leftover values:
+  [[ "$#" -eq 1 ]] && result+=" $1"
+
+  # Print the message:
+  echo "$(date +%T) $result"
 }
 
 # Print a banner with a formatted message to standard outptut.
