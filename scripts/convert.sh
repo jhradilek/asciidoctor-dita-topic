@@ -98,9 +98,9 @@ function convert_to_map {
 
   # Convert the file to a DITA map:
   if [[ "$content_type" == 'assembly' ]]; then
-    dita-map "${OPT_OPTS[@]}" --include-self "$file_name" --out-file "$output_file" 2> "$error_log"
+    dita-map "${OPT_OPTS[@]}" -i "$file_name" -o "$output_file" 2> "$error_log"
   else
-    dita-map "${OPT_OPTS[@]}" --zero-offset "$file_name" --out-file "$output_file" 2> "$error_log"
+    dita-map "${OPT_OPTS[@]}" -z "$file_name" -o "$output_file" 2> "$error_log"
   fi
 
   # Capture the exit status:
@@ -139,14 +139,17 @@ function convert_to_topic {
   # Derive the output file name:
   local -r output_file=$(echo "$file_name" | sed -e 's/\.a\(doc\|sciidoc\|sc\|d\)$/.dita/')
 
+  # Derive the actual target content type:
+  local -r target_type="${content_type/#assembly/concept}"
+
   # Create a temporary to capture error log:
   local -r error_log=$(mktemp --tmpdir "$NAME".XXXXXXXXXX)
 
   # Convert the file to a DITA topic:
   if [[ "$content_type" == 'assembly' ]]; then
-    (dita-topic "${OPT_OPTS[@]}" --no-module --out-file - "$file_name" | dita-convert --generated --output "$output_file") 2> "$error_log"
+    (dita-topic "${OPT_OPTS[@]}" -Ao - "$file_name" | dita-convert -gt "$target_type" -o "$output_file") 2> "$error_log"
   else
-    (dita-topic "${OPT_OPTS[@]}" --out-file - "$file_name" | dita-convert --generated --output "$output_file") 2> "$error_log"
+    (dita-topic "${OPT_OPTS[@]}" -o - "$file_name" | dita-convert -gt "$target_type" -o "$output_file") 2> "$error_log"
   fi
 
   # Capture the exit status:
@@ -167,12 +170,12 @@ function convert_to_topic {
 
   # Check if the conversion succeeded:
   if [[ "$exit_code" -ne 0 ]]; then
-    log fatal "Unable to create a DITA ${content_type/#assembly/concept}" output "$output_file" input "$file_name"
+    log fatal "Unable to create a DITA $target_type" output "$output_file" input "$file_name"
     return 1
   fi
 
   # Report success:
-  log info "Created a DITA ${content_type/#assembly/concept}" output "$output_file" input "$file_name"
+  log info "Created a DITA $target_type" output "$output_file" input "$file_name"
 }
 
 # Determine the content type of the supplied AsciiDoc file and convert
