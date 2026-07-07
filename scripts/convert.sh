@@ -33,13 +33,13 @@ declare -i OPT_RECURSIVE=0
 declare -i OPT_WATCH=0
 
 # Set default colors:
-declare -r CLR_BOLD=$(tput bold)
-declare -r CLR_INFO=$(tput setaf 14)
-declare -r CLR_WARNING=$(tput setaf 11)
-declare -r CLR_ERROR=$(tput setaf 9)
-declare -r CLR_FATAL=$(tput setaf 13)
-declare -r CLR_KEYWORD=$(tput setaf 12)
-declare -r CLR_RESET=$(tput sgr0)
+export CLR_BOLD=$(tput bold)
+export CLR_INFO=$(tput setaf 14)
+export CLR_WARNING=$(tput setaf 11)
+export CLR_ERROR=$(tput setaf 9)
+export CLR_FATAL=$(tput setaf 13)
+export CLR_KEYWORD=$(tput setaf 12)
+export CLR_RESET=$(tput sgr0)
 
 # Print a message to standard error output and terminate the script with
 # the selected exit status.
