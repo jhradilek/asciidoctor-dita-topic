@@ -1,5 +1,6 @@
 FROM fedora-minimal:latest
 
+ENV LANG=C.UTF-8
 ENV TERM=xterm-256color
 
 RUN microdnf install -y python3-pip rubygems inotify-tools entr gum elinks less tput
