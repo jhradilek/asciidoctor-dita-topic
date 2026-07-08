@@ -192,12 +192,12 @@ function convert_to_topic {
   local exit_code="$?"
 
   # Filter and report any warnings:
-  sed -ne 's/^\(dita-convert: WARNING\|[^:]*: WARNING: dita-topic\): //ip' "$error_log" | while read line; do
+  sed -ne 's/^\(dita-convert: WARNING\|dita-convert: [^:]*: WARNING\|[^:]*: WARNING: dita-topic\): //ip' "$error_log" | while read line; do
     log warn "$line" output "$output_file" input "$file_name"
   done
 
   # Filter and report any errors:
-  sed -ne 's/^\(dita-convert: ERROR\|[^:]*: ERROR: dita-topic\): //ip' "$error_log" | while read line; do
+  sed -ne 's/^\(dita-convert: ERROR\|dita-convert: [^:]*: ERROR\|[^:]*: ERROR: dita-topic\): //ip' "$error_log" | while read line; do
     log error "$line" output "$output_file" input "$file_name"
   done
 
