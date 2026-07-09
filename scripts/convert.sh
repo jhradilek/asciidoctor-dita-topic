@@ -31,6 +31,8 @@ declare -r NAME=${0##*/}
 declare -a OPT_OPTS=()
 declare -i OPT_RECURSIVE=0
 declare -i OPT_WATCH=0
+declare -i OPT_BUSY=0
+declare -i OPT_INTERVAL=2
 
 # Set default colors:
 export CLR_BOLD=$(tput bold)
@@ -57,20 +59,26 @@ function exit_with_error {
 #
 # Usage: print_usage
 function print_usage {
-  echo "Usage: $NAME [-w] [-a ATTRIBUTE] [-p FILE] FILE|DIRECTORY"
+  echo "Usage: $NAME [-w|-W] [-a ATTRIBUTE] [-p FILE] FILE|DIRECTORY"
   echo "       $NAME -h"
   echo
   echo "  Convert an AsciiDoc FILE or all AsciiDoc files in the supplied DIRECTORY"
   echo "  to a DITA concept, task, reference, or map."
   echo
-  echo "  -w               watch the file and reconvert it whenever it changes"
-  echo "  -r               search for relevant files recursively if a DIRECTORY"
-  echo "                   is specified"
-  echo "  -a ATTRIBUTE     set a document attribute in the form of name, name!,"
-  echo "                   or name=value pair; can be supplied multiple times"
-  echo "  -p FILE          prepend a file to the input file, typically to bring"
-  echo "                   in attribute definitions; can be supplied multiple"
-  echo "                   times"
+  echo "  -w             watch the file or directory and reconvert it whenever it"
+  echo "                 changes; use this method on systems that support the"
+  echo "                 inotify API for monitoring filesystem events"
+  echo "  -W             watch the file or directory and reconvert it whenever it"
+  echo "                 changes; this option uses busy waiting and is a fallback"
+  echo "                 mechanism for systems that do not support the inotify API"
+  echo "  -r             search for relevant files recursively if a DIRECTORY"
+  echo "                 is specified"
+  echo
+  echo "  -a ATTRIBUTE   set a document attribute in the form of name, name!,"
+  echo "                 or name=value pair; can be supplied multiple times"
+  echo "  -p FILE        prepend a file to the input file, typically to bring"
+  echo "                 in attribute definitions; can be supplied multiple"
+  echo "                 times"
   echo
   echo "  -h      display this help and exit"
 }
@@ -268,8 +276,35 @@ function watch_file {
   # Print the banner:
   banner "Monitoring the supplied file for changes." "To exit this mode, press ^C (Ctrl+C)."
 
-  # Monitor the file for changes:
-  echo "$file_name" | entr -r bash -c "convert_file \"$file_name\""
+  # Determine whether to use busy waiting:
+  if [[ "$OPT_BUSY" -eq 0 ]]; then
+    # Monitor the file for changes:
+    echo "$file_name" | entr -r bash -c "convert_file \"$file_name\""
+  else
+    # Get the time of the last modification from the file:
+    local latest_change=$(stat -c %Z "$file_name")
+
+    # Convert the file prior to watching it:
+    convert_file "$file_name"
+
+    # Start the busy waiting loop:
+    while true; do
+      # Get the information about the last change:
+      changed_time=$(stat -c %Z "$file_name")
+
+      # Check if the file changed:
+      if [[ "$(echo "$changed_time > $latest_change" | bc)" -eq 1 ]]; then
+        # Update the time of the last modification:
+        latest_change="$changed_time"
+
+        # Convert the changed file:
+        convert_file "$file_name"
+      fi
+
+      # Wait the selected amount of time:
+      sleep "$OPT_INTERVAL"
+    done
+  fi
 }
 
 # Watch AsciiDoc files in the supplied directory and re-convert them whenever
@@ -278,21 +313,56 @@ function watch_file {
 # Usage: watch_directory DIRECTORY_NAME
 function watch_directory {
   local -r directory_name="$1"
+  local opts=''
 
   # Print the banner:
   banner "Monitoring the supplied directory for changes." "To exit this mode, press ^C (Ctrl+C)."
 
+  # Determine whether to use busy waiting:
+  if [[ "$OPT_BUSY" -eq 0 ]]; then
+    # Determine whether to traverse directories recursively:
+    if [[ "$OPT_RECURSIVE" -eq 1 ]]; then
+      opts='-r'
+    fi
 
-  # Determine whether to traverse directories recursively:
-  if [[ "$OPT_RECURSIVE" -eq 1 ]]; then
     # Watch the directory for updates and continuously convert it:
-    inotifywait -qrme close_write --include '.*\.a(doc|sciidoc|sc|d)$' "$directory_name" | while read -r dir event file; do
+    inotifywait "$opts" -qme close_write --include '.*\.a(doc|sciidoc|sc|d)$' "$directory_name" | while read -r dir event file; do
       convert_file "$dir$file"
     done
   else
-    # Watch the directory for updates and continuously convert it:
-    inotifywait -qme close_write --include '.*\.a(doc|sciidoc|sc|d)$' "$directory_name" | while read -r dir event file; do
-      convert_file "$dir$file"
+    # Determine whether to traverse directories recursively:
+    if [[ "$OPT_RECURSIVE" -eq 0 ]]; then
+      opts='-maxdepth 1'
+    fi
+
+    # Create a temporary to capture the time stamp; this is to prevent clock drift:
+    local -r reference_file=$(mktemp --tmpdir ".$NAME".XXXXXXXXXX)
+
+    # Get the time of the last modification from the file:
+    local latest_change=$(stat -c %Z "$reference_file")
+
+    # Remove the temporary file:
+    rm "$reference_file"
+
+    # Start the busy waiting loop:
+    while true; do
+      # Process the list of changed files:
+      while read -r line; do
+        # Extract the information about the file:
+        changed_time=$(echo "$line" | cut -d : -f 1)
+        changed_file=$(echo "$line" | cut -d : -f 2-)
+
+        # Update the time of the last modification:
+        if [[ "$(echo "$changed_time > $latest_change" | bc)" -eq 1 ]]; then
+          latest_change="$changed_time"
+        fi
+
+        # Convert the changed file:
+        convert_file "$changed_file"
+      done < <(find . $opts -type f -regex '.*\.a\(doc\|sciidoc\|sc\|d\)' -newermt "@$latest_change" -printf "%T@:%p\n")
+
+      # Wait the selected amount of time:
+      sleep "$OPT_INTERVAL"
     done
   fi
 }
@@ -302,7 +372,7 @@ export -f log banner
 export -f convert_file convert_to_map convert_to_topic
 
 # Process command-line options:
-while getopts ':ha:p:rw' OPTION; do
+while getopts ':ha:p:rwW' OPTION; do
   case "$OPTION" in
     a)
       # Append the attribute definition to the list of common options:
@@ -317,8 +387,15 @@ while getopts ':ha:p:rw' OPTION; do
       OPT_RECURSIVE=1
       ;;
     w)
-      # Enable continuous processing of the supplied file:
+      # Enable continuous processing of the supplied file or directory:
       OPT_WATCH=1
+      ;;
+    W)
+      # Enable continuous processing of the supplied file or directory:
+      OPT_WATCH=1
+
+      # Select busy waiting as the monitoring method:
+      OPT_BUSY=1
       ;;
     h)
       # Print usage information to standard output:
