@@ -65,12 +65,12 @@ function print_usage {
   echo "  Convert an AsciiDoc FILE or all AsciiDoc files in the supplied DIRECTORY"
   echo "  to a DITA concept, task, reference, or map."
   echo
-  echo "  -w             watch the file or directory and reconvert it whenever it"
+  echo "  -w             watch the FILE or DIRECTORY and reconvert it whenever it"
   echo "                 changes; use this method on systems that support the"
   echo "                 inotify API for monitoring filesystem events"
-  echo "  -W             watch the file or directory and reconvert it whenever it"
-  echo "                 changes; this option uses busy waiting and is a fallback"
-  echo "                 mechanism for systems that do not support the inotify API"
+  echo "  -W             watch the FILE or DIRECTORY and reconvert it whenever it"
+  echo "                 changes; this option uses busy waiting and is suitable"
+  echo "                 for systems that do not support the inotify API"
   echo "  -r             search for relevant files recursively if a DIRECTORY"
   echo "                 is specified"
   echo
