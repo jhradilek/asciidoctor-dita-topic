@@ -28,7 +28,7 @@
 declare -r NAME=${0##*/}
 
 # Set the default options:
-declare -a OPT_OPTS=()
+declare -a OPT_ARGS=()
 declare -i OPT_RECURSIVE=0
 declare -i OPT_WATCH=0
 declare -i OPT_BUSY=0
@@ -134,6 +134,9 @@ function convert_to_map {
   local -r file_name="$1"
   local -r content_type="$2"
 
+  # Restore the array variable declaration in a subshell:
+  eval "$PACK_ARGS"
+
   # Derive the output file name:
   local -r output_file=$(echo "$file_name" | sed -e 's/\.a\(doc\|sciidoc\|sc\|d\)$/.ditamap/')
 
@@ -142,9 +145,9 @@ function convert_to_map {
 
   # Convert the file to a DITA map:
   if [[ "$content_type" == 'assembly' ]]; then
-    dita-map "${OPT_OPTS[@]}" -i "$file_name" -o "$output_file" 2> "$error_log"
+    dita-map "${OPT_ARGS[@]}" -i "$file_name" -o "$output_file" 2> "$error_log"
   else
-    dita-map "${OPT_OPTS[@]}" -z "$file_name" -o "$output_file" 2> "$error_log"
+    dita-map "${OPT_ARGS[@]}" -z "$file_name" -o "$output_file" 2> "$error_log"
   fi
 
   # Capture the exit status:
@@ -180,6 +183,9 @@ function convert_to_topic {
   local -r file_name="$1"
   local -r content_type="$2"
 
+  # Restore the array variable declaration in a subshell:
+  eval "$PACK_ARGS"
+
   # Derive the output file name:
   local -r output_file=$(echo "$file_name" | sed -e 's/\.a\(doc\|sciidoc\|sc\|d\)$/.dita/')
 
@@ -191,9 +197,9 @@ function convert_to_topic {
 
   # Convert the file to a DITA topic:
   if [[ "$content_type" == 'assembly' ]]; then
-    (dita-topic "${OPT_OPTS[@]}" -Ao - "$file_name" | dita-convert -gt "$target_type" -o "$output_file") 2> "$error_log"
+    (dita-topic "${OPT_ARGS[@]}" -Ao - "$file_name" | dita-convert -gt "$target_type" -o "$output_file") 2> "$error_log"
   else
-    (dita-topic "${OPT_OPTS[@]}" -o - "$file_name" | dita-convert -gt "$target_type" -o "$output_file") 2> "$error_log"
+    (dita-topic "${OPT_ARGS[@]}" -o - "$file_name" | dita-convert -gt "$target_type" -o "$output_file") 2> "$error_log"
   fi
 
   # Capture the exit status:
@@ -376,11 +382,11 @@ while getopts ':ha:p:rwW' OPTION; do
   case "$OPTION" in
     a)
       # Append the attribute definition to the list of common options:
-      OPT_OPTS+=('-a' "$OPTARG")
+      OPT_ARGS+=('-a' "$OPTARG")
       ;;
     p)
       # Append the prepended file to the list of common options:
-      OPT_OPTS+=('-p' "$OPTARG")
+      OPT_ARGS+=('-p' "$OPTARG")
       ;;
     r)
       # Enable recursive traversal of the supplied directory:
@@ -433,6 +439,9 @@ declare -r target="$1"
 [[ -e "$target" ]] || exit_with_error "$target: No such file or directory" 2
 [[ -r "$target" ]] || exit_with_error "$target: Permission denied" 13
 [[ -f "$target" || -d "$target" ]] || exit_with_error "$target: Not a file or directory" 22
+
+# Save additional arguments to a string variable to make it available in subshells:
+export PACK_ARGS=$(declare -p OPT_ARGS)
 
 # Check if the target is a file or a directory:
 if [[ -f "$target" ]]; then
