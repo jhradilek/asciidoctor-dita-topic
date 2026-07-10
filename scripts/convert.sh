@@ -389,12 +389,15 @@ while getopts ':ha:p:rwW' OPTION; do
     w)
       # Enable continuous processing of the supplied file or directory:
       OPT_WATCH=1
+
+      # Disable busy waiting as the monitoring method:
+      OPT_BUSY=0
       ;;
     W)
       # Enable continuous processing of the supplied file or directory:
       OPT_WATCH=1
 
-      # Select busy waiting as the monitoring method:
+      # Enable busy waiting as the monitoring method:
       OPT_BUSY=1
       ;;
     h)
