@@ -64,4 +64,28 @@ class ExampleTest < Minitest::Test
 
     assert_xpath_count xml, 0, '//example/@id'
   end
+
+  def test_non_breaking_spaces
+    xml = <<~EOF.chomp.to_dita
+    .An{nbsp}example block title
+    ====
+    An example block
+    ====
+    EOF
+
+    assert_xpath_equal xml, 'An&#160;example block title', '//example/title/text()'
+  end
+
+  def test_non_breaking_spaces_off
+    xml = <<~EOF.chomp.to_dita
+    :dita-topic-spaces: off
+
+    .An{nbsp}example block title
+    ====
+    An example block
+    ====
+    EOF
+
+    assert_xpath_equal xml, 'An example block title', '//example/title/text()'
+  end
 end

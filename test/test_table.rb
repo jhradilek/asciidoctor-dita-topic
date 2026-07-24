@@ -191,4 +191,32 @@ class TableTest < Minitest::Test
 
     assert_xpath_count xml, 0, '//table/@id'
   end
+
+  def test_non_breaking_spaces
+    xml = <<~EOF.chomp.to_dita
+    .Table{nbsp}title
+    [cols="1, 1"]
+    |===
+    |Column 1
+    |Column 2
+    |===
+    EOF
+
+    assert_xpath_equal xml, 'Table&#160;title', '//table/title/text()'
+  end
+
+  def test_non_breaking_spaces_off
+    xml = <<~EOF.chomp.to_dita
+    :dita-topic-spaces: off
+
+    .Table{nbsp}title
+    [cols="1, 1"]
+    |===
+    |Column 1
+    |Column 2
+    |===
+    EOF
+
+    assert_xpath_equal xml, 'Table title', '//table/title/text()'
+  end
 end

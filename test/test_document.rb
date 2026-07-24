@@ -130,4 +130,27 @@ class DocumentTest < Minitest::Test
     assert_xpath_equal xml, 'First paragraph. Second sentence with a *bold* text.', '/topic/body/p[1]/text()'
     assert_xpath_count xml, 2, '/topic/body/p'
   end
+
+  def test_non_breaking_spaces
+    xml = <<~EOF.chomp.to_dita
+    = Topic{nbsp}title
+
+    Topic contents.
+    EOF
+
+    assert_xpath_equal xml, 'Topic&#160;title', '/topic/title/text()'
+  end
+
+  def test_non_breaking_spaces_off
+    xml = <<~EOF.chomp.to_dita
+    :dita-topic-spaces: off
+
+    = A{nbsp}B&nbsp;C&#160;D&thinsp;E&ThinSpace;F&#8201;G{zwsp}H&ZeroWidthSpace;I&#8203;J{wj}K&NoBreak;L&#8288;M
+
+    Topic{nbsp}contents.
+    EOF
+
+    assert_xpath_equal xml, 'A B C D E F GHIJKLM', '/topic/title/text()'
+    assert_xpath_equal xml, 'Topic&#160;contents.', '/topic/body/p/text()'
+  end
 end

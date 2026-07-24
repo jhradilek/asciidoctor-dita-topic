@@ -297,6 +297,16 @@ class CliTest < Minitest::Test
     assert_includes cli.instance_variable_get(:@attr), 'dita-topic-titles=off'
   end
 
+  def test_no_spaces_short
+    cli  = AsciidoctorDitaTopic::Cli.new 'script-name', ['-B']
+    assert_includes cli.instance_variable_get(:@attr), 'dita-topic-spaces=off'
+  end
+
+  def test_no_spaces_long
+    cli  = AsciidoctorDitaTopic::Cli.new 'script-name', ['--no-spaces']
+    assert_includes cli.instance_variable_get(:@attr), 'dita-topic-spaces=off'
+  end
+
   def test_help_short
     assert_output(/^Usage: script-name /) do
       error = assert_raises SystemExit do

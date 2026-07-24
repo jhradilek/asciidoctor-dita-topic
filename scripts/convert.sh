@@ -197,9 +197,9 @@ function convert_to_topic {
 
   # Convert the file to a DITA topic:
   if [[ "$content_type" == 'assembly' ]]; then
-    (dita-topic "${OPT_ARGS[@]}" -Ao - "$file_name" | dita-convert -gt "$target_type" -o "$output_file") 2> "$error_log"
+    (dita-topic "${OPT_ARGS[@]}" -ABo - "$file_name" | dita-convert -gt "$target_type" -o "$output_file") 2> "$error_log"
   else
-    (dita-topic "${OPT_ARGS[@]}" -o - "$file_name" | dita-convert -gt "$target_type" -o "$output_file") 2> "$error_log"
+    (dita-topic "${OPT_ARGS[@]}" -Bo - "$file_name" | dita-convert -gt "$target_type" -o "$output_file") 2> "$error_log"
   fi
 
   # Capture the exit status:

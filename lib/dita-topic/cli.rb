@@ -103,6 +103,10 @@ module AsciidoctorDitaTopic
           @attr.append 'dita-topic-titles=off'
         end
 
+        opt.on('-B', '--no-spaces', 'disable non-breaking spaces in titles') do
+          @attr.append 'dita-topic-spaces=off'
+        end
+
         opt.separator ''
 
         opt.on('-h', '--help', 'display this help and exit') do
