@@ -98,4 +98,26 @@ class SectionTest < Minitest::Test
 
     assert_xpath_equal xml, 'linux', '//section/@platform'
   end
+
+  def test_non_breaking_spaces
+    xml = <<~EOF.chomp.to_dita
+    == Section{nbsp}title
+
+    Section contents.
+    EOF
+
+    assert_xpath_equal xml, 'Section&#160;title', '//section/title/text()'
+  end
+
+  def test_non_breaking_spaces_off
+    xml = <<~EOF.chomp.to_dita
+    :dita-topic-spaces: off
+
+    == Section{nbsp}title
+
+    Section contents.
+    EOF
+
+    assert_xpath_equal xml, 'Section title', '//section/title/text()'
+  end
 end

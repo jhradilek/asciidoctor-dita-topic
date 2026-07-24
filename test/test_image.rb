@@ -123,4 +123,24 @@ class ImageTest < Minitest::Test
 
     assert_xpath_count xml, 0, '//fig/@id'
   end
+
+  def test_non_breaking_spaces
+    xml = <<~EOF.chomp.to_dita
+    .Image{nbsp}title
+    image::image.png[]
+    EOF
+
+    assert_xpath_equal xml, 'Image&#160;title', '//fig/title/text()'
+  end
+
+  def test_non_breaking_spaces_off
+    xml = <<~EOF.chomp.to_dita
+    :dita-topic-spaces: off
+
+    .Image{nbsp}title
+    image::image.png[]
+    EOF
+
+    assert_xpath_equal xml, 'Image title', '//fig/title/text()'
+  end
 end

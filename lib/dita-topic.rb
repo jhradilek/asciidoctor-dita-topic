@@ -52,6 +52,9 @@ class DitaTopic < Asciidoctor::Converter::Base
 
     # Disable propagating the content type to sections by default:
     @type_allowed = false
+
+    # Enable non-breaking spaces in titles by default:
+    @spaces_allowed = true
   end
 
   def convert_document node
@@ -73,6 +76,9 @@ class DitaTopic < Asciidoctor::Converter::Base
     # Check if propagating the content type to sections is enabled:
     @type_allowed = true if (node.attr 'dita-topic-type') == 'on'
 
+    # Check if non-breaking spaces in titles are enabled:
+    @spaces_allowed = false if (node.attr 'dita-topic-spaces') == 'off'
+
     # Check if the file name is available (it is not for standard input):
     if node.attr? 'docname'
       file_name   = node.attr 'docname'
@@ -87,7 +93,7 @@ class DitaTopic < Asciidoctor::Converter::Base
     result = ["<?xml version='1.0' encoding='utf-8' ?>"]
     result << %(<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">)
     result << %(<topic#{compose_id (node.id or node.attributes['docname'] or 'topic-'+SecureRandom.uuid)}#{outputclass}>)
-    result << %(<title>#{node.doctitle}</title>)
+    result << %(<title>#{replace_spaces node.doctitle}</title>)
 
     # Check if the author line is enabled and defined:
     if @authors_allowed && !node.authors.empty?
@@ -252,7 +258,7 @@ class DitaTopic < Asciidoctor::Converter::Base
     # Return the XML output:
     <<~EOF.chomp
     <example#{compose_id node.id}#{compose_metadata node.role}>
-    #{node.title ? %(<title>#{node.title}</title>\n) : ''}#{node.content}
+    #{node.title ? %(<title>#{replace_spaces node.title}</title>\n) : ''}#{node.content}
     </example>
     EOF
   end
@@ -286,7 +292,7 @@ class DitaTopic < Asciidoctor::Converter::Base
     if node.title?
       <<~EOF.chomp
       <fig#{compose_id node.id}#{compose_metadata node.role}>
-      <title>#{node.title}</title>
+      <title>#{replace_spaces node.title}</title>
       <image href="#{node.image_uri(node.attr 'target')}"#{width}#{height}#{scale} placement="break">
       <alt>#{node.alt}</alt>
       </image>
@@ -645,7 +651,7 @@ class DitaTopic < Asciidoctor::Converter::Base
     # Return the XML output:
     <<~EOF.chomp
     <section#{compose_id node.id}#{outputclass}#{compose_metadata node.role}>
-    <title>#{node.title}</title>
+    <title>#{replace_spaces node.title}</title>
     #{node.content}
     </section>
     EOF
@@ -688,7 +694,7 @@ class DitaTopic < Asciidoctor::Converter::Base
     result = [%(<table#{compose_id node.id}#{compose_metadata node.role}>)]
 
     # Check if the title is specified:
-    result << %(<title>#{node.title}</title>) if node.title?
+    result << %(<title>#{replace_spaces node.title}</title>) if node.title?
 
     # Define the table properties and open the tgroup:
     result << %(<tgroup cols="#{node.attr 'colcount'}">)
@@ -902,7 +908,7 @@ class DitaTopic < Asciidoctor::Converter::Base
     result = [%(<table outputclass="horizontal-dlist"#{compose_id node.id}#{compose_metadata node.role}>)]
 
     # Check if the title is specified:
-    result << %(<title>#{node.title}</title>) if node.title?
+    result << %(<title>#{replace_spaces node.title}</title>) if node.title?
 
     # Define the table properties and open the tgroup:
     result << %(<tgroup cols="2">)
@@ -1085,6 +1091,23 @@ class DitaTopic < Asciidoctor::Converter::Base
     else
       return ' ' + result.map { |k, v| %(#{k}="#{v}") unless v.empty? }.join(' ')
     end
+  end
+
+  def replace_spaces text
+    # Return the original value if no text is supplied
+    return text unless text
+
+    # Check if non-breaking spaces are allowd:
+    if @spaces_allowed
+      return text
+    end
+
+    # Replace unsupported non-breaking spaces:
+    return text.
+      gsub(/&(?:nbsp|#160);/, ' ').              # Non-breaking space
+      gsub(/&(?:thinsp|ThinSpace|#8201);/, ' '). # Thin space
+      gsub(/&(?:ZeroWidthSpace|#8203);/, '').    # Zero-width space
+      gsub(/&(?:NoBreak|#8288);/, '')            # Word joiner
   end
 
   def extract_attributes text

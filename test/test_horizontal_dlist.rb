@@ -89,4 +89,28 @@ class HorizontalDlistTest < Minitest::Test
 
     assert_xpath_count xml, 0, '//table/@id'
   end
+
+  def test_non_breaking_spaces
+    xml = <<~EOF.chomp.to_dita
+    .A{nbsp}description list title
+    [horizontal]
+    Term1:: Definition one
+    Term2:: Definition two
+    EOF
+
+    assert_xpath_equal xml, 'A&#160;description list title', '//table/title/text()'
+  end
+
+  def test_non_breaking_spaces_off
+    xml = <<~EOF.chomp.to_dita
+    :dita-topic-spaces: off
+
+    .A{nbsp}description list title
+    [horizontal]
+    Term1:: Definition one
+    Term2:: Definition two
+    EOF
+
+    assert_xpath_equal xml, 'A description list title', '//table/title/text()'
+  end
 end
