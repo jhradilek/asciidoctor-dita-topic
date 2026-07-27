@@ -24,6 +24,6 @@
 # frozen_string_literal: true
 
 module AsciidoctorDitaTopic
-  VERSION     = '1.5.2'
+  VERSION     = '1.5.3'
   NAME        = 'dita-topic'
 end
