@@ -23,6 +23,7 @@
 
 require 'asciidoctor'
 require 'pathname'
+require_relative 'version'
 
 class FilterIncludeDirectives < Asciidoctor::Extensions::IncludeProcessor
   def handles? target
@@ -35,6 +36,10 @@ class FilterIncludeDirectives < Asciidoctor::Extensions::IncludeProcessor
     begin
       logger = Asciidoctor::LoggerManager.logger
       include_doc = Asciidoctor.load_file file_path, safe: :secure, logger: false
+    rescue
+      Asciidoctor::LoggerManager.logger = logger
+      logger.warn "#{AsciidoctorDitaTopic::NAME}: Failed to load AsciiDoc document: #{target}"
+      return reader
     ensure
       Asciidoctor::LoggerManager.logger = logger
     end
