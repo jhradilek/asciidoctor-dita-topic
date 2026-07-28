@@ -240,7 +240,7 @@ function convert_file {
 
   # Report an unsupported content type:
   if [[ ! "$content_type" =~ ^(assembly|concept|reference|task|map)$ ]]; then
-    log fatal "Unsuppported content type" type "$content_type" input "$file_name"
+    log fatal "Unsupported content type" type "$content_type" input "$file_name"
     return
   fi
 
