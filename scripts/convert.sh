@@ -73,6 +73,7 @@ function print_usage {
   echo "                 for systems that do not support the inotify API"
   echo "  -r             search for relevant files recursively if a DIRECTORY"
   echo "                 is specified"
+  echo "  -C             do not add colors to log messages"
   echo
   echo "  -a ATTRIBUTE   set a document attribute in the form of name, name!,"
   echo "                 or name=value pair; can be supplied multiple times"
@@ -378,7 +379,7 @@ export -f log banner
 export -f convert_file convert_to_map convert_to_topic
 
 # Process command-line options:
-while getopts ':ha:p:rwW' OPTION; do
+while getopts ':ha:p:CrwW' OPTION; do
   case "$OPTION" in
     a)
       # Append the attribute definition to the list of common options:
@@ -405,6 +406,16 @@ while getopts ':ha:p:rwW' OPTION; do
 
       # Enable busy waiting as the monitoring method:
       OPT_BUSY=1
+      ;;
+    C)
+      # Disable colors in log messages:
+      export CLR_BOLD=''
+      export CLR_INFO=''
+      export CLR_WARNING=''
+      export CLR_ERROR=''
+      export CLR_FATAL=''
+      export CLR_KEYWORD=''
+      export CLR_RESET=''
       ;;
     h)
       # Print usage information to standard output:
