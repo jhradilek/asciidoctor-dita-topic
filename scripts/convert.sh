@@ -32,7 +32,16 @@ declare -a OPT_ARGS=()
 declare -i OPT_RECURSIVE=0
 declare -i OPT_WATCH=0
 declare -i OPT_BUSY=0
+declare -i OPT_AMAPS=1
 declare -i OPT_INTERVAL=2
+
+# Export the default options:
+export OPT_ARGS
+export OPT_RECURSIVE
+export OPT_WATCH
+export OPT_BUSY
+export OPT_AMAPS
+export OPT_INTERVAL
 
 # Set default colors:
 export CLR_BOLD=$(tput bold)
@@ -60,7 +69,6 @@ function exit_with_error {
 # Usage: print_usage
 function print_usage {
   echo "Usage: $NAME [-w|-W] [-a ATTRIBUTE] [-p FILE] FILE|DIRECTORY"
-  echo "       $NAME -h"
   echo
   echo "  Convert an AsciiDoc FILE or all AsciiDoc files in the supplied DIRECTORY"
   echo "  to a DITA concept, task, reference, or map."
@@ -73,6 +81,7 @@ function print_usage {
   echo "                 for systems that do not support the inotify API"
   echo "  -r             search for relevant files recursively if a DIRECTORY"
   echo "                 is specified"
+  echo "  -A             do not convert assemblies to DITA maps"
   echo "  -C             do not add colors to log messages"
   echo
   echo "  -a ATTRIBUTE   set a document attribute in the form of name, name!,"
@@ -246,7 +255,9 @@ function convert_file {
   fi
 
   # Convert the file to a DITA map:
-  if [[ "$content_type" =~ ^(assembly|map)$ ]]; then
+  if [[ "$content_type" == 'map' ]]; then
+    convert_to_map "$file_name" "$content_type"
+  elif [[ "$content_type" == 'assembly' ]] && [[ "$OPT_AMAPS" -eq 1 ]]; then
     convert_to_map "$file_name" "$content_type"
   fi
 
@@ -379,7 +390,7 @@ export -f log banner
 export -f convert_file convert_to_map convert_to_topic
 
 # Process command-line options:
-while getopts ':ha:p:CrwW' OPTION; do
+while getopts ':ha:p:ACrwW' OPTION; do
   case "$OPTION" in
     a)
       # Append the attribute definition to the list of common options:
@@ -406,6 +417,10 @@ while getopts ':ha:p:CrwW' OPTION; do
 
       # Enable busy waiting as the monitoring method:
       OPT_BUSY=1
+      ;;
+    A)
+      # Disable conversion of assemblies to maps:
+      OPT_AMAPS=0
       ;;
     C)
       # Disable colors in log messages:
