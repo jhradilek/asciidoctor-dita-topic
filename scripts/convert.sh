@@ -80,7 +80,7 @@ function print_usage {
   echo "                 changes; this option uses busy waiting and is suitable"
   echo "                 for systems that do not support the inotify API"
   echo "  -r             search for relevant files recursively if a DIRECTORY"
-  echo "                 is specified"
+  echo "                 is specified, or convert all files included in the FILE"
   echo "  -A             do not convert assemblies to DITA maps"
   echo "  -C             do not add colors to log messages"
   echo
@@ -268,7 +268,7 @@ function convert_file {
 }
 
 # Discover AsciiDoc files in the supplied directory and convert them to the
-# corresponding DITA topic or a map.
+# corresponding DITA topics or maps.
 #
 # Usage: convert_directory DIRECTORY_NAME
 function convert_directory {
@@ -474,13 +474,20 @@ if [[ -f "$target" ]]; then
   # Verify that the file has the a valid AsciiDoc file extension:
   [[ "$target" =~ .*\.a(doc|sciidoc|sc|d)$ ]] || exit_with_error "$target: Not an AsciiDoc file" 22
 
+  # Report when mutually exclusive options are specified:
+  [[ "$OPT_RECURSIVE" -eq 1 ]] && [[ "$OPT_WATCH" -eq 1 ]] && exit_with_error "Options -r and -w/-W are mutually exclusive when a file is supplied" 22
+
   # Determine which mode to run in:
-  if [[ "$OPT_WATCH" -eq 0 ]]; then
-    # Convert the file one time:
-    convert_file "$target" || exit 1
-  else
+  if [[ "$OPT_WATCH" -eq 1 ]]; then
     # Watch the file for updates and continuously convert it:
     watch_file "$target"
+  elif [[ "$OPT_RECURSIVE" -eq 1 ]]; then
+    # Convert the supplied file and all files included in it:
+    convert_file "$target"
+    list-content "$target" | sort -u | xargs -I %% bash -c 'convert_file %%'
+  else
+    # Convert the file one time:
+    convert_file "$target" || exit 1
   fi
 else
   # Determine which mode to run in:
