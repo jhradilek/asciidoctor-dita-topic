@@ -272,7 +272,7 @@ Unlike AsciiDoc, DITA provides a number of semantic elements for software compon
 
 | option
 | `<option>`
-| An command-line option.
+| A command-line option.
 
 | variable
 | `<varname>`
