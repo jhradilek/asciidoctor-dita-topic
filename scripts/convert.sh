@@ -32,7 +32,7 @@ declare -a OPT_ARGS=()
 declare -i OPT_RECURSIVE=0
 declare -i OPT_WATCH=0
 declare -i OPT_BUSY=0
-declare -i OPT_AMAPS=1
+declare -i OPT_ASSEMBLY=1
 declare -i OPT_INTERVAL=2
 
 # Export the default options:
@@ -40,7 +40,7 @@ export OPT_ARGS
 export OPT_RECURSIVE
 export OPT_WATCH
 export OPT_BUSY
-export OPT_AMAPS
+export OPT_ASSEMBLY
 export OPT_INTERVAL
 
 # Set default colors:
@@ -143,6 +143,7 @@ function banner {
 function convert_to_map {
   local -r file_name="$1"
   local -r content_type="$2"
+  local opts=''
 
   # Restore the array variable declaration in a subshell:
   eval "$PACK_ARGS"
@@ -153,11 +154,16 @@ function convert_to_map {
   # Create a temporary to capture error log:
   local -r error_log=$(mktemp --tmpdir "$NAME".XXXXXXXXXX)
 
+  # Determine whether to treat assemblies as maps:
+  if [[ "$OPT_ASSEMBLY" -eq 0 ]]; then
+    opts='-A'
+  fi
+
   # Convert the file to a DITA map:
   if [[ "$content_type" == 'assembly' ]]; then
-    dita-map "${OPT_ARGS[@]}" -i "$file_name" -o "$output_file" 2> "$error_log"
+    dita-map "${OPT_ARGS[@]}" $opts -i "$file_name" -o "$output_file" 2> "$error_log"
   else
-    dita-map "${OPT_ARGS[@]}" -z "$file_name" -o "$output_file" 2> "$error_log"
+    dita-map "${OPT_ARGS[@]}" $opts -z "$file_name" -o "$output_file" 2> "$error_log"
   fi
 
   # Capture the exit status:
@@ -257,7 +263,7 @@ function convert_file {
   # Convert the file to a DITA map:
   if [[ "$content_type" == 'map' ]]; then
     convert_to_map "$file_name" "$content_type"
-  elif [[ "$content_type" == 'assembly' ]] && [[ "$OPT_AMAPS" -eq 1 ]]; then
+  elif [[ "$content_type" == 'assembly' ]] && [[ "$OPT_ASSEMBLY" -eq 1 ]]; then
     convert_to_map "$file_name" "$content_type"
   fi
 
@@ -420,7 +426,7 @@ while getopts ':ha:p:ACrwW' OPTION; do
       ;;
     A)
       # Disable conversion of assemblies to maps:
-      OPT_AMAPS=0
+      OPT_ASSEMBLY=0
       ;;
     C)
       # Disable colors in log messages:
