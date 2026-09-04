@@ -490,7 +490,7 @@ if [[ -f "$target" ]]; then
   elif [[ "$OPT_RECURSIVE" -eq 1 ]]; then
     # Convert the supplied file and all files included in it:
     convert_file "$target"
-    list-content "$target" | sort -u | xargs -I %% bash -c 'convert_file %%'
+    list-content "$target" 2>/dev/null | sort -u | xargs -I %% bash -c 'convert_file %%'
   else
     # Convert the file one time:
     convert_file "$target" || exit 1
