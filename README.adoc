@@ -29,7 +29,7 @@ $ *dita-convert -g _source_file.dita_ -o _output_file.dita_*
 +
 [literal,subs="+quotes"]
 ....
-$ *dita-cleanup -iI -D ../images -X . _output_file.dita_*
+$ *dita-cleanup -i -D ../images -X . _output_file.dita_*
 ....
 
 [#install]
