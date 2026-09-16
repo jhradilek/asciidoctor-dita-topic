@@ -254,7 +254,9 @@ function convert_file {
 
   # Report an unsupported content type:
   if [[ ! "$content_type" =~ ^(assembly|concept|reference|task|map)$ ]]; then
-    log fatal "Unsupported content type" type "$content_type" input "$file_name"
+    if [[ ! "$content_type" =~ ^(snippet|attributes)$ ]] || [[ "$OPT_RECURSIVE" -eq 0 ]]; then
+      log fatal "Unsupported content type" type "$content_type" input "$file_name"
+    fi
     return
   fi
 
