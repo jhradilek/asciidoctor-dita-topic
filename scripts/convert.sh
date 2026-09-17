@@ -171,7 +171,7 @@ function convert_to_map {
 
   # Print the unfiltered error log in debug mode:
   if [[ "$OPT_DEBUG" -eq 1 ]]; then
-    cat "$error_log"
+    cat "$error_log" >&2
   fi
 
   # Filter and report any warnings:
@@ -228,7 +228,7 @@ function convert_to_topic {
 
   # Print the unfiltered error log in debug mode:
   if [[ "$OPT_DEBUG" -eq 1 ]]; then
-    cat "$error_log"
+    cat "$error_log" >&2
   fi
 
   # Filter and report any warnings:
