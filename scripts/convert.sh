@@ -421,6 +421,11 @@ while getopts ':ha:p:ACdrwW' OPTION; do
       OPT_DEBUG=1
       ;;
     p)
+      # Verify that the supplied file exists:
+      [[ -e "$OPTARG" ]] || exit_with_error "$OPTARG: No such file or directory" 2
+      [[ -r "$OPTARG" ]] || exit_with_error "$OPTARG: Permission denied" 13
+      [[ -f "$OPTARG" ]] || exit_with_error "$OPTARG: Not a file" 22
+
       # Append the prepended file to the list of common options:
       OPT_ARGS+=('-p' "$OPTARG")
       ;;
