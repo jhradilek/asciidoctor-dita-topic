@@ -70,7 +70,7 @@ function exit_with_error {
 #
 # Usage: print_usage
 function print_usage {
-  echo "Usage: $NAME [-rAC] [-w|-W] [-a ATTRIBUTE] [-p FILE] FILE|DIRECTORY"
+  echo "Usage: $NAME [-drAC] [-w|-W] [-a ATTRIBUTE] [-p FILE] FILE|DIRECTORY"
   echo
   echo "  Convert an AsciiDoc FILE or all AsciiDoc files in the supplied DIRECTORY"
   echo "  to a DITA concept, task, reference, or map."
@@ -91,6 +91,8 @@ function print_usage {
   echo "  -p FILE        prepend a file to the input file, typically to bring"
   echo "                 in attribute definitions; can be supplied multiple"
   echo "                 times"
+  echo
+  echo "  -d             print unfiltered error log to standard error output"
 }
 
 # Print a formatted message to standard error output.
