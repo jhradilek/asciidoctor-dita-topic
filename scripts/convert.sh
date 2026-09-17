@@ -34,6 +34,7 @@ declare -i OPT_WATCH=0
 declare -i OPT_BUSY=0
 declare -i OPT_ASSEMBLY=1
 declare -i OPT_INTERVAL=2
+declare -i OPT_DEBUG=0
 
 # Export the default options:
 export OPT_ARGS
@@ -42,6 +43,7 @@ export OPT_WATCH
 export OPT_BUSY
 export OPT_ASSEMBLY
 export OPT_INTERVAL
+export OPT_DEBUG
 
 # Set default colors:
 export CLR_BOLD=$(tput bold)
@@ -167,6 +169,11 @@ function convert_to_map {
   # Capture the exit status:
   local -r exit_code="$?"
 
+  # Print the unfiltered error log in debug mode:
+  if [[ "$OPT_DEBUG" -eq 1 ]]; then
+    cat "$error_log"
+  fi
+
   # Filter and report any warnings:
   sed -ne 's/^dita-map: warning: //ip' "$error_log" | while read line; do
     log warn "$line" output "$output_file" input "$file_name"
@@ -218,6 +225,11 @@ function convert_to_topic {
 
   # Capture the exit status:
   local exit_code="$?"
+
+  # Print the unfiltered error log in debug mode:
+  if [[ "$OPT_DEBUG" -eq 1 ]]; then
+    cat "$error_log"
+  fi
 
   # Filter and report any warnings:
   sed -ne 's/^\(dita-convert: WARNING\|dita-convert: [^:]*: WARNING\|[^:]*: WARNING: dita-topic\): //ip' "$error_log" | while read line; do
@@ -396,11 +408,15 @@ export -f log banner
 export -f convert_file convert_to_map convert_to_topic
 
 # Process command-line options:
-while getopts ':ha:p:ACrwW' OPTION; do
+while getopts ':ha:p:ACdrwW' OPTION; do
   case "$OPTION" in
     a)
       # Append the attribute definition to the list of common options:
       OPT_ARGS+=('-a' "$OPTARG")
+      ;;
+    d)
+      # Enable debugging mode:
+      OPT_DEBUG=1
       ;;
     p)
       # Append the prepended file to the list of common options:
