@@ -36,7 +36,7 @@ module AsciidoctorDitaTopic
         :output => false,
         :standalone => true,
         :modules => true,
-        :no_includes => 0
+        :no_includes => false
       }
       @prep = []
       @name = name
@@ -69,8 +69,8 @@ module AsciidoctorDitaTopic
           @prep.append file
         end
 
-        opt.on('-I', '--no-includes', 'disable processing of include directives; specify this option twice to also apply on prepended files') do
-          @opts[:no_includes] += 1
+        opt.on('-I', '--no-includes', 'disable processing of include directives') do
+          @opts[:no_includes] = true
         end
 
         opt.on('-A', '--no-modules', 'disable processing of include directives with assemblies and modules') do
@@ -163,8 +163,8 @@ module AsciidoctorDitaTopic
         end
 
         prepended.gsub!(/^:_(?:mod-docs-content|content|module)-type:[ \t]+\S/, '//\&')
-        prepended.gsub!(Asciidoctor::IncludeDirectiveRx, '//\&') if @opts[:no_includes] > 1
-        input.gsub!(Asciidoctor::IncludeDirectiveRx, '//\&') if @opts[:no_includes] > 0
+        prepended.gsub!(Asciidoctor::IncludeDirectiveRx, '')
+        input.gsub!(Asciidoctor::IncludeDirectiveRx, '') if @opts[:no_includes]
 
         result = convert_topic prepended + input, base_dir
 
