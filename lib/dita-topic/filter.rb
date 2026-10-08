@@ -31,7 +31,13 @@ class FilterIncludeDirectives < Asciidoctor::Extensions::IncludeProcessor
   end
 
   def process doc, reader, target, attributes
-    file_path   = Pathname.new(doc.base_dir) + target
+    base_dir = Pathname.new(doc.base_dir)
+
+    if reader.cursor.file
+      file_path = base_dir + Pathname.new(reader.cursor.file).dirname + target
+    else
+      file_path = base_dir + target
+    end
 
     begin
       logger = Asciidoctor::LoggerManager.logger
@@ -55,6 +61,6 @@ class FilterIncludeDirectives < Asciidoctor::Extensions::IncludeProcessor
     type = attributes['_content-type'] ? attributes['_content-type'].downcase : nil unless type
     type = attributes['_module-type'] ? attributes['_module-type'].downcase : nil unless type
 
-    ['attributes', 'snippet'].include? type
+    ['snippet'].include? type
   end
 end
