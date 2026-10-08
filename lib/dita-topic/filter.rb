@@ -61,6 +61,6 @@ class FilterIncludeDirectives < Asciidoctor::Extensions::IncludeProcessor
     type = attributes['_content-type'] ? attributes['_content-type'].downcase : nil unless type
     type = attributes['_module-type'] ? attributes['_module-type'].downcase : nil unless type
 
-    ['attributes', 'snippet'].include? type
+    ['snippet'].include? type
   end
 end

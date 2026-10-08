@@ -73,7 +73,7 @@ module AsciidoctorDitaTopic
           @opts[:no_includes] = true
         end
 
-        opt.on('-A', '--no-modules', 'disable processing of include directives with assemblies and modules') do
+        opt.on('-A', '--no-modules', 'disable processing of include directives with assemblies, modules, and attributes') do
           @opts[:modules] = false
         end
 
