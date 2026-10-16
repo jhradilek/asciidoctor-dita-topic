@@ -29,7 +29,7 @@ class ListingTest < Minitest::Test
     ----
     EOF
 
-    assert_xpath_equal xml, 'A listing block title', '//p[@outputclass="title"]/b/text()'
+    assert_xpath_equal xml, 'A listing block title', '//p/b/text()'
     assert_xpath_equal xml, 'A listing block', '//codeblock/text()'
   end
 
@@ -62,7 +62,7 @@ class ListingTest < Minitest::Test
     ----
     EOF
 
-    assert_xpath_equal xml, 'A source block title', '//p[@outputclass="title"]/b/text()'
+    assert_xpath_equal xml, 'A source block title', '//p/b/text()'
     assert_xpath_equal xml, 'A source block', '//codeblock/text()'
   end
 
@@ -85,18 +85,28 @@ class ListingTest < Minitest::Test
     EOF
 
     assert_xpath_equal xml, 'linux', '//codeblock/@platform'
-    assert_xpath_equal xml, 'linux', '//p[@outputclass="title"]/@platform'
+    assert_xpath_equal xml, 'linux', '//p/@platform'
   end
 
   def test_source_block_id
+    xml = <<~EOF.chomp.to_dita
+    [source,id="source-id"]
+    A source code block
+    EOF
+
+    assert_xpath_equal xml, 'source-id', '//codeblock/@id'
+    assert_xpath_count xml, 0, '//p/@id'
+  end
+
+  def test_source_block_title_id
     xml = <<~EOF.chomp.to_dita
     [source,id="source-id"]
     .A listing block title
     A source code block
     EOF
 
-    assert_xpath_equal xml, 'source-id', '//codeblock/@id'
-    assert_xpath_count xml, 0, '//p[@outputclass="title"]/@id'
+    assert_xpath_equal xml, 'source-id', '//p/@id'
+    assert_xpath_count xml, 0, '//codeblock/@id'
   end
 
   def test_source_block_no_id
@@ -106,5 +116,16 @@ class ListingTest < Minitest::Test
     EOF
 
     assert_xpath_count xml, 0, '//codeblock/@id'
+  end
+
+  def test_source_block_no_title_id
+    xml = <<~EOF.chomp.to_dita
+    [source]
+    .A listing block title
+    A source code block
+    EOF
+
+    assert_xpath_count xml, 0, '//codeblock/@id'
+    assert_xpath_count xml, 0, '//p/@id'
   end
 end
