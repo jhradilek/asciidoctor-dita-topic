@@ -38,7 +38,7 @@ class LiteralTest < Minitest::Test
     ....
     EOF
 
-    assert_xpath_equal xml, 'A literal block title', '//p[@outputclass="title"]/b/text()'
+    assert_xpath_equal xml, 'A literal block title', '//p/b/text()'
     assert_xpath_equal xml, 'A literal block', '//pre/text()'
   end
 
@@ -50,18 +50,28 @@ class LiteralTest < Minitest::Test
     EOF
 
     assert_xpath_equal xml, 'linux', '//pre/@platform'
-    assert_xpath_equal xml, 'linux', '//p[@outputclass="title"]/@platform'
+    assert_xpath_equal xml, 'linux', '//p/@platform'
   end
 
   def test_literal_block_id
+    xml = <<~EOF.chomp.to_dita
+    [literal,id="literal-id"]
+    A literal block
+    EOF
+
+    assert_xpath_equal xml, 'literal-id', '//pre/@id'
+    assert_xpath_count xml, 0, '//p/@id'
+  end
+
+  def test_literal_block_title_id
     xml = <<~EOF.chomp.to_dita
     [literal,id="literal-id"]
     .A literal block title
     A literal block
     EOF
 
-    assert_xpath_equal xml, 'literal-id', '//pre/@id'
-    assert_xpath_count xml, 0, '//p[@outputclass="title"]/@id'
+    assert_xpath_equal xml, 'literal-id', '//p/@id'
+    assert_xpath_count xml, 0, '//pre/@id'
   end
 
   def test_literal_block_no_id
@@ -71,5 +81,16 @@ class LiteralTest < Minitest::Test
     EOF
 
     assert_xpath_count xml, 0, '//pre/@id'
+  end
+
+  def test_literal_block_no_title_id
+    xml = <<~EOF.chomp.to_dita
+    [literal]
+    .A literal block title
+    A literal block
+    EOF
+
+    assert_xpath_count xml, 0, '//pre/@id'
+    assert_xpath_count xml, 0, '//p/@id'
   end
 end
