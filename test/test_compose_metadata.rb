@@ -31,4 +31,22 @@ class ComposeMetadataTest < Minitest::Test
     result = dt.compose_metadata 'title floating'
     assert_equal '', result
   end
+
+  def test_metadata_multiple
+    dt     = Asciidoctor::DitaTopic.new nil
+    result = dt.compose_metadata 'pl:linux+mac pl:windows'
+    assert_equal ' platform="linux mac windows"', result
+  end
+
+  def test_metadata_group
+    dt     = Asciidoctor::DitaTopic.new nil
+    result = dt.compose_metadata 'au:job(developer)'
+    assert_equal ' audience="job(developer)"', result
+  end
+
+  def test_metadata_group_multiple
+    dt     = Asciidoctor::DitaTopic.new nil
+    result = dt.compose_metadata 'au:job(developer+qa)'
+    assert_equal ' audience="job(developer qa)"', result
+  end
 end
