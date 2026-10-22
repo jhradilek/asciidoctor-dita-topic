@@ -1095,6 +1095,9 @@ class DitaTopic < Asciidoctor::Converter::Base
       # Ignore unsupported attribute names:
       next unless valid.value? attribute
 
+      # Separate multiple attribute values:
+      value.gsub!(/\+/, ' ')
+
       # Append the value to the attribute:
       if result.key? attribute
         result[attribute] << %( #{value})
