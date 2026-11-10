@@ -142,7 +142,7 @@ function convert_to_topic {
   fi
 
   # Filter and report any warnings:
-  sed -ne 's/^[^:]*: WARNING: dita-topic: //ip' "$error_log" | while read line; do
+  sed -ne 's/^[^:]*: WARNING: \(dita-topic\|<stdin>\): //ip' "$error_log" | while read line; do
     # Filter out warnings related to nesting sections as they are expected:
     [[ "$line" =~ "Nesting of sections not supported in DITA" ]] && continue
 
@@ -151,7 +151,7 @@ function convert_to_topic {
   done
 
   # Filter and report any errors:
-  sed -ne 's/^[^:]*: ERROR: dita-topic: //ip' "$error_log" | while read line; do
+  sed -ne 's/^[^:]*: ERROR: \(dita-topic\|<stdin>\): //ip' "$error_log" | while read line; do
     log error "$line" output "$output_file" input "$input_file"
   done
 
