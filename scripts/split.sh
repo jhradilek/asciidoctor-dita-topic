@@ -61,14 +61,14 @@ function exit_with_error {
 #
 # Usage: print_usage
 function print_usage {
-  echo "Usage: $NAME [-adC] [-a ATTRIBUTE] [-p FILE] [-o DIRECTORY] FILE"
+  echo "Usage: $NAME [-dC] [-a ATTRIBUTE] [-p FILE] [-o DIRECTORY] FILE"
   echo
   echo "  Convert an AsciiDoc FILE to a generic DITA topic. If an output DIRECTORY is"
   echo "  supplied, split individual sections into separate DITA concepts, tasks, and"
   echo "  references and generate a corresponding DITA map."
   echo
   echo "  -o DIRECTORY   store the DITA concepts, tasks, references, and the"
-  echo "                 corresponding map in the selected DIRECTORY."
+  echo "                 corresponding map in the selected DIRECTORY"
   echo "  -C             do not add colors to log messages"
   echo
   echo "  -a ATTRIBUTE   set a document attribute in the form of name, name!,"
@@ -145,6 +145,7 @@ function convert_to_topic {
   sed -ne 's/^[^:]*: WARNING: \(dita-topic\|<stdin>\): //ip' "$error_log" | while read line; do
     # Filter out warnings related to nesting sections as they are expected:
     [[ "$line" =~ "Nesting of sections not supported in DITA" ]] && continue
+    [[ "$line" =~ "Examples not supported within section in DITA" ]] && continue
 
     # Report the warning:
     log warn "$line" output "$output_file" input "$input_file"
