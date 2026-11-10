@@ -500,7 +500,7 @@ export PACK_ARGS=$(declare -p OPT_ARGS)
 
 # Check if the target is a file or a directory:
 if [[ -f "$target" ]]; then
-  # Verify that the file has the a valid AsciiDoc file extension:
+  # Verify that the file has a valid AsciiDoc file extension:
   [[ "$target" =~ .*\.a(doc|sciidoc|sc|d)$ ]] || exit_with_error "$target: Not an AsciiDoc file" 22
 
   # Report when mutually exclusive options are specified:
