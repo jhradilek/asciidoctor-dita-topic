@@ -178,6 +178,32 @@ If you prefer to use Asciidoctor directly, set the value of the `dita-topic-call
 $ **asciidoctor -r dita-topic -b dita-topic -a dita-topic-callouts=off _your_file_.adoc**
 ....
 
+[#sidebars]
+=== Disabling sidebars
+
+Unlike AsciiDoc, DITA does not support sidebars as a method to visually separate information from the main text. To avoid losing content during conversion, as a workaround, the `dita-topic` converter uses the following markup by default:
+
+[source,xml]
+----
+<div outputclass="sidebar">
+  Sidebar text.
+</div>
+----
+
+To disable this behavior, run the `dita-topic` command with the `-S` option:
+
+[literal,subs="+quotes"]
+....
+$ **dita-topic -S _your_file_.adoc**
+....
+
+If you prefer to use Asciidoctor directly, set the value of the `dita-topic-sidebars` attribute to `off`:
+
+[literal,subs="+quotes"]
+....
+$ **asciidoctor -r dita-topic -b dita-topic -a dita-topic-sidebars=off _your_file_.adoc**
+....
+
 [#includes]
 === Disabling all include directives
 
