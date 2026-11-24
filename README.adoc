@@ -357,6 +357,8 @@ Block titles not supported in DITA:: AsciiDoc allows you to include `._Block tit
 
 Callouts not supported in DITA:: AsciiDoc allows you to use `<1>`, `<2>`, `<3>` and so on in verbatim blocks to add annotations to the specific lines. Unlike AsciiDoc, DITA does not provide a direct equivalent for this functionality. `dita-topic` issues this warning when the `-a dita-topic-callouts=off` option is specified and these annotations are present in the converted AsciiDoc file.
 
+Callout number not in range between 1 and 50:: The `dita-topic` converter uses Unicode characters to represent callouts. Because the Unicode characters for circled numbers are only available for numbers between 1 and 50, `dita-topic` issues this warning when a callout number is outside of this range.
+
 Examples not supported within _object_ in DITA:: AsciiDoc allows you to use an example block anywhere in the document. Unlike AsciiDoc, DITA only allows examples to appear directly in the topic body. `dita-topic` issues a warning whenever an example is nested in another AsciiDoc element.
 
 Floating titles not supported in DITA:: AsciiDoc allows you to use floating titles anywhere in the document. Unlike AsciiDoc, DITA does not support floating titles. `dita-topic` issues this warning when the `-a dita-topic-titles=off` option is specified and a floating title is present in the converted AsciiDoc file.
