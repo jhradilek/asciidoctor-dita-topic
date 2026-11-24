@@ -86,7 +86,7 @@ $ **xmlstarlet val -e -s _path_to_dita-ot_directory_/plugins/org.oasis-open.dita
 [#attributes]
 === Supplying individual attribute definitions
 
-If your AsciiDoc files use attributes that are defined outside of these files, you can supply the attribute definitions on the command line with the `-a _attribute_=_value_` option:
+If your AsciiDoc files use attributes that are defined outside of these files, you can supply the attribute definitions on the command line with the `-a _attribute_=_value_` (or `--attribute _attribute_=_value_`) option:
 
 [literal,subs="+quotes"]
 ....
@@ -105,7 +105,7 @@ You can provide multiple `-a` options at the same time. Providing relevant attri
 [#attribute_files]
 === Supplying attribute definition files
 
-If listing individual attribute definitions is impractical, you can use the `-p _definition_file_.adoc` option to supply another AsciiDoc file with attribute definitions in it:
+If listing individual attribute definitions is impractical, you can use the `-p _definition_file_.adoc` (or `--prepend-file _definition_file_.adoc`) option to supply another AsciiDoc file with attribute definitions in it:
 
 [literal,subs="+quotes"]
 ....
@@ -121,7 +121,7 @@ This functionality is not available in standard Asciidoctor.
 
 AsciiDoc topics are expected to be included in other files and therefore should not contain link:https://docs.asciidoctor.org/asciidoc/latest/document/author-line/[author line] definitions. In most cases, lines that directly follow the topic title are intended as first paragraphs. For this reason, author lines are disabled by default. To avoid losing content during conversion, as a workaround, the `dita-topic` converter interprets the raw content of the author line as a paragraph and issues a warning.
 
-To enable processing of author lines as metadata, run the `dita-topic` command with the `-l` option:
+To enable processing of author lines as metadata, run the `dita-topic` command with the `-l` (or `--author-line`) option:
 
 [literal,subs="+quotes"]
 ....
@@ -145,7 +145,7 @@ Unlike AsciiDoc, DITA does not support floating titles and only allows titles to
 <p outputclass="title"><b>Floating title</b></p>
 ----
 
-To disable this behavior, run the `dita-topic` command with the `-T` option:
+To disable this behavior, run the `dita-topic` command with the `-T` (or `--no-titles`) option:
 
 [literal,subs="+quotes"]
 ....
@@ -164,7 +164,7 @@ $ **asciidoctor -r dita-topic -b dita-topic -a dita-topic-titles=off _your_file_
 
 Unlike AsciiDoc, DITA does not support callouts as a method to add annotations to specific lines in verbatim blocks. To avoid losing content during conversion, as a workaround, the `dita-topic` converter uses Unicode characters for circled numbers.
 
-To disable this behavior, run the `dita-topic` command with the `-C` option:
+To disable this behavior, run the `dita-topic` command with the `-C` (or `--no-callouts`) option:
 
 [literal,subs="+quotes"]
 ....
@@ -190,7 +190,7 @@ Unlike AsciiDoc, DITA does not support sidebars as a method to visually separate
 </div>
 ----
 
-To disable this behavior, run the `dita-topic` command with the `-S` option:
+To disable this behavior, run the `dita-topic` command with the `-S` (or `--no-sidebars`) option:
 
 [literal,subs="+quotes"]
 ....
@@ -207,7 +207,7 @@ $ **asciidoctor -r dita-topic -b dita-topic -a dita-topic-sidebars=off _your_fil
 [#includes]
 === Disabling all include directives
 
-By default, Asciidoctor resolves all `include` directives before converting the file. To only convert the contents of the selected file, run the `dita-topic` command with the `-I` option:
+By default, Asciidoctor resolves all `include` directives before converting the file. To only convert the contents of the selected file, run the `dita-topic` command with the `-I` (or `--no-includes`) option:
 
 [literal,subs="+quotes"]
 ....
@@ -226,7 +226,7 @@ This disables processing of the include directives, but leaves cross references 
 [#include_filter]
 === Disabling inclusion of assemblies and modules
 
-By default, Asciidoctor resolves all `include` directives before converting the file. To only include content from files explicitly marked as attributes or snippets, run the `dita-topic` command with the `-A` option:
+By default, Asciidoctor resolves all `include` directives before converting the file. To only include content from files explicitly marked as attributes or snippets, run the `dita-topic` command with the `-A` (or `--no-modules`) option:
 
 [literal,subs="+quotes"]
 ....
@@ -308,7 +308,7 @@ Read the [filename]`/etc/passwd` file to see the complete list of
 available user accounts.
 ----
 
-To disable this behavior, for example when the source files do not annotate semantic markup consistently, run the `dita-topic` command with the `-M` option:
+To disable this behavior, for example when the source files do not annotate semantic markup consistently, run the `dita-topic` command with the `-M` (or `--no-semantic-markup`) option:
 
 [literal,subs="+quotes"]
 ....
