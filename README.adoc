@@ -162,7 +162,7 @@ $ **asciidoctor -r dita-topic -b dita-topic -a dita-topic-titles=off _your_file_
 [#callouts]
 === Disabling callouts
 
-Unlike AsciiDoc, DITA does not support callouts as a method to add annotations to specific lines in verbatim blocks. To avoid losing content during conversion, as a workaround, the `dita-topic` converter uses XML entities for circled numbers.
+Unlike AsciiDoc, DITA does not support callouts as a method to add annotations to specific lines in verbatim blocks. To avoid losing content during conversion, as a workaround, the `dita-topic` converter uses Unicode characters for circled numbers.
 
 To disable this behavior, run the `dita-topic` command with the `-C` option:
 
