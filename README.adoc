@@ -226,28 +226,52 @@ This disables processing of the include directives, but leaves cross references 
 [#include_filter]
 === Disabling inclusion of assemblies and modules
 
-By default, Asciidoctor resolves all `include` directives before converting the file. To only include content from files explicitly marked as attributes or snippets, run the `dita-topic` command with the `-A` (or `--no-modules`) option:
+By default, Asciidoctor resolves all `include` directives before converting the file. To only include content from files that are explicitly xref:type[marked as attributes or snippets], run the `dita-topic` command with the `-A` (or `--no-modules`) option:
 
 [literal,subs="+quotes"]
 ....
 $ **dita-topic -A _your_file_.adoc**
 ....
 
-To mark a file as an attribute definition file, add the following line at the top of it:
+This functionality is not available in standard Asciidoctor.
+
+[#type]
+=== Adding content type definitions
+
+DITA differentiates between three main topic types: link:https://docs.oasis-open.org/dita/dita/v1.3/errata02/os/complete/part3-all-inclusive/langRef/technicalContent/concept.html[concepts], link:https://docs.oasis-open.org/dita/dita/v1.3/errata02/os/complete/part3-all-inclusive/langRef/technicalContent/task.html[tasks], and link:https://docs.oasis-open.org/dita/dita/v1.3/errata02/os/complete/part3-all-inclusive/langRef/technicalContent/reference.html[references]. To replicate this behavior, the `dita-topic` converter recognizes the following `:_mod-docs-content-type:` attribute definition values in AsciiDoc files:
+
+[cols="1,3"]
+|===
+| Attribute value
+| Description
+
+| ASSEMBLY
+| The AsciiDoc file is link:https://redhat-documentation.github.io/modular-docs/#forming-assemblies[a modular documentation assembly] intended to convert to a DITA concept. This implies that the assembly file follows the modular documentation guidelines and in addition to include directives, it contains a title and an introduction.
+
+| ATTRIBUTES
+| The AsciiDoc file is an attribute definition file and is not intended to be converted to DITA on its own. This implies that the file is only used to provide attribute definitions and does not contain any printable content.
+
+| CONCEPT
+| The AsciiDoc file is link:https://redhat-documentation.github.io/modular-docs/#creating-concept-modules[a concept module] intended to convert to a DITA concept.
+
+| PROCEDURE
+| The AsciiDoc file is link:https://redhat-documentation.github.io/modular-docs/#con-creating-procedure-modules[a procedure module] intended to convert to a DITA task.
+
+| REFERENCE
+| The AsciiDoc file is link:https://redhat-documentation.github.io/modular-docs/#creating-reference-modules[a reference module] intended to convert to a DITA reference.
+
+| SNIPPET
+| The AsciiDoc file is link:https://redhat-documentation.github.io/modular-docs/#using-text-snippets[a modular documentation text snippet] and is not intended to be converted to DITA on its own.
+|===
+
+For example, to identify an AsciiDoc file as a concept, add the following line at the top of the file above the document title:
 
 [source,asciidoc]
 ----
-:_mod-docs-content-type: ATTRIBUTES
+:_mod-docs-content-type: CONCEPT
 ----
 
-To mark a file as a snippet file, add the following line at the top of it:
-
-[source,asciidoc]
-----
-:_mod-docs-content-type: SNIPPET
-----
-
-Any other files are ignored. This functionality is not available in standard Asciidoctor.
+The `dita-topic` converter uses this information to add an appropriate `outputclass="_content_type_"` attribute to the `<topic>` element. The link:https://github.com/jhradilek/dita-custom-xslt#installation[dita-convert Python package] then transforms such a topic to the specialized DITA concept, reference, or task.
 
 [#abstracts]
 === Adding short descriptions
