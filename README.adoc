@@ -378,13 +378,78 @@ DITA provides four metadata attributes that can be used for conditional processi
 | Additional properties.
 |===
 
-For example, to indicate that a particular paragraph is relevant for Linux and macOS and is intended for beginners, use the following AsciiDoc markup:
+Use the following syntax to assign the role to the correct element:
 
+* To *assign a role to a complete block* such as a paragraph or an entire list, use the standard attribute list syntax:
++
 [source,asciidoc]
 ----
-[role="pl:linux pl:mac au:beginner"]
-For more information, see the *bash*(1) manual page.
+[role="pl:linux+mac au:beginner"]
+A paragraph with multiple roles.
 ----
+
+* To *assign a role to a block element with an existing attribute list* such as an admonition, a source code block, an example block, or a table, append the role assignment to it:
++
+[source,asciidoc]
+----
+[NOTE,role="au:beginner"]
+====
+An admonition intended for beginners.
+====
+----
+
+* To *assign a role to a formatted inline element*, use the standard boxed attribute list in front of link:https://docs.asciidoctor.org/asciidoc/latest/text/[valid inline markup]:
++
+[source,asciidoc]
+----
+A paragraph with text intended for [.pl:linux]#Linux.# [.pl:windows+macos]#other platforms.#
+----
+
+* To *assign a role to an inline element with an existing attribute list* such as a link, a cross reference, or an image, append the role assignment to it:
++
+[source,asciidoc]
+----
+image:example-image.png[An image intended for beginners,role="au:beginner"]
+
+link:https://example.com/[An external link intended for Linux,role="pl:linux"]
+
+xref:other-platforms[A cross reference intended for other platforms,role="pl:windows+macos"]
+----
+
+* To *assign a role to an individual list item* such as a procedure step or a prerequisite, assign it to the `\{empty}` character reference attribute at the beginning of the list item:
++
+[source,asciidoc]
+----
+. [.pl:linux]#{empty}# A step intended for Linux.
+----
++
+AsciiDoc does not provide native syntax for assigning roles to list items.
+
+* To *assign a role to an individual description list term and explanation pair*, assign it to the `\{empty}` character reference attribute at the beginning of the description term:
++
+[source,asciidoc]
+----
+[.pl:linux]#{empty}# A term intended for Linux::
+A description intended for Linux.
+----
++
+AsciiDoc does not provide native syntax for assigning roles to description list items.
+
+* To *assign a role to an individual table row*, assign it to the `\{empty}` character reference attribute at the beginning of the first column:
++
+[source,asciidoc]
+----
+[cols="1,1"]
+|===
+|First column
+|Second column
+
+| [.au:beginner]#{empty}# A table row intended for beginners
+| Another cell in the same row
+|===
+----
++
+AsciiDoc does not provide native syntax for assigning roles to table rows.
 
 [#warnings]
 == Warnings
