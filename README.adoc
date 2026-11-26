@@ -35,6 +35,9 @@ $ *dita-cleanup -i -D ../images -X . _output_file.dita_*
 [#install]
 == Installation
 
+[#gem]
+=== Installing as a Ruby gem
+
 Install the `asciidoctor-dita-topic` Ruby gem:
 
 [literal,subs="+quotes"]
@@ -42,29 +45,53 @@ Install the `asciidoctor-dita-topic` Ruby gem:
 $ *gem install asciidoctor-dita-topic*
 ....
 
+[#container]
+=== Installing as a container
+
+Pull the `asciidoc-to-dita` container with Podman:
+
+[literal,subs="+quotes"]
+....
+$ *podman pull quay.io/jhradilek/asciidoc-to-dita*
+....
+
+If you prefer to use Docker, replace `podman` with `docker`.
+
 [#use]
 == Usage
 
-To convert an AsciiDoc file to a generic DITA topic, run the supplied `dita-topic` command-line interface as follows:
+To convert an AsciiDoc file to a generic DITA topic by using the Ruby gem, run the `dita-topic` command-line interface as follows:
 
 [literal,subs="+quotes"]
 ....
 $ *dita-topic _your_file_.adoc*
 ....
 
-This creates a new file, `_your_file_.dita`, in the same directory as `_your_file_.adoc`. You can also convert multiple files at the same time:
+This creates a new file, `_your_file_.dita`, in the same directory as `_your_file_.adoc`. You can also supply multiple files or use wildcards to convert entire documentation sets.
 
-[literal,subs="+quotes"]
-....
-$ **dita-topic *.adoc**
-....
-
-The command-line interface simplifies the code execution and provides a few options in addition to the conversion. However, if you prefer to use Asciidoctor directly, load the converter with the `-r dita-topic` option and then select `dita-topic` as the backend output format with `-b dita-topic`:
+The command-line interface simplifies the code execution and provides a few options in addition to the conversion. If you prefer to use Asciidoctor directly, load the converter with the `-r dita-topic` option and then select `dita-topic` as the backend output format with `-b dita-topic`:
 
 [literal,subs="+quotes"]
 ....
 $ *asciidoctor -r dita-topic -b dita-topic _your_file_.adoc*
 ....
+
+To run the `dita-topic` command in a container, use the following command:
+
+[literal,subs="+quotes"]
+....
+$ *podman run --rm -it -v \`pwd`:/docs quay.io/jhradilek/asciidoc-to-dita:latest dita-topic _your_file_.adoc*
+....
+
+If you are on a system with SELinux enabled, add `:Z` to the mount options:
+
+[literal,subs="+quotes"]
+....
+$ *podman run --rm -it -v \`pwd`:/docs:Z quay.io/jhradilek/asciidoc-to-dita:latest dita-topic _your_file_.adoc*
+....
+
+Replace `podman` with `docker` if you prefer to use Docker.
+
 
 [#type]
 === Adding content type definitions
