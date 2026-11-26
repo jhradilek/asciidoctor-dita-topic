@@ -190,19 +190,7 @@ Read the [filename]`/etc/passwd` file to see the complete list of
 available user accounts.
 ----
 
-To disable this behavior, for example when the source files do not annotate semantic markup consistently, run the `dita-topic` command with the `-M` (or `--no-semantic-markup`) option:
-
-[literal,subs="+quotes"]
-....
-$ **dita-topic -M _your_file_.adoc**
-....
-
-If you prefer to use Asciidoctor directly, set the value of the `dita-topic-semantic` attribute to `off`:
-
-[literal,subs="+quotes"]
-....
-$ **asciidoctor -r dita-topic -b dita-topic -a dita-topic-semantic=off _your_file_.adoc**
-....
+If you do not want to use semantic markup during conversion, for example when the source files do not use annotations for it consistently, you can xref:markup[disable this functionality].
 
 [#metadata]
 === Adding metadata
@@ -464,6 +452,23 @@ If you prefer to use Asciidoctor directly, set the value of the `dita-topic-side
 [literal,subs="+quotes"]
 ....
 $ **asciidoctor -r dita-topic -b dita-topic -a dita-topic-sidebars=off _your_file_.adoc**
+....
+
+[#markup]
+=== Disabling semantic markup
+
+By default, the `dita-topic` converter xref:semantics[supports additional semantic markup] for elements like command names, file paths, command-line options, and variables. To disable this functionality, run the `dita-topic` command with the `-M` (or `--no-semantic-markup`) option:
+
+[literal,subs="+quotes"]
+....
+$ **dita-topic -M _your_file_.adoc**
+....
+
+If you prefer to use Asciidoctor directly, set the value of the `dita-topic-semantic` attribute to `off`:
+
+[literal,subs="+quotes"]
+....
+$ **asciidoctor -r dita-topic -b dita-topic -a dita-topic-semantic=off _your_file_.adoc**
 ....
 
 [#spaces]
