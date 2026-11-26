@@ -320,6 +320,37 @@ The supplied file is automatically prepended to each AsciiDoc file during conver
 
 This functionality is not available in standard Asciidoctor.
 
+[#includes]
+=== Disabling all include directives
+
+By default, Asciidoctor resolves all `include` directives before converting the file. To only convert the contents of the selected file, run the `dita-topic` command with the `-I` (or `--no-includes`) option:
+
+[literal,subs="+quotes"]
+....
+$ **dita-topic -I _your_file_.adoc**
+....
+
+If you prefer to use Asciidoctor directly, there is no direct equivalent to this functionality. As a workaround, you can specify the `-S secure` option:
+
+[literal,subs="+quotes"]
+....
+$ **asciidoctor -r dita-topic -b dita-topic -S secure _your_file_.adoc**
+....
+
+This disables processing of the include directives, but leaves cross references to the included files in the converted output.
+
+[#include_filter]
+=== Disabling inclusion of assemblies and modules
+
+By default, Asciidoctor resolves all `include` directives before converting the file. To only include content from files that are explicitly xref:type[marked as attributes or snippets], run the `dita-topic` command with the `-A` (or `--no-modules`) option:
+
+[literal,subs="+quotes"]
+....
+$ **dita-topic -A _your_file_.adoc**
+....
+
+This functionality is not available in standard Asciidoctor.
+
 [#authors]
 === Enabling author lines
 
@@ -457,38 +488,6 @@ If you prefer to use Asciidoctor directly, set the value of the `dita-topic-spac
 ....
 $ **asciidoctor -r dita-topic -b dita-topic -a dita-topic-spaces=off _your_file_.adoc**
 ....
-
-
-[#includes]
-=== Disabling all include directives
-
-By default, Asciidoctor resolves all `include` directives before converting the file. To only convert the contents of the selected file, run the `dita-topic` command with the `-I` (or `--no-includes`) option:
-
-[literal,subs="+quotes"]
-....
-$ **dita-topic -I _your_file_.adoc**
-....
-
-If you prefer to use Asciidoctor directly, there is no direct equivalent to this functionality. As a workaround, you can specify the `-S secure` option:
-
-[literal,subs="+quotes"]
-....
-$ **asciidoctor -r dita-topic -b dita-topic -S secure _your_file_.adoc**
-....
-
-This disables processing of the include directives, but leaves cross references to the included files in the converted output.
-
-[#include_filter]
-=== Disabling inclusion of assemblies and modules
-
-By default, Asciidoctor resolves all `include` directives before converting the file. To only include content from files that are explicitly xref:type[marked as attributes or snippets], run the `dita-topic` command with the `-A` (or `--no-modules`) option:
-
-[literal,subs="+quotes"]
-....
-$ **dita-topic -A _your_file_.adoc**
-....
-
-This functionality is not available in standard Asciidoctor.
 
 [#warnings]
 == Warnings
