@@ -73,7 +73,7 @@ DITA differentiates between three main topic types: link:https://docs.oasis-open
 
 [cols="1,3"]
 |===
-| Attribute value
+| Attribute Value
 | Description
 
 | ASSEMBLY
@@ -407,6 +407,57 @@ If you prefer to use Asciidoctor directly, set the value of the `dita-topic-side
 ....
 $ **asciidoctor -r dita-topic -b dita-topic -a dita-topic-sidebars=off _your_file_.adoc**
 ....
+
+[#spaces]
+=== Disabling non-breaking spaces in titles
+
+In certain situations, excessive use of non-breaking spaces can cause rendering problems, for example in a narrow navigation side bar. For convenience, the `dita-topic` converter can remove the following characters from titles at conversion time:
+
+[cols="1,1,1,1"]
+|===
+| AsciiDoc Attribute
+| HTML Character Entity Reference
+| Numeric Character Reference
+| Description
+
+| `\{nbsp}`
+| `\&nbsp;`
+| `\&#160;`
+| Non-breaking space
+
+| N/A
+| `\&thinsp;`, `\&ThinSpace;`
+| `\&#8201;`
+| Thin space
+
+| `\{zwsp}`
+| `\&ZeroWidthSpace;`
+| `\&#8203;`
+| Zero-width space
+
+| `\{wj}`
+| `\&NoBreak;`
+| `\&#8288;`
+| Word joiner
+|===
+
+Note that this list is not excessive and is based on white space characters with corresponding link:https://docs.asciidoctor.org/asciidoc/latest/attributes/character-replacement-ref/[character replacement attribute references] in AsciiDoc.
+
+
+To strip non-breaking spaces from titles, run the `dita-topic` command with the `-B` (or `--no-spaces`) option:
+
+[literal,subs="+quotes"]
+....
+$ **dita-topic -B _your_file_.adoc**
+....
+
+If you prefer to use Asciidoctor directly, set the value of the `dita-topic-spaces` attribute to `off`:
+
+[literal,subs="+quotes"]
+....
+$ **asciidoctor -r dita-topic -b dita-topic -a dita-topic-spaces=off _your_file_.adoc**
+....
+
 
 [#includes]
 === Disabling all include directives
